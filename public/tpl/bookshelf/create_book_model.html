@@ -1,0 +1,71 @@
+<div class="modal-header">
+    <h4 class="modal-title">Create a new Book</h4>
+</div>
+<div class="modal-body" cg-busy="{promise:imagePromise}">
+    <form name="create_book_form" novalidate="novalidate" class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-6">
+                <input type="text" ng-model="book.title" required name="title" maxlength="255"
+                       placeholder="Book Title" popover="Enter Book Title" popover-trigger="mouseenter"
+                       popover-placement="top" class="form-control"/></div>
+            <div class="col-md-6">
+                <input type="text" ng-model="book.author" required name="author" maxlength="255"
+                       placeholder="Book Author" popover="Enter Book Author" popover-trigger="mouseenter"
+                       popover-placement="top" class="form-control"/></div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-6">
+                <select ng-model="book.permission" ng-options="bookp for bookp in bookPermissions"
+                        popover="Select Permission" popover-trigger="mouseenter" popover-placement="top"
+                        class="form-control" required name="permission">
+                </select>
+            </div>
+            <div class="col-md-6">
+                <input type="text" ng-model="book.zoom" required name="zoom" maxlength="255"
+                       ng-pattern="/^-?[0-9]\d*(\.\d+)?$/" popover="Enter Zoom value" popover-trigger="mouseenter"
+                       popover-placement="top" placeholder="Zoom" class="form-control"/></div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-6">
+                <select ng-model="book.subType" ng-options="bookt for bookt in bookSubType"
+                        popover="Select Subtype" popover-trigger="mouseenter" popover-placement="top"
+                        class="form-control" required name="subType">
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select ng-disabled="book.subType == 'FREE'" ng-model="book.currency" popover="Select Currency Type"
+                        popover-trigger="mouseenter" popover-placement="top"
+                        ng-options="currencyt for currencyt in currencyType" class="form-control" required
+                        name="currency">
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input ng-disabled="book.subType == 'FREE'" type="text" ng-model="book.price" popover="Enter Price"
+                       popover-trigger="mouseenter" popover-placement="top" required name="price" maxlength="255"
+                       placeholder="Price" class="form-control"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-6">
+                <input type="text" ng-model="book.trailPeriod" ng-pattern="/^-?[0-9]\d*(\.\d+)?$/"
+                       name="trailPeriod" maxlength="255" placeholder="Trail Period" popover="Enter Trail Period"
+                       popover-trigger="mouseenter" popover-placement="top" class="form-control"/>
+            </div>
+            <div class="col-md-6">
+                <tags-input ng-model="book.tags" popover="Enter Tags" popover-trigger="mouseenter"
+                            popover-placement="top"></tags-input>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-6">
+                <browse upload-model="book.ImageBoxArray" my-promise="imagePromise"></browse>
+            </div>
+        </div>
+        <div>{{message}}</div>
+    </form>
+    <div class="modal-footer">
+        <input type="button" class="btn btn-primary glyphicon glyphicon-remove" value="Create"
+               ng-disabled="create_book_form.$invalid || !hascover " ng-click="createBook();">
+        <button class="btn btn-warning" ng-click="cancel();"><span class="glyphicon glyphicon-remove"></span>Cancel</button>
+    </div>
+</div>

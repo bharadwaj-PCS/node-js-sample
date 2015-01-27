@@ -1,0 +1,46 @@
+<div class="modal-header">
+    <h3 class="modal-title">Game1</h3>
+</div>
+<div class="modal-body row" cg-busy="{promise:imagePromise}">
+    <div class="form row">
+        <div class="form-group col-md-6">
+            <label class="col-md-3 control-label">Draggables</label>
+            <div class="col-md-7">
+                <select ng-options="image.ImageName for image in game1Page.ImageBoxArray" class="form-control"
+                        ng-model="dragSelected"> </select>
+            </div>
+            <div class="col-md-2">
+                <input type="button" class="btn btn-primary" value="Add" ng-click="addToDraggable()">
+            </div>
+        </div>
+        <div class="form-group col-md-6">
+            <label class="col-md-3 control-label">Droppables</label>
+            <div class="col-md-7">
+                <select ui-select2 ng-model="select2" data-placeholder="Pick a number">
+                    <option value=""></option>
+                    <option ng-options="image.ImageName for image in game1Page.ImageBoxArray" value="{{image.ImageName}}">{{number.text}}</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="button" class="btn btn-primary" value="Add" ng-click="addToDroppable()">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <label class="col-md-12 text-center">Droppables</label>
+        <ul>
+            <li data-ng-repeat="drop in "></li>
+        </ul>
+
+    </div>
+    <div class="col-md-6">
+        <label class="col-md-12 text-center">Dropables</label>
+
+    </div>
+
+</div>
+
+<div class="modal-footer">
+    <!--<input type="button" class="btn btn-primary" value="Add" ng-click="">-->
+    <button class="btn btn-warning" ng-click="cancel()"><span class="glyphicon glyphicon-remove"></span> Close</button>
+</div>

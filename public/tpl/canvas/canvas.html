@@ -1,0 +1,58 @@
+<div class="canvas" data-ng-controller="canvasCtrl" cg-busy="{promise:myPromise}">
+
+    <div class="canvasdiv" cg-busy="{promise:myPromise}">
+        <div data-ng-repeat="image in page.ImageBoxArray">
+            <div context-menu class="panel-default" data-target="menu-{{ $index }}">
+                <div resizable style="position: absolute;" class="innerElement"
+                     data-element-style="image.additionalInfo"
+                     ng-style="{width:image.additionalInfo.width, height:image.additionalInfo.height,left:image.additionalInfo.x ,top:image.additionalInfo.y,zIndex: image.additionalInfo.zIndex }">
+
+                    <img ng-src="{{image.Image}}" class="img-responsive">
+                </div>
+
+            </div>
+            <div class="dropdown position-fixed" style="z-index: 10000 !important;" id="menu-{{ $index }}">
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        <a class="pointer" role="menuitem" tabindex="1"
+                           ng-click="openModelToDeleteImage($index)">
+                            Delete
+                        </a>
+                    </li>
+                    <li>
+                        <a class="pointer" role="menuitem" tabindex="1"
+                           ng-click="bringBack(image)">
+                            Bring Back
+                        </a>
+                    </li>
+                    <li>
+                        <a class="pointer" role="menuitem" tabindex="1"
+                           ng-click="bringFront(image)">
+                            Bring Front
+                        </a>
+                    </li>
+                    <li>
+                        <a class="pointer" role="menuitem" tabindex="1"
+                           ng-click="openModelToUpdateImage(image)">
+                            Update
+                        </a>
+                    </li>
+                    <li>
+                        <a class="pointer" role="menuitem" tabindex="1"
+                           ng-click="openModelToTouchFX(image)">
+                            TouchFX
+                        </a>
+                    </li>
+                    <li>
+                        <a class="pointer" role="menuitem" tabindex="1"
+                           ng-click="pageFX(image)">
+                            PageFX
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+</div>

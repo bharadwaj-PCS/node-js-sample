@@ -1,0 +1,60 @@
+<div class="modal-header">
+    <h3 class="modal-title">Touch Sprite/Audio.</h3>
+</div>
+<div class="modal-body" cg-busy="{promise:imagePromise}">
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-6 col-md-offset-3">
+                <select class="form-control" ng-model="tap.touchOption"> Sprite
+                    <option>SpriteTouchFx</option>
+                    <option>AudioTouchFx</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="form-group">
+                <p></p>
+
+                <div class="col-md-4 col-md-offset-3">
+                    <browse upload-model="ImageBoxArray" my-promise="imagePromise"></browse>
+                    <img ng-src="{{imageData.touchfx.tap.sprite}}" ng-show="imageData.touchfx.tap.sprite" class="img-thumbnail img-upload-thimb">
+                    <audio ng-src="{{url}}" ng-show="url" controls="controls"></audio>
+                </div>
+            </div>
+            <div ng-if="tap.touchOption == 'SpriteTouchFx'">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Sprite Count</label>
+
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" ng-model="imageData.touchfx.tap.spritecount" placeholder="Sprite Count">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Loop</label>
+
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" data-ng-model="imageData.touchfx.tap.loop" placeholder="loop">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Sprite Width</label>
+
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" data-ng-model="imageData.touchfx.tap.width" placeholder="Width">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Sprite Height</label>
+
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" data-ng-model="imageData.touchfx.tap.height" placeholder="Height">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="add(ImageBoxArray)">add</button>
+    <button class="btn btn-default" ng-click="cancel()">cancel</button>
+</div>

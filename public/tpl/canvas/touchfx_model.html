@@ -1,0 +1,55 @@
+<div class="modal-header">
+    <h3 class="modal-title">Touch Sprite/Audio.</h3>
+</div>
+<div class="modal-body" cg-busy="{promise:imagePromise}">
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-8 col-md-offset-2">
+                <select class="form-control" ng-model="tap.touchOption"> Sprite
+                    <option value="SpriteTouchEffects" ng-selected="imageData.touchfx.tap.sprite">SpriteTouchEffects</option>
+                    <option value="AudioTouchEffects" ng-selected="url">AudioTouchEffects</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <p></p>
+
+            <div class="col-md-8 col-md-offset-2">
+                <span class="col-md-4" data-ng-if="tap.touchOption == 'SpriteTouchEffects'">Upload Image</span>
+                <span class="col-md-4" data-ng-if="tap.touchOption == 'AudioTouchEffects'">Upload Audio</span>
+                <span class="col-md-6" data-ng-show="tap.touchOption">
+                    <browse upload-model="ImageBoxArray" my-promise="imagePromise"></browse>
+                </span>
+                <div class="col-md-2"></div>
+                <span class="col-md-4">
+                    <img ng-src="{{imageData.touchfx.tap.sprite}}" ng-show="imageData.touchfx.tap.sprite"
+                         class="img-thumbnail img-upload-thimb">
+                    <audio ng-src="{{url}}" ng-show="url" controls="controls"></audio>
+                </span>
+            </div>
+        </div>
+        <div ng-if="tap.touchOption == 'SpriteTouchEffects'">
+            <div class="form-group">
+                <label class="col-md-4 control-label">Sprite Count</label>
+
+                <div class="col-md-6 col-md-offset-1">
+                    <input type="text" class="form-control" ng-model="imageData.touchfx.tap.spritecount"
+                           placeholder="Sprite Count">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label">Loop</label>
+
+                <div class="col-md-6 col-md-offset-1">
+                    <input type="text" class="form-control" data-ng-model="imageData.touchfx.tap.loop"
+                           placeholder="loop">
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="add(ImageBoxArray)"><span class="glyphicon glyphicon-ok"></span>  add</button>
+    <button class="btn btn-warning" ng-click="cancel()"><span class="glyphicon glyphicon-remove"></span> cancel</button>
+</div>

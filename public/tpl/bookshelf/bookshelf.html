@@ -1,0 +1,101 @@
+<div class="hbox hbox-auto-xs bg-light " ng-init="
+  app.settings.asideFolded = false;
+  app.settings.asideFixed = true;
+  app.settings.asideDock = false;
+  app.settings.container = false;
+  app.hideAside = false">
+</div>
+<div class="container" ng-controller="bookShelfCtrl">
+    <toaster-container toaster-options="{'time-out': 3000, 'close-button':true}"></toaster-container>
+
+    <div class="wrapper-md bg-light">
+        <div class="col-md-3">
+            <div class="input-group">
+                <input type="text" ng-model="searchKey"
+                       typeahead="state for state in states | filter:$viewValue | limitTo:8"
+                       class="form-control input-sm no-border rounded padder ng-pristine ng-valid"
+                       placeholder="Search books..." aria-autocomplete="list" aria-expanded="false"
+                       aria-owns="typeahead-017-8817"><!-- ngIf: isOpen() -->
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-sm rounded"><i class="fa fa-search"></i></button>
+              </span>
+            </div>
+        </div>
+        <div class="col-md-7"></div>
+        <div class="btn-group col-md-2">
+                <span class="pull-right">
+                    <label class="btn btn-primary" ng-model="layoutView" btn-radio="'thumbnail'" title="Thumbnails View"
+                           ><i class="glyphicon glyphicon-th-large"></i></label>
+                    <label class="btn btn-primary" ng-model="layoutView" btn-radio="'list'" title="List View"
+                       ><i class="glyphicon glyphicon-list"></i></label>
+                </span>
+        </div>
+    </div>
+
+
+    <div class="row bookshelf" cg-busy="{promise:myPromise}" ng-if="layoutView == 'thumbnail'">
+        <div class="col-sm-4  ng-scope margin-btm" ng-repeat="book in bookList | filter: searchKey">
+
+            <div class="panel">
+                <div class="book_thumbs">
+
+                    <div class=" bg-primary">
+                        <p class="btn-lg btn-g">{{book.title}}</p>
+                    </div>
+                    <div>
+                        <a href="#" class="ng-scope">
+                            <img data-ng-src="{{book.imageData}}" class="img-responsive thumbNail"/>
+                        </a>
+                    </div>
+
+                    <div class="book_editor">
+                        <button href="#" class="btn btn-primary" ng-click="editBook($index)"><span
+                                class="glyphicon glyphicon-edit"></span> Edit
+                        </button>
+                        <button ui-sref="book.canvas({ BookID: book.id })" class="btn btn-primary"
+                                ng-click="canvasBook($index)"><span
+                                class="glyphicon glyphicon-pencil"></span> canvas
+                        </button>
+                        <button href="#" class="btn btn-primary " ng-click="open($index)"><span
+                                class="glyphicon glyphicon-trash"></span> Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row bookshelf" cg-busy="{promise:myPromise}" ng-if="layoutView == 'list'">
+        <div class="col-sm-12  ng-scope margin-btm" ng-repeat="book in bookList | filter: searchKey">
+
+            <div class="panel">
+                <div class="book_thumbs">
+
+                    <div class="col-md-1">
+                        <a href="#" class="ng-scope">
+                            <img data-ng-src="{{book.imageData}}" class="image-div"/>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6">
+                        <p class="btn-lg btn-g">{{book.title}}</p>
+                        <div class="book-manager">
+                            <button href="#" class="btn btn-primary btn-sm" ng-click="editBook($index)"><span
+                                    class="glyphicon glyphicon-edit"></span> Edit
+                            </button>
+                            <button ui-sref="book.canvas({ BookID: book.id })" class="btn btn-primary btn-sm"
+                                    ng-click="canvasBook($index)"><span
+                                    class="glyphicon glyphicon-pencil"></span> canvas
+                            </button>
+                            <button href="#" class="btn btn-primary btn-sm" ng-click="open($index)"><span
+                                    class="glyphicon glyphicon-trash"></span> Delete
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-md-5"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

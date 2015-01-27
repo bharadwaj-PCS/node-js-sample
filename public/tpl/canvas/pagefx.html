@@ -1,0 +1,57 @@
+<div class="modal-header">
+    <h3 class="modal-title">Page Sprite/Audio.</h3>
+</div>
+<div class="modal-body" cg-busy="{promise:imagePromise}">
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-8 col-md-offset-2">
+                <select class="form-control" ng-model="onload.pageOption"> Audio
+                    <option value="SpritePageEffects" ng-selected="imagePageFx.pagefx.onload.sprite">SpritePageEffects</option>
+                    <option value="AudioPageEffects" ng-selected="url">AudioPageEffects</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="form-group">
+                <p></p>
+
+                <div class="col-md-8 col-md-offset-2">
+                    <span class="col-md-4" data-ng-if="onload.pageOption == 'SpritePageEffects'">Upload Image</span>
+                    <span class="col-md-4" data-ng-if="onload.pageOption == 'AudioPageEffects'">Upload Audio</span>
+                    <span class="col-md-6" data-ng-show="onload.pageOption">
+                        <browse upload-model="ImageBoxArray" my-promise="imagePromise"></browse>
+                    </span>
+                    <div class="col-md-2"></div>
+                    <span class="col-md-4">
+                        <p></p>
+                        <img ng-src="{{imagePageFx.pagefx.onload.sprite}}" ng-show="imagePageFx.pagefx.onload.sprite"
+                             class="img-upload-thimb">
+                        <audio ng-src="{{url}}" ng-show="url" controls="controls"></audio>
+                    </span>
+                </div>
+            </div>
+            <div ng-if="onload.pageOption == 'SpritePageEffects'">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Sprite Count</label>
+
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" ng-model="imagePageFx.pagefx.onload.spritecount"
+                               placeholder="Sprite Count">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Loop</label>
+
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" data-ng-model="imagePageFx.pagefx.onload.loop"
+                               placeholder="loop">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="add(ImageBoxArray)"><span class="glyphicon glyphicon-ok"></span> add</button>
+    <button class="btn btn-warning" ng-click="cancel()"><span class="glyphicon glyphicon-remove"></span> cancel</button>
+</div>

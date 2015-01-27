@@ -1,0 +1,10 @@
+<div class="modal-header">
+    <h3 class="modal-title">Update Image</h3>
+</div>
+<div class="modal-body" cg-busy="{promise:imagePromise}">
+    <browse upload-model="ImageBoxArray" my-promise="imagePromise"></browse>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-danger" ng-disabled="!ImageBoxArray" ng-click="update(ImageBoxArray)"><span class="glyphicon glyphicon-ok"></span>  OK</button>
+    <button class="btn btn-warning" ng-click="cancel()"><span class="glyphicon glyphicon-remove"></span> cancel</button>
+</div>

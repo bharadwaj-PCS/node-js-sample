@@ -1,0 +1,87 @@
+<div class="modal-header">
+    <h4 class="modal-title">Update {{book.title}}</h4>
+</div>
+<div cg-busy="{promise:myPromise}">
+    <div class="modal-body">
+        <div cg-busy="{promise:imagePromise}">
+            <form name="create_book_form" novalidate="novalidate" class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <input type="text" ng-model="book.title" required name="title" maxlength="255"
+                               popover="Enter Book Title" popover-trigger="mouseenter" popover-placement="top"
+                               class="form-control"/></div>
+                    <div class="col-md-6">
+                        <input type="text" ng-model="book.author" required name="author" maxlength="255"
+                               placeholder="Book Author" popover="Enter Book Author" popover-trigger="mouseenter"
+                               popover-placement="top" class="form-control"/></div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <select ng-model="book.permission" ng-options="bookp for bookp in bookPermissions"
+                                class="form-control" popover="Select Permission" popover-trigger="mouseenter"
+                                popover-placement="top" required name="permission">
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" ng-model="book.zoom" required name="zoom" ng-pattern="/^-?[0-9]\d*(\.\d+)?$/"
+                               maxlength="255" placeholder="Zoom" popover="Enter Zoom value"
+                               popover-trigger="mouseenter" popover-placement="top" class="form-control"/></div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <select ng-model="book.subType" ng-options="bookt for bookt in bookSubType"
+                                popover="Select Subtype" popover-trigger="mouseenter" popover-placement="top"
+                                class="form-control" required name="subType">
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select ng-disabled="book.subType == 'FREE'" ng-model="book.currency"
+                                ng-options="currencyt for currencyt in currencyType" class="form-control" required
+                                popover="Select Currency Type" popover-trigger="mouseenter" popover-placement="top"
+                                name="currency">
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input ng-disabled="book.subType == 'FREE'" type="text" ng-model="book.price" required
+                               name="price" maxlength="255" placeholder="Price" popover="Enter Price"
+                               popover-trigger="mouseenter" popover-placement="top" class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <input type="text" ng-model="book.trailPeriod" ng-pattern="/^-?[0-9]\d*(\.\d+)?$/"
+                               name="trailPeriod" maxlength="255" placeholder="Trail Period"
+                               popover="Enter Trail Period" popover-trigger="mouseenter" popover-placement="top"
+                               class="form-control"/>
+                    </div>
+                    <div class="col-md-6">
+                        <tags-input ng-model="book.tags" popover="Enter Tags" popover-trigger="mouseenter"
+                                    popover-placement="top"></tags-input>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <browse upload-model="book.ImageBoxArray" my-promise="imagePromise"></browse>
+                    <span ng-if="!book.ImageBoxArray" class="btn" style="width:150px;">
+                        <img ng-src="{{book.imageData}}" class="img-thumbnail img-upload-thimb"/></span>
+                    </div>
+                    <div class="col-md-8">
+                        <div>Tablet Zip Link: {{book.zip_tablet}}</div>
+                        <div>IPhone Zip Link: {{book.zip_iphone}}</div>
+                        <input type="button" value="Generate Tablet Zip" class="btn" data-ng-click="tabletZip();">
+
+                        <input type="button" value="Generate iPhone Zip" class="btn" data-ng-click="iphoneZip();">
+                    </div>
+                </div>
+
+
+                <div>{{message}}</div>
+            </form>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-primary" value="Update" ng-disabled="create_book_form.$invalid  "
+                       ng-click="updateBook();" id="btn-update">
+                <button class="btn btn-warning" ng-click="cancel();"><span class="glyphicon glyphicon-remove"></span> Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

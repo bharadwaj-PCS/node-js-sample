@@ -1,0 +1,52 @@
+<div class="wrapper ng-scope" data-ng-controller="pageCtrl">
+    <div class="ng-class:myOverlay">
+        <section class="container-fluid ng-scope">
+
+            <div class="row">
+                <div class="col-md-12 image_div">
+                        <span class="pull-left">
+                            <div class="btn-group" dropdown is-open="status.isopen">
+                                <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle
+                                        ng-disabled="disabled">
+                                    Plugins <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a data-ng-click="game1()">Game 1</a></li>
+                                    <li><a data-ng-click="game2()">Game 2</a></li>
+                                    <li><a data-ng-click="game3()">Game 3</a></li>
+                                </ul>
+                            </div>
+                            <div class="btn btn-default" data-ng-click="browse()"><span
+                                    class="glyphicon glyphicon-upload"></span> Image
+                            </div>
+                       </span>
+                       <span class="pull-right">
+                            <div class="btn btn-default" data-ng-click="saveModifications()"><span
+                                    class="glyphicon glyphicon-save"></span> Save
+                            </div>
+                        </span>
+                </div>
+            </div>
+            <div ui-view class="col-md-12"></div>
+            <div class="col-md-12">
+                <div class="scrollbar">
+                    <div class="thumbs">
+                        <ul ui-sortable="sortableOptions" ng-model="pages" class="page">
+                            <li ng-repeat="page in pages" ui-sref-active="active">
+                                <a ui-sref="book.canvas.page({ BookID: bid , pageId: page.id})"><span
+                                        class="myHandle">{{$index + 1}}</span><img
+                                        src="/img/cover.jpg" ng-src="{{page.thumbnail}}"
+                                        class="img-upload-thimb"
+                                        ng-animate="{enter: 'animate-enter', leave: 'animate-leave'}"></a>
+                                <a class="remove-link" ng-click="deletePage(page,$index)"><i
+                                        class="glyphicon glyphicon-trash"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <span class="addPage img-upload-thimb"><a href="" data-ng-click="createPage()"><i
+                            class="glyphicon glyphicon-plus addButton"></i> </a></span>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

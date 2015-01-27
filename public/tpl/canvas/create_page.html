@@ -1,0 +1,21 @@
+<div class="modal-header">
+    <h3 class="modal-title">Upload Page Thumbnail</h3>
+</div>
+<div class="modal-body" cg-busy="{promise:imagePromise}">
+    <form name="image_form" novalidate="novalidate" class="form-horizontal">
+
+
+        <div class="form-group">
+            <div class="col-md-4">
+                <browse upload-model="ImageBoxArray" my-promise="imagePromise"></browse>
+            </div>
+        </div>
+
+    </form>
+    <div class="modal-footer">
+        <input type="button" class="btn btn-primary" value="Create" ng-click="upload(ImageBoxArray)">
+        <button class="btn btn-warning" ng-click="cancel()"><span class="glyphicon glyphicon-remove"></span> cancel</button>
+    </div>
+</div>
+
+
