@@ -46559,7 +46559,7 @@ angular.module('app')
       'use strict';
       /*======================================================*/
       $urlRouterProvider
-        .otherwise('/book/bookshelf');
+        .otherwise('/signin');
       $stateProvider
         .state('book', {
           abstract: true,
@@ -46610,6 +46610,21 @@ angular.module('app')
               }
             ]
           }
+        })
+        .state('signin', {
+          url:'/signin',
+          views: {
+            '':{
+              templateUrl: 'tpl/page_signin.html'
+            }
+          },
+          resolve: {
+            deps: ['uiLoad',
+              function (uiLoad) {
+                return uiLoad.load(['js/controllers/signin.js']);
+              }
+            ]
+          }
         });
     }
   ]
@@ -46633,8 +46648,8 @@ angular.module('app')
 
       // config
       $scope.app = {
-        name: 'BULBUL',
-        version: '1.3.2',
+        name: 'WHAT SAY',
+        version: '0.0.1',
         // for chart colors
         color: {
           primary: '#7266ba',

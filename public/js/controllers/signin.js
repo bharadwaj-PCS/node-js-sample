@@ -6,8 +6,10 @@ angular.module('app').controller('SigninFormController', ['$scope', '$http', '$s
   $scope.authError = null;
   $scope.login = function () {
     $scope.authError = null;
-    if ($scope.user.email === 'admin@apspeak.com' && $scope.user.password === 'Admin@123') {
-      $state.go('app.dashboard-v1');
+    var emailList = ['admin@whatsay.com'],passwordList = ['123'];
+    var index = emailList.indexOf($scope.user.email);
+    if (index !== -1 && $scope.user.password === passwordList[index]) {
+      $state.go('book.bookshelf');
     } else {
       $scope.authError = 'Email or Password not right';
     }

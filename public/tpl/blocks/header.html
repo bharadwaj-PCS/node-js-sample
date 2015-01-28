@@ -33,37 +33,61 @@
     <ul class="nav navbar-nav hidden-sm">
         <li class="">
             <a class="auto" ui-sref="book.bookshelf">
-                <span>Bookshelf</span>
+                <span>Asset</span>
             </a>
         </li>
         <li>
-            <a class="auto" href="" create-book="createBook">
-                <span>Create Book</span>
+            <a class="auto" href="">
+                <span>Cue</span>
             </a>
         </li>
-        <!--<li class="dropdown">-->
-        <!--<a href class="dropdown-toggle">-->
-        <!--<i class="fa fa-fw fa-plus visible-xs-inline-block"></i>-->
-        <!--<span translate="header.navbar.new.NEW">New</span> <span class="caret"></span>-->
-        <!--</a>-->
-        <!--<ul class="dropdown-menu" role="menu">-->
-        <!--<li><a href="#" translate="header.navbar.new.PROJECT">Projects</a></li>-->
-        <!--<li>-->
-        <!--<a href>-->
-        <!--<span class="badge bg-info pull-right">5</span>-->
-        <!--<span translate="header.navbar.new.TASK">Task</span>-->
-        <!--</a>-->
-        <!--</li>-->
-        <!--<li><a href translate="header.navbar.new.USER">User</a></li>-->
-        <!--<li class="divider"></li>-->
-        <!--<li>-->
-        <!--<a href>-->
-        <!--<span class="badge bg-danger pull-right">4</span>-->
-        <!--<span translate="header.navbar.new.EMAIL">Email</span>-->
-        <!--</a>-->
-        <!--</li>-->
-        <!--</ul>-->
-        <!--</li>-->
+        <li>
+            <a class="auto" href="">
+                <span>Notification</span>
+            </a>
+        </li>
+        <li class="dropdown">
+            <a href class="dropdown-toggle clear" data-toggle="dropdown">
+                <span class="hidden-sm hidden-md">More</span> <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu animated fadeInRight w">
+                <li>
+                    <a ui-sref="">Groups</a>
+                </li>
+                <li>
+                    <a ui-sref="">Categories</a>
+                </li>
+                <li>
+                    <a ui-sref="">Tags</a>
+                </li>
+                <li>
+                    <a ui-sref="">Analytics</a>
+                </li>
+            </ul>
+        </li>
+        <!--<li class="dropdown">
+        <a href class="dropdown-toggle">
+        <i class="fa fa-fw fa-plus visible-xs-inline-block"></i>
+        <span translate="header.navbar.new.NEW">New</span> <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" role="menu">
+        <li><a href="#" translate="header.navbar.new.PROJECT">Projects</a></li>
+        <li>
+        <a href>
+        <span class="badge bg-info pull-right">5</span>
+        <span translate="header.navbar.new.TASK">Task</span>
+        </a>
+        </li>
+        <li><a href translate="header.navbar.new.USER">User</a></li>
+        <li class="divider"></li>
+        <li>
+        <a href>
+        <span class="badge bg-danger pull-right">4</span>
+        <span translate="header.navbar.new.EMAIL">Email</span>
+        </a>
+        </li>
+        </ul>
+        </li>-->
     </ul>
     <!-- / link and dropdown -->
 
@@ -117,6 +141,9 @@
                     </a>
                   </li>
                   <li class="divider"></li> -->
+                <li>
+                    <a ui-sref="access.signin">Settings</a>
+                </li>
                 <li>
                     <a ui-sref="access.signin">Logout</a>
                 </li>
