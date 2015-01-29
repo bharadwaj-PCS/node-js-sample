@@ -9,7 +9,7 @@ angular.module('app').controller('SigninFormController', ['$scope', '$http', '$s
     var emailList = ['admin@whatsay.com'],passwordList = ['123'];
     var index = emailList.indexOf($scope.user.email);
     if (index !== -1 && $scope.user.password === passwordList[index]) {
-      $state.go('book.bookshelf');
+      $state.go('whatsay.cue');
     } else {
       $scope.authError = 'Email or Password not right';
     }

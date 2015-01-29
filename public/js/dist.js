@@ -46561,27 +46561,76 @@ angular.module('app')
       $urlRouterProvider
         .otherwise('/signin');
       $stateProvider
-        .state('book', {
+        .state('whatsay', {
           abstract: true,
-          url: '/book',
+          url: '/whatsay',
           templateUrl: 'tpl/app.html'
         })
-        .state('book.bookshelf', {
-          url: '/bookshelf',
+        .state('whatsay.cue', {
+          url: '/cue',
+          template: '<div ui-view class="fade-in-up"></div>'
+        })
+        .state('whatsay.cue.view', {
+          url: '/view',
           views: {
             '': {
-              templateUrl: 'tpl/bookshelf/bookshelf.html'
+              templateUrl: 'tpl/cue/cue_view.html'
             }
           },
           resolve: {
             deps: ['uiLoad',
               function (uiLoad) {
-                return uiLoad.load(['js/app/bookshelf/bookshelf.js']);
+                return uiLoad.load(['js/app/cue/cue.js']);
               }
             ]
           }
         })
-        .state('book.canvas', {
+        .state('whatsay.cue.update', {
+          url: '/update',
+          views: {
+            '': {
+              templateUrl: 'tpl/cue/cue_update.html'
+            }
+          },
+          resolve: {
+            deps: ['uiLoad',
+              function (uiLoad) {
+                return uiLoad.load(['js/app/cue/cue.js']);
+              }
+            ]
+          }
+        })
+        .state('whatsay.cue.create', {
+          url: '/create',
+          views: {
+            '': {
+              templateUrl: 'tpl/cue/cue_create.html'
+            }
+          },
+          resolve: {
+            deps: ['uiLoad',
+              function (uiLoad) {
+                return uiLoad.load(['js/app/cue/cue.js']);
+              }
+            ]
+          }
+        })
+        .state('whatsay.cue.delete', {
+          url: '/delete',
+          views: {
+            '': {
+              templateUrl: 'tpl/cue/cue_delete.html'
+            }
+          },
+          resolve: {
+            deps: ['uiLoad',
+              function (uiLoad) {
+                return uiLoad.load(['js/app/cue/cue.js']);
+              }
+            ]
+          }
+        })
+        /*.state('book.canvas', {
           url: '/canvas/:BookID',
           views: {
             '': {
@@ -46610,7 +46659,7 @@ angular.module('app')
               }
             ]
           }
-        })
+        })*/
         .state('signin', {
           url:'/signin',
           views: {

@@ -10,12 +10,12 @@
       <span class="pull-right text-muted">
       </span>
             <i class="glyphicon glyphicon-book text-primary-dker"></i>
-            <span>Asset</span>
+            <span>Assets</span>
         </a>
         <ul class="nav nav-sub dk">
             <li class="nav-sub-header">
                 <a href>
-                    <span>Asset</span>
+                    <span>Assets</span>
                 </a>
             </li>
         </ul>
@@ -23,14 +23,16 @@
     <li>
         <a href class="auto">
       <span class="pull-right text-muted">
+         <!-- <i class="fa fa-fw fa-angle-right text"></i>
+        <i class="fa fa-fw fa-angle-down text-active"></i>-->
       </span>
             <i class="glyphicon glyphicon-paperclip text-primary-dker"></i>
-            <span>Cues</span>
+            <span>Notifications</span>
         </a>
         <ul class="nav nav-sub dk">
             <li class="nav-sub-header">
                 <a href="">
-                    <span>Cues</span>
+                    <span>Notifications</span>
                 </a>
             </li>
         </ul>
@@ -38,14 +40,36 @@
     <li>
         <a href class="auto">
       <span class="pull-right text-muted">
+          <i class="fa fa-fw fa-angle-right text"></i>
+        <i class="fa fa-fw fa-angle-down text-active"></i>
       </span>
-            <i class=" glyphicon glyphicon-list-alt text-primary-dker"></i>
-            <span>Notification</span>
+            <i class="glyphicon glyphicon-list-alt text-primary-dker"></i>
+            <span>Cues</span>
         </a>
         <ul class="nav nav-sub dk">
             <li class="nav-sub-header">
                 <a href="" >
-                    <span>Notification</span>
+                    <span>Cues</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="whatsay.cue.view">
+                    <span>View</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="whatsay.cue.create">
+                    <span>Create</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="whatsay.cue.update">
+                    <span>Update</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="whatsay.cue.delete">
+                    <span>Delete</span>
                 </a>
             </li>
         </ul>
@@ -55,12 +79,12 @@
       <span class="pull-right text-muted">
       </span>
             <i class="glyphicon glyphicon-list-alt text-primary-dker"></i>
-            <span>Group</span>
+            <span>Groups</span>
         </a>
         <ul class="nav nav-sub dk">
             <li class="nav-sub-header">
                 <a href="" >
-                    <span>Group</span>
+                    <span>Groups</span>
                 </a>
             </li>
         </ul>
@@ -98,6 +122,8 @@
     <li>
         <a href class="auto">
       <span class="pull-right text-muted">
+          <i class="fa fa-fw fa-angle-right text"></i>
+        <i class="fa fa-fw fa-angle-down text-active"></i>
       </span>
             <i class="glyphicon glyphicon-tag text-primary-dker"></i>
             <span>Analytics</span>
@@ -110,5 +136,97 @@
             </li>
         </ul>
     </li>
+    <!--<li>
+        <a href class="auto">
+      <span class="pull-right text-muted">
+        <i class="fa fa-fw fa-angle-right text"></i>
+        <i class="fa fa-fw fa-angle-down text-active"></i>
+      </span>
+            <i class="glyphicon glyphicon-briefcase icon"></i>
+            <span translate="aside.nav.components.ui_kits.UI_KITS">UI Kits</span>
+        </a>
+        <ul class="nav nav-sub dk">
+            <li class="nav-sub-header">
+                <a href>
+                    <span translate="aside.nav.components.ui_kits.UI_KITS">UI Kits</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="app.ui.buttons">
+                    <span translate="aside.nav.components.ui_kits.BUTTONS">Buttons</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="app.ui.icons">
+                    <b class="badge bg-info pull-right">3</b>
+                    <span translate="aside.nav.components.ui_kits.ICONS">Icons</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="app.ui.grid">
+                    <span translate="aside.nav.components.ui_kits.GRID">Grid</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="app.ui.widgets">
+                    <b class="badge bg-success pull-right">13</b>
+                    <span translate="aside.nav.WIDGETS">Widgets</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="app.ui.bootstrap">
+                    <b class="badge bg-primary pull-right">16</b>
+                    <span translate="aside.nav.components.ui_kits.BOOTSTRAP">Bootstrap</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="app.ui.sortable">
+                    <span translate="aside.nav.components.ui_kits.SORTABLE">Sortable</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="app.ui.portlet">
+                    <span translate="aside.nav.components.ui_kits.PORTLET">Portlet</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="app.ui.timeline">
+                    <span translate="aside.nav.components.ui_kits.TIMELINE">Timeline</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="app.ui.tree">
+                    <span>Tree</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="app.ui.toaster">
+                    <span>Toaster</span>
+                </a>
+            </li>
+            <li>
+                <a href class="auto">
+          <span class="pull-right text-muted">
+            <i class="fa fa-fw fa-angle-right text"></i>
+            <i class="fa fa-fw fa-angle-down text-active"></i>
+          </span>
+                    <b class="label bg-info pull-right">2</b>
+                    <span>Maps</span>
+                </a>
+                <ul class="nav dker">
+                    <li ui-sref-active="active">
+                        <a ui-sref="app.ui.jvectormap">
+                            <span translate="aside.nav.components.ui_kits.VECTOR_MAP">Vector Map</span>
+                        </a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="app.ui.googlemap">
+                            <span>Google Map</span>
+                        </a>
+                    </li>
+            </li>
+        </ul>
+    </li>-->
+
 </ul>
 <!-- / list -->
