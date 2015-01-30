@@ -1,3 +1,24 @@
-<div class="bg-light lter b-b wrapper-md">
-    <h1 class="m-n font-thin h3">Cues / delete</h1>
+<div class="modal-header">
+    <h4 class="modal-title">Delete Cue</h4>
+</div>
+<div class="modal-body">
+    <form name="editForm" class="form-validation">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="h4"></span>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label>Text</label>
+                    <input type="text" class="form-control" ng-model="model.text" required>
+                </div>
+            </div>
+            <div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button type="submit" class="btn btn-success" ng-disabled="editForm.$invalid" ng-click="createText()">Submit</button>
+    <button class="btn btn-danger" ng-click="cancel()">Cancel</button>
 </div>

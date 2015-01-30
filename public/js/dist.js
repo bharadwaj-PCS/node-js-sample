@@ -46425,7 +46425,7 @@ var app =
       $translateProvider.preferredLanguage('en');
       // Tell the module to store the language in the local storage
       $translateProvider.useLocalStorage();
-    }]).constant('appConfig', {apiUrl: 'http://ec2-54-205-221-158.compute-1.amazonaws.com:3000',bookPermissions: ['PUBLIC', 'PRIVATE', 'DRAFT'],bookSubType: ['FREE', 'PAID'],currencyType: ['INR', 'USD']
+    }]).constant('appConfig', {apiUrl: 'https://whatsay-node-server-dev.herokuapp.com/api/v1',bookPermissions: ['PUBLIC', 'PRIVATE', 'DRAFT'],bookSubType: ['FREE', 'PAID'],currencyType: ['INR', 'USD']
     });
 // lazyload config
 
@@ -46568,7 +46568,9 @@ angular.module('app')
         })
         .state('whatsay.cue', {
           url: '/cue',
-          template: '<div ui-view class="fade-in-up"></div>'
+          template: '<div ui-view class="fade-in-up"><div class="bg-light lter b-b wrapper-md">'+
+                    '<h1 class="m-n font-thin h3">Select left panel to operate.</h1>'+
+                    '</div></div>'
         })
         .state('whatsay.cue.view', {
           url: '/view',
@@ -46589,7 +46591,7 @@ angular.module('app')
           url: '/update',
           views: {
             '': {
-              templateUrl: 'tpl/cue/cue_update.html'
+              templateUrl: 'tpl/cue/cue_edit.html'
             }
           },
           resolve: {
@@ -46757,27 +46759,19 @@ angular.module('app').directive('browse', function () {
   function uploadCtrl($scope, $http, browseFactory, toaster, $sce) {
     $scope.onUpload = function ($file) {
       $scope.uploadModel = {
-        Image: '',
-        ImageName: '',
-        additionalInfo: {
-          height: '',
-          width: '',
-          x: 0,
-          y: 0,
-          zIndex: 5
+        url:''
         }
       };
 
       var file = $file[0],
        fd = new FormData(),
        reader = new FileReader();
-      $scope.uploadModel.ImageName = file.name;
       fd.append('file', file);
       if ((/\.(jpg|jpeg|png)$/i).test(file.name)) {
         reader.onload = (function () {
           return function (e) {
             $scope.$apply(function () {
-              $scope.uploadModel.Image = e.target.result;
+              $scope.uploadModel.url = e.target.result;
             });
           };
         })(file);
@@ -46791,26 +46785,18 @@ angular.module('app').directive('browse', function () {
             reader.onload = (function () {
               return function (e) {
                 $scope.$apply(function () {
-                  $scope.uploadModel.Image = url;
-                  img.src = e.target.result;
-                  $scope.uploadModel.additionalInfo.height = img.height;
-                  $scope.uploadModel.additionalInfo.width = img.width;
+                  $scope.uploadModel.url = url;
                 });
               };
             })(file);
             reader.readAsDataURL(file);
-          }else {
-            $scope.uploadModel.url = url;
-            $scope.url = {};
-            $scope.url = $sce.trustAsResourceUrl(url);
-
           }
           toaster.pop('success', 'File Successfully Uploaded');
         }).error(function () {
           toaster.pop('error', 'Error while file upload.');
         });
     };
-  }
+
 
   return {
     restrict: 'EA',

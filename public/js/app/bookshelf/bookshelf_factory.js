@@ -6,15 +6,16 @@
  * To change this template use File | Settings | File Templates.
  */
 
-angular.module('app').factory('bookshelfFactory', function ($http, appConfig) {
+angular.module('app').factory('cueFactory', function ($http, appConfig) {
   'use strict';
-  var getBookList = function () {
+  var getCueList = function () {
+    console.log(appConfig.apiUrl + '/cue/get/all :: URL');
     return $http({
-      method: 'POST',
-      url: appConfig.apiUrl + '/rest/book/user/list'
+      method: 'GET',
+      url: appConfig.apiUrl + '/cue/get/all/20/30' //whatsay-node-server-dev.herokuapp.com/api/v1/cue/get/all
     });
   };
-  var deleteBook = function (data) {
+  /*var deleteBook = function (data) {
     return $http({
       method: 'POST',
       url: appConfig.apiUrl + '/rest/book/user/delete',
@@ -33,14 +34,14 @@ angular.module('app').factory('bookshelfFactory', function ($http, appConfig) {
       url: appConfig.apiUrl + '/rest/book/user/update/type',
       data: book
     });
-  };
+  };*/
 
   return {
-    getBooks: getBookList,
+    getCueList: getCueList/*,
     deleteBook: deleteBook,
     tabletZip: tabletZip,
     iphoneZip: iphoneZip,
-    updateBook: updateBook
+    updateBook: updateBook*/
   };
 
 });

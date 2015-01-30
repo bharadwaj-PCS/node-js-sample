@@ -1,3 +1,124 @@
+<toaster-container toaster-options="{'time-out': 3000, 'close-button':true}"></toaster-container>
 <div class="bg-light lter b-b wrapper-md">
     <h1 class="m-n font-thin h3">Cues / view</h1>
+</div>
+<div class="wrapper-md" ng-controller="cueController">
+    <div class="row">
+        <div class="col-lg-6" ng-repeat="cue in cueData">
+            <tabset class="tab-container">
+                <tab>
+                    <tab-heading>
+                        Over view
+                    </tab-heading>
+                    <div class="cue_thumbs">
+                        <img ng-src="{{cue.background_url_wide || 'http://placehold.it/500x250' }}" alt="" style="width:100%"/>
+                        <ul class="list-group no-borders pull-in m-b-none">
+                            <li class="list-group-item">
+                                <span href="" class="h4 text-primary m-b-sm m-t-sm block">{{cue.text}}</span>
+                                <!--<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi id neque quam. Aliquam sollicitudin egestas dui nec, fermentum diam. Vivamus vel tincidunt libero, vitae elementum ligula venenatis ipsum ac feugiat. Vestibulum ullamcorper sodales nisi nec condimentum</p>
+                                <p><span class="label bg-primary pos-rlt m-r inline wrapper-xs"><i class="arrow right arrow-primary"></i> Tags:</span> <a href class="m-r-sm">admin</a> <a href>app</a>
+                                </p>-->
+                            </li>
+                        </ul>
+                        <div class="cue_editor">
+                            <!--<button class="btn btn-primary " ng-click="UploadImg(cue)"><span
+                                    class="glyphicon glyphicon-edit"></span> Upload Image
+                            </button>-->
+                            <button href="#" class="btn btn-primary" ng-click="editCue(cue)"><span
+                                    class="glyphicon glyphicon-edit"></span> Edit
+                            </button>
+                            <button class="btn btn-primary"
+                                    ng-click="removeCue(cue)"><span
+                                    class="glyphicon glyphicon-pencil"></span> Remove
+                            </button>
+                            <button class="btn btn-primary " ng-click="deleteCue(cue)"><span
+                                    class="glyphicon glyphicon-trash"></span> Delete
+                            </button>
+
+                        </div>
+                    </div>
+
+                </tab>
+                <tab>
+                    <tab-heading>
+                        Parameters
+                    </tab-heading>
+                    <table class="table table-striped m-b-none cue-table" style="width:100%;table-layout: fixed;">
+                        <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="(key,value) in cue">
+                            <td>
+                                {{key}}
+                            </td>
+                            <td>{{value}}</td>
+                        </tr>
+
+
+                        </tbody>
+                    </table>
+                </tab>
+                <tab>
+                    <tab-heading>
+                        Delete
+                    </tab-heading>
+                    <!--<ul class="list-group list-group-lg no-borders pull-in m-b-none">
+                        <li class="list-group-item">
+                            <a href="#" class="h4 text-primary m-b-sm block">Mauris convallis mauris at pellentesque
+                                volutpat</a>
+
+                            <p class="b wrapper-md pos-rlt bg-light r r-2x"><span
+                                    class="arrow top pull-left arrow-light"></span>Lorem ipsum dolor sit amet, fermentum
+                                diam. Vivamus vel tincidunt libero, vitae elementum ligula venenatis ipsum ac feugiat.
+                                Vestibulum ullamcorper sodales nisi nec condimentum</p>
+                        </li>
+
+                    </ul>-->
+                    <form editable-form name="editableForm" onaftersave="saveUser()">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Username:</label>
+                                <div class="col-sm-9">
+                                    <p class="form-control-static">
+                                        <span editable-text="user.name">{{ user.name || 'empty' }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Status:</label>
+                                <div class="col-sm-9">
+                                    <p class="form-control-static">
+                    <span editable-select="user.status" e-ng-options="s.value as s.text for s in statuses">
+                      {{ showStatus() }}
+                    </span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-sm-9 col-sm-offset-3">
+                                    <button type="button" class="btn btn-default" ng-click="editableForm.$show()" ng-show="!editableForm.$visible">
+                                        Edit
+                                    </button>
+                                    <!-- buttons to submit / cancel form -->
+                  <span ng-show="editableForm.$visible">
+                    <button type="submit" class="btn btn-primary" ng-disabled="editableForm.$waiting">
+                        Save
+                    </button>
+                    <button type="button" class="btn btn-default" ng-disabled="editableForm.$waiting" ng-click="editableForm.$cancel()">
+                        Cancel
+                    </button>
+                  </span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </tab>
+            </tabset>
+        </div>
+    </div>
 </div>

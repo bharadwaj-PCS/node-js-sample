@@ -1,0 +1,64 @@
+<div class="modal-header">
+    <h4 class="modal-title">Edit Cue</h4>
+</div>
+<div>
+    <div class="modal-body">
+        <div cg-busy="{promise:imagePromise}">
+            <form role="form" ng-model="cue" name="cueUpdate">
+                <div class="row">
+                <div class="col-md-6">
+                <div class="form-group">
+                    <label>Background color</label>
+                    <input colorpicker colorpicker-position="left" type="text"
+                           ng-model="cue.bgcolor" class="color-pointer form-control" readonly/>
+                </div>
+                <div class="form-group">
+                    <label>ForeGround  color</label>
+                    <input colorpicker colorpicker-position="left" type="text"
+                           ng-model="cue.fcolor" class="color-pointer form-control" readonly/>
+                </div>
+                <div class="form-group">
+                    <label>Text</label>
+                    <input type="text" class="form-control" ng-model="cue.text"/>
+                </div>
+                </div>
+                <div class="col-md-6">
+                <div class="form-group">
+                    <label>Background Image [PNG/JPEG, 600x600]</label>
+                    <div class="input-group">
+                                    <span class="input-group-btn">
+                                    <span class="btn btn-primary btn-file">
+                                    Browse&hellip; <input type="file" name="bgimage" ng-file-select="onBGSelect($files)"
+                                                          accept="image/*" >
+                                    </span>
+                                    </span>
+                    </div>
+                    <div data-ng-if="cue.background_url"><img ng-src="{{cue.background_url}}" class="img-thumbnail" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Background Image wide [PNG/JPEG, 1200x600]</label>
+                    <div class="input-group">
+                                    <span class="input-group-btn">
+                                        <span class="btn btn-primary btn-file">
+                                            Browse&hellip; <input type="file" name="bgimagewide" ng-file-select="onBGWideSelect($files)" accept="image/*">
+                                        </span>
+                                    </span>
+                    </div>
+
+                    <div data-ng-if="cue.background_url_wide"><img ng-src="{{cue.background_url_wide}}" class="img-thumbnail" />
+                    </div>
+                    </div>
+                </div>
+                </div>
+            </form>
+            </div>
+        </div>
+    <div class="modal-footer">
+        <input type="button" class="btn btn-primary" value="Update" ng-disabled="cueUpdate.$invalid"
+               ng-click="updateCue(cue,cueUpdate);" id="btn-update">
+        <input type="button" class="btn btn-primary" value="Reset"
+               ng-click="resetCue(cue,cueUpdate);" id="btn-reset">
+        <button class="btn btn-warning" ng-click="cancel();"><span class="glyphicon glyphicon-remove"></span> Cancel</button>
+    </div>
+</div>
