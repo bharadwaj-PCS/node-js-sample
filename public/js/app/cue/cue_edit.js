@@ -2,9 +2,8 @@
  * Created by bharadwaj on 29/1/15.
  */
 
-angular.module('app').controller('cueEditController',['$scope', 'cue',
-  function ($scope,cue) {
-    console.log("In CueEdit",cue);
+angular.module('app').controller('cueEditController',['$scope', 'cue', function ($scope,cue) {
+    //console.log("In CueEdit",cue);
     var originalCue = angular.copy(cue);
     $scope.cue = cue;
     /*$scope.localWideBackgroundImage = cue.background_url_wide;
