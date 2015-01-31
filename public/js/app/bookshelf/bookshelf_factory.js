@@ -1,3 +1,4 @@
+/*
 angular.module('app').factory('cueFactory', ['$http', 'appConfig', function ($http, appConfig) {
   'use strict';
   function getCueList () {
@@ -11,4 +12,4 @@ angular.module('app').factory('cueFactory', ['$http', 'appConfig', function ($ht
     getCueList: getCueList
   };
 
-}]);
+}]);*/

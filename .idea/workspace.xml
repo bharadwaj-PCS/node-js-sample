@@ -2,7 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a4bf2daa-d649-46fa-b75f-48dad2dc74e1" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/app.min.js" afterPath="$PROJECT_DIR$/public/js/app.min.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/app/bookshelf/bookshelf_factory.js" afterPath="$PROJECT_DIR$/public/js/app/bookshelf/bookshelf_factory.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/app/cue/cue.js" afterPath="$PROJECT_DIR$/public/js/app/cue/cue.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/tpl/cue/cue_create.html" afterPath="$PROJECT_DIR$/public/tpl/cue/cue_create.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/tpl/cue/cue_view.html" afterPath="$PROJECT_DIR$/public/tpl/cue/cue_view.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/dist.js" afterPath="$PROJECT_DIR$/public/js/dist.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/tpl/blocks/nav.html" afterPath="$PROJECT_DIR$/public/tpl/blocks/nav.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/vendor/modules/angularjs-toaster/toaster.css" afterPath="$PROJECT_DIR$/public/vendor/modules/angularjs-toaster/toaster.css" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/vendor/modules/angularjs-toaster/toaster.js" afterPath="$PROJECT_DIR$/public/vendor/modules/angularjs-toaster/toaster.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="node-js-sample.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -49,8 +58,8 @@
       <file leaf-file-name="login.json" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/public/api/login.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="604">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.12417219" vertical-offset="0" max-vertical-offset="604">
+              <caret line="5" column="1" selection-start-line="5" selection-start-column="1" selection-end-line="5" selection-end-column="1" />
               <folding />
             </state>
           </provider>
@@ -100,6 +109,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -152,7 +162,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -244,6 +253,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/index.js">
       <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="195" max-vertical-offset="285">
+          <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="525">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/index.js">
+      <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="285">
           <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
           <folding />
@@ -260,8 +285,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/public/api/login.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="628">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.12417219" vertical-offset="0" max-vertical-offset="604">
+          <caret line="5" column="1" selection-start-line="5" selection-start-column="1" selection-end-line="5" selection-end-column="1" />
           <folding />
         </state>
       </provider>

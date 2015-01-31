@@ -1,9 +1,9 @@
 <toaster-container toaster-options="{'time-out': 3000, 'close-button':true}"></toaster-container>
 <div class="bg-light lter b-b wrapper-md">
-    <h1 class="m-n font-thin h3">Cues / view</h1>
+    <h1 class="m-n font-thin h3">Cues</h1>
 </div>
 <div class="wrapper-md" ng-controller="cueController">
-    <div class="row">
+    <div class="row" infinite-scroll="getPagination()" cg-busy="{promise:myPromise}">
         <div class="col-lg-6" ng-repeat="cue in cueData">
             <tabset class="tab-container">
                 <tab>
@@ -122,3 +122,4 @@
         </div>
     </div>
 </div>
+<div ng-class="scrollClass"></div>

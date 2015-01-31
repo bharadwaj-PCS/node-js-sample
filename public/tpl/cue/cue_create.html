@@ -1,3 +1,104 @@
+<toaster-container toaster-options="{'position-class': 'toast-top-right', 'showDuration':'200', 'hideDuration':'200','showMethod':'fadeIn','hideMethod':'fadeOut'}"></toaster-container>
 <div class="bg-light lter b-b wrapper-md">
-    <h1 class="m-n font-thin h3">Cues / create</h1>
+    <h1 class="m-n font-thin h3">Create Cue</h1>
 </div>
+<form name="addForm" class="form-validation" novalidate ng-controller="cueCreateController">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <span class="h4">Cue Details</span>
+        </div>
+        <div class="panel-body">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Text </label>
+                    <input type="text" class="form-control" ng-model="cue.text" required>
+                </div>
+                <div class="form-group">
+                    <label>BackGround color </label>
+                    <input colorpicker colorpicker-position="left" type="text" ng-model="cue.bgcolor" class="color-pointer form-control" readonly required/>
+                </div>
+                <div class="form-group">
+                    <label>ForeGround color </label>
+                    <input colorpicker colorpicker-position="left" type="text" ng-model="cue.fcolor" class="color-pointer form-control" readonly required/>
+                </div>
+
+                <div class="form-group">
+                    <label>Scale</label>
+                    <div class="input-group">
+                    <label class="i-checks checkbox-inline">
+                        <input type="radio" name="scale" ng-model="cue.scale" value="TILE"><i></i>Tiles
+                    </label>
+                    <label class="i-checks checkbox-inline">
+                        <input type="radio" name="scale" ng-model="cue.scale" value="STRETCHED"><i></i>Stretched
+                    </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Font</label>
+                    <select name="account" class="form-control m-b" data-ng-model="cue.font" required>
+                        <option>option 1</option>
+                        <option>option 2</option>
+                        <option>option 3</option>
+                        <option>option 4</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Font Size</label>
+                    <div class="input-group m-b">
+                        <!--<input type="text" class="form-control" ng-model="cue.font_size">-->
+                        <!--<span class="input-group-addon">px</span>-->
+                        <!--<input ui-jq="TouchSpin" type="text" value="0" class="form-control" data-min='0' data-max="32" data-step="1" data-decimals="0" >-->
+                        <input ui-jq="TouchSpin" type="text" value="14" class="form-control" data-step="2"
+                               data-min='8' data-max="48" data-verticalbuttons="true" data-verticalupclass="fa fa-caret-up"
+                               data-verticaldownclass="fa fa-caret-down" required>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Icon Url </label>
+                    <div class="input-group">
+                                    <span class="input-group-btn">
+                                    <span class="btn btn-primary btn-file">
+                                    Browse&hellip; <input type="file" name="iconImage" ng-file-select="onIconSelect($files)"
+                                                          accept="image/*" >
+                                    </span>
+                                    </span>
+                    </div>
+                    <div data-ng-if="cue.iconUrl"><img ng-src="{{cue.iconUrl}}" class=" img-thumbnail" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Background Image</label>
+                    <div class="input-group">
+                                    <span class="input-group-btn">
+                                    <span class="btn btn-primary btn-file">
+                                    Browse&hellip; <input type="file" name="bgimage" ng-file-select="onBGSelect($files)" accept="image/*" >
+                                    </span>
+                                    </span>
+                    </div>
+                    <div data-ng-if="cue.background_url"><img ng-src="{{cue.background_url}}" class=" img-thumbnail" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Background Image wide</label>
+                    <div class="input-group">
+                                    <span class="input-group-btn">
+                                        <span class="btn btn-primary btn-file">
+                                            Browse&hellip; <input type="file" name="bgimagewide" ng-file-select="onBGWideSelect($files)" accept="image/*">
+                                        </span>
+                                    </span>
+                    </div>
+
+                    <div data-ng-if="cue.background_url_wide"><img ng-src="{{cue.background_url_wide}}" class="img-thumbnail" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer class="panel-footer text-right bg-light lter">
+            <button class="btn m-b-xs btn-sm btn-default btn-addon" ng-click="cueReset()"><i class="fa fa-circle"></i>Reset</button>
+            <button ng-disabled="addForm.$invalid && imageUploaded" class="btn m-b-xs btn-sm btn-primary btn-addon" ng-click="addCue(cue,addForm)"><i class="fa fa-plus"></i>Add</button>
+        </footer>
+    </div>
+</form>

@@ -1827,12 +1827,12 @@ function setupModuleLoader(window) {
 
           /**
            * @ngdoc method
-           * @name angular.Module#factories
+           * @name angular.Module#factory
            * @module ng
            * @param {string} name service name
            * @param {Function} providerFunction Function for creating new instance of the service.
            * @description
-           * See {@link auto.$provide#factory $provide.factories()}.
+           * See {@link auto.$provide#factory $provide.factory()}.
            */
           factory: invokeLater('$provide', 'factory'),
 
@@ -3623,13 +3623,13 @@ function annotate(fn, strictDi, name) {
  * with the {@link auto.$injector $injector}. Many of these functions are also exposed on
  * {@link angular.Module}.
  *
- * An Angular **service** is a singleton object created by a **service factories**.  These **service
+ * An Angular **service** is a singleton object created by a **service factory**.  These **service
  * factories** are functions which, in turn, are created by a **service provider**.
  * The **service providers** are constructor functions. When instantiated they must contain a
- * property called `$get`, which holds the **service factories** function.
+ * property called `$get`, which holds the **service factory** function.
  *
  * When you request a service, the {@link auto.$injector $injector} is responsible for finding the
- * correct **service provider**, instantiating it and then calling its `$get` **service factories**
+ * correct **service provider**, instantiating it and then calling its `$get` **service factory**
  * function to get the instance of the **service**.
  *
  * Often services have no configuration options and there is no need to add methods to the service
@@ -3643,9 +3643,9 @@ function annotate(fn, strictDi, name) {
  *     providers and services.
  * * {@link auto.$provide#value value(obj)} - registers a value/object that can only be accessed by
  *     services, not providers.
- * * {@link auto.$provide#factory factories(fn)} - registers a service **factories function**, `fn`,
+ * * {@link auto.$provide#factory factory(fn)} - registers a service **factory function**, `fn`,
  *     that will be wrapped in a **service provider** object, whose `$get` property will contain the
- *     given factories function.
+ *     given factory function.
  * * {@link auto.$provide#service service(class)} - registers a **constructor function**, `class`
  *     that will be wrapped in a **service provider** object, whose `$get` property will instantiate
  *      a new object using the given constructor function.
@@ -3659,7 +3659,7 @@ function annotate(fn, strictDi, name) {
  * @description
  *
  * Register a **provider function** with the {@link auto.$injector $injector}. Provider functions
- * are constructor functions, whose instances are responsible for "providing" a factories for a
+ * are constructor functions, whose instances are responsible for "providing" a factory for a
  * service.
  *
  * Service provider names start with the name of the service they provide followed by `Provider`.
@@ -3699,7 +3699,7 @@ function annotate(fn, strictDi, name) {
  *      trackingUrl = url;
  *    };
  *
- *    // The service factories function
+ *    // The service factory function
  *    this.$get = ['$http', function($http) {
  *      var trackedEvents = {};
  *      return {
@@ -3751,13 +3751,13 @@ function annotate(fn, strictDi, name) {
 
 /**
  * @ngdoc method
- * @name $provide#factories
+ * @name $provide#factory
  * @description
  *
- * Register a **service factories**, which will be called to return the service instance.
+ * Register a **service factory**, which will be called to return the service instance.
  * This is short for registering a service where its provider consists of only a `$get` property,
- * which is the given service factories function.
- * You should use {@link auto.$provide#factory $provide.factories(getFn)} if you do not need to
+ * which is the given service factory function.
+ * You should use {@link auto.$provide#factory $provide.factory(getFn)} if you do not need to
  * configure your service in a provider.
  *
  * @param {string} name The name of the instance.
@@ -3768,7 +3768,7 @@ function annotate(fn, strictDi, name) {
  * @example
  * Here is an example of registering a service
  * ```js
- *   $provide.factories('ping', ['$http', function($http) {
+ *   $provide.factory('ping', ['$http', function($http) {
  *     return function ping() {
  *       return $http.send('/ping');
  *     };
@@ -3831,7 +3831,7 @@ function annotate(fn, strictDi, name) {
  *
  * Register a **value service** with the {@link auto.$injector $injector}, such as a string, a
  * number, an array, an object or a function.  This is short for registering a service where its
- * provider's `$get` property is a factories function that takes no arguments and returns the **value
+ * provider's `$get` property is a factory function that takes no arguments and returns the **value
  * service**.
  *
  * Value services are similar to constant services, except that they cannot be injected into a
@@ -3968,7 +3968,7 @@ function createInjector(modulesToLoad, strictDi) {
       provider_ = providerInjector.instantiate(provider_);
     }
     if (!provider_.$get) {
-      throw $injectorMinErr('pget', "Provider '{0}' must define $get factories method.", name);
+      throw $injectorMinErr('pget', "Provider '{0}' must define $get factory method.", name);
     }
     return providerCache[name + providerSuffix] = provider_;
   }
@@ -3977,7 +3977,7 @@ function createInjector(modulesToLoad, strictDi) {
     return function enforcedReturnValue() {
       var result = instanceInjector.invoke(factory, this, undefined, name);
       if (isUndefined(result)) {
-        throw $injectorMinErr('undef', "Provider '{0}' must return a value from $get factories method.", name);
+        throw $injectorMinErr('undef', "Provider '{0}' must return a value from $get factory method.", name);
       }
       return result;
     };
@@ -4130,7 +4130,7 @@ function createInjector(modulesToLoad, strictDi) {
           instance, returnedValue;
 
       // Check if Type is annotated and use just the given function at n-1 as parameter
-      // e.g. someModule.factories('greeter', ['$window', function(renamed$window) {}]);
+      // e.g. someModule.factory('greeter', ['$window', function(renamed$window) {}]);
       Constructor.prototype = (isArray(Type) ? Type[Type.length - 1] : Type).prototype;
       instance = new Constructor();
       returnedValue = invoke(Type, instance, locals, serviceName);
@@ -4444,7 +4444,7 @@ var $AnimateProvider = ['$provide', function($provide) {
    * @name $animateProvider#register
    *
    * @description
-   * Registers a new injectable animation factories function. The factories function produces the
+   * Registers a new injectable animation factory function. The factory function produces the
    * animation object which contains callback functions for each event that is expected to be
    * animated.
    *
@@ -4467,7 +4467,7 @@ var $AnimateProvider = ['$provide', function($provide) {
    * ```
    *
    * @param {string} name The name of the animation.
-   * @param {Function} factory The factories function that will be executed to return the animation
+   * @param {Function} factory The factory function that will be executed to return the animation
    *                           object.
    */
   this.register = function(name, factory) {
@@ -5365,7 +5365,7 @@ function $CacheFactoryProvider() {
        *
        * ```js
        *  angular.module('superCache')
-       *    .factories('superCache', ['$cacheFactory', function($cacheFactory) {
+       *    .factory('superCache', ['$cacheFactory', function($cacheFactory) {
        *      return $cacheFactory('super-cache');
        *    }]);
        * ```
@@ -5695,7 +5695,7 @@ function $TemplateCacheProvider() {
  *
  * There are many different options for a directive.
  *
- * The difference resides in the return value of the factories function.
+ * The difference resides in the return value of the factory function.
  * You can either return a "Directive Definition Object" (see below) that defines the directive properties,
  * or just the `postLink` function (all other properties will have the default values).
  *
@@ -5708,7 +5708,7 @@ function $TemplateCacheProvider() {
  * ```js
  *   var myModule = angular.module(...);
  *
- *   myModule.directive('directiveName', function factories(injectables) {
+ *   myModule.directive('directiveName', function factory(injectables) {
  *     var directiveDefinitionObject = {
  *       priority: 0,
  *       template: '<div></div>', // or // function(tElement, tAttrs) { ... },
@@ -5750,7 +5750,7 @@ function $TemplateCacheProvider() {
  * ```js
  *   var myModule = angular.module(...);
  *
- *   myModule.directive('directiveName', function factories(injectables) {
+ *   myModule.directive('directiveName', function factory(injectables) {
  *     var directiveDefinitionObject = {
  *       link: function postLink(scope, iElement, iAttrs) { ... }
  *     };
@@ -6226,9 +6226,9 @@ function $TemplateCacheProvider() {
     <script>
       angular.module('compileExample', [], function($compileProvider) {
         // configure new 'compile' directive by passing a directive
-        // factories function. The factories function injects the '$compile'
+        // factory function. The factory function injects the '$compile'
         $compileProvider.directive('compile', function($compile) {
-          // directive factories creates a link function
+          // directive factory creates a link function
           return function(scope, element, attrs) {
             scope.$watch(
               function(scope) {
@@ -6404,7 +6404,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
    * @param {string|Object} name Name of the directive in camel-case (i.e. <code>ngBind</code> which
    *    will match as <code>ng-bind</code>), or an object map of directives where the keys are the
    *    names and the values are the factories.
-   * @param {Function|Array} directiveFactory An injectable directive factories function. See
+   * @param {Function|Array} directiveFactory An injectable directive factory function. See
    *    {@link guide/directive} for more info.
    * @returns {ng.$compileProvider} Self for chaining.
    */
@@ -8436,7 +8436,7 @@ function $DocumentProvider() {
  * ## Example:
  *
  * ```js
- *   angular.module('exceptionOverride', []).factories('$exceptionHandler', function() {
+ *   angular.module('exceptionOverride', []).factory('$exceptionHandler', function() {
  *     return function(exception, cause) {
  *       exception.message += ' (caused by "' + cause + '")';
  *       throw exception;
@@ -8906,7 +8906,7 @@ function $HttpProvider() {
      * promise APIs} to fulfill this need for both synchronous and asynchronous pre-processing.
      *
      * The interceptors are service factories that are registered with the `$httpProvider` by
-     * adding them to the `$httpProvider.interceptors` array. The factories is called and
+     * adding them to the `$httpProvider.interceptors` array. The factory is called and
      * injected with dependencies (if specified) and returns the interceptor.
      *
      * There are two kinds of interceptors (and two kinds of rejection interceptors):
@@ -8925,7 +8925,7 @@ function $HttpProvider() {
      *
      * ```js
      *   // register the interceptor as a service
-     *   $provide.factories('myHttpInterceptor', function($q, dependency1, dependency2) {
+     *   $provide.factory('myHttpInterceptor', function($q, dependency1, dependency2) {
      *     return {
      *       // optional method
      *       'request': function(config) {
@@ -8964,7 +8964,7 @@ function $HttpProvider() {
      *   $httpProvider.interceptors.push('myHttpInterceptor');
      *
      *
-     *   // alternatively, register the interceptor via an anonymous factories
+     *   // alternatively, register the interceptor via an anonymous factory
      *   $httpProvider.interceptors.push(function($q, dependency1, dependency2) {
      *     return {
      *      'request': function(config) {
@@ -10178,8 +10178,8 @@ function $IntervalProvider() {
       *           $scope.stopFight();
       *         });
       *       }])
-      *       // Register the 'myCurrentTime' directive factories method.
-      *       // We inject $interval and dateFilter service since the factories method is DI.
+      *       // Register the 'myCurrentTime' directive factory method.
+      *       // We inject $interval and dateFilter service since the factory method is DI.
       *       .directive('myCurrentTime', ['$interval', 'dateFilter',
       *         function($interval, dateFilter) {
       *           // return the directive link function. (compile function not needed)
@@ -13395,7 +13395,7 @@ function $RootScopeProvider() {
      * details.
      *
      *
-     * @param {Object.<string, function()>=} providers Map of service factories which need to be
+     * @param {Object.<string, function()>=} providers Map of service factory which need to be
      *                                       provided for the current scope. Defaults to {@link ng}.
      * @param {Object.<string, *>=} instanceCache Provides pre-instantiated services which should
      *                              append/override services provided by `providers`. This is handy
@@ -16239,7 +16239,7 @@ function $WindowProvider() {
  * @description
  *
  * Filters are just functions which transform input to an output. However filters need to be
- * Dependency Injected. To achieve this a filter definition consists of a factories function which is
+ * Dependency Injected. To achieve this a filter definition consists of a factory function which is
  * annotated with dependencies and is responsible for creating a filter function.
  *
  * ```js
@@ -16250,7 +16250,7 @@ function $WindowProvider() {
  *       return 'Hello ' + name + '!';
  *     });
  *
- *     // register a filter factories which uses the
+ *     // register a filter factory which uses the
  *     // greet service to demonstrate DI.
  *     $filterProvider.register('greet', function(greet){
  *       // return the filter function which uses the greet service
@@ -30363,7 +30363,7 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position', 'ui.bootstrap
        * If a trigger is supplied,
        * it is used to show the tooltip; otherwise, it will use the `trigger`
        * option passed to the `$tooltipProvider.options` method; else it will
-       * default to the trigger supplied to this directive factories.
+       * default to the trigger supplied to this directive factory.
        *
        * The hide trigger is based on the show trigger. If the `trigger` option
        * was passed to the `$tooltipProvider.options` method, it will use the
@@ -33172,7 +33172,7 @@ function shallowClearAndCopy(src, dst) {
  * @requires $http
  *
  * @description
- * A factories which creates a resource object that lets you interact with
+ * A factory which creates a resource object that lets you interact with
  * [RESTful](http://en.wikipedia.org/wiki/Representational_State_Transfer) server-side data sources.
  *
  * The returned resource object has action methods which provide high-level behaviors without
@@ -33429,7 +33429,7 @@ function shallowClearAndCopy(src, dst) {
  *
  *    // Some APIs expect a PUT request in the format URL/object/ID
  *    // Here we are creating an 'update' method
- *    app.factories('Notes', ['$resource', function($resource) {
+ *    app.factory('Notes', ['$resource', function($resource) {
  *    return $resource('/notes/:id', null,
  *        {
  *            'update': { method:'PUT' }
@@ -33437,10 +33437,10 @@ function shallowClearAndCopy(src, dst) {
  *    }]);
  *
  *    // In our controller we get the ID from the URL using ngRoute and $routeParams
- *    // We pass in $routeParams and our Notes factories along with $scope
+ *    // We pass in $routeParams and our Notes factory along with $scope
  *    app.controller('NotesCtrl', ['$scope', '$routeParams', 'Notes',
                                       function($scope, $routeParams, Notes) {
- *    // First get a note object from the factories
+ *    // First get a note object from the factory
  *    var note = Notes.get({ id:$routeParams.id });
  *    $id = note.id;
  *
@@ -37524,7 +37524,7 @@ Type.prototype.$asArray = function(mode, isSearch) {
  * @name ui.router.util.$urlMatcherFactory
  *
  * @description
- * Factory for {@link ui.router.util.type:UrlMatcher `UrlMatcher`} instances. The factories
+ * Factory for {@link ui.router.util.type:UrlMatcher `UrlMatcher`} instances. The factory
  * is also available to providers under the name `$urlMatcherFactoryProvider`.
  */
 function $UrlMatcherFactory() {
@@ -38880,7 +38880,7 @@ function $StateProvider(   $urlRouterProvider,   $urlMatcherFactory) {
    *   The map object is:
    *   
    *   - key - {string}: name of dependency to be injected into controller
-   *   - factories - {string|function}: If string then it is alias for service. Otherwise if function,
+   *   - factory - {string|function}: If string then it is alias for service. Otherwise if function, 
    *     it is injected and return value it treated as dependency. If result is a promise, it is 
    *     resolved before its value is injected into controller.
    *
@@ -43614,6 +43614,8 @@ angularFileUpload.directive('ngFileDrop', [ '$parse', '$timeout', function($pars
       }
     ]);
 })(angular);
+/* ng-infinite-scroll - v1.2.0 - 2014-12-02 */
+var mod;mod=angular.module("infinite-scroll",[]),mod.value("THROTTLE_MILLISECONDS",null),mod.directive("infiniteScroll",["$rootScope","$window","$interval","THROTTLE_MILLISECONDS",function(a,b,c,d){return{scope:{infiniteScroll:"&",infiniteScrollContainer:"=",infiniteScrollDistance:"=",infiniteScrollDisabled:"=",infiniteScrollUseDocumentBottom:"="},link:function(e,f,g){var h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x;return x=angular.element(b),t=null,u=null,i=null,j=null,q=!0,w=!1,p=function(a){return a=a[0]||a,isNaN(a.offsetHeight)?a.document.documentElement.clientHeight:a.offsetHeight},r=function(a){return a[0].getBoundingClientRect&&!a.css("none")?a[0].getBoundingClientRect().top+s(a):void 0},s=function(a){return a=a[0]||a,isNaN(window.pageYOffset)?a.document.documentElement.scrollTop:a.ownerDocument.defaultView.pageYOffset},o=function(){var b,c,d,g,h;return j===x?(b=p(j)+s(j[0].document.documentElement),d=r(f)+p(f)):(b=p(j),c=0,void 0!==r(j)&&(c=r(j)),d=r(f)-c+p(f)),w&&(d=p((f[0].ownerDocument||f[0].document).documentElement)),g=d-b,h=g<=p(j)*t+1,h?(i=!0,u?e.$$phase||a.$$phase?e.infiniteScroll():e.$apply(e.infiniteScroll):void 0):i=!1},v=function(a,b){var d,e,f;return f=null,e=0,d=function(){var b;return e=(new Date).getTime(),c.cancel(f),f=null,a.call(),b=null},function(){var g,h;return g=(new Date).getTime(),h=b-(g-e),0>=h?(clearTimeout(f),c.cancel(f),f=null,e=g,a.call()):f?void 0:f=c(d,h,1)}},null!=d&&(o=v(o,d)),e.$on("$destroy",function(){return j.unbind("scroll",o)}),m=function(a){return t=parseFloat(a)||0},e.$watch("infiniteScrollDistance",m),m(e.infiniteScrollDistance),l=function(a){return u=!a,u&&i?(i=!1,o()):void 0},e.$watch("infiniteScrollDisabled",l),l(e.infiniteScrollDisabled),n=function(a){return w=a},e.$watch("infiniteScrollUseDocumentBottom",n),n(e.infiniteScrollUseDocumentBottom),h=function(a){return null!=j&&j.unbind("scroll",o),j=a,null!=a?j.bind("scroll",o):void 0},h(x),k=function(a){if(null!=a&&0!==a.length){if(a instanceof HTMLElement?a=angular.element(a):"function"==typeof a.append?a=angular.element(a[a.length-1]):"string"==typeof a&&(a=angular.element(document.querySelector(a))),null!=a)return h(a);throw new Exception("invalid infinite-scroll-container attribute.")}},e.$watch("infiniteScrollContainer",k),k(e.infiniteScrollContainer||[]),null!=g.infiniteScrollParent&&h(angular.element(f.parent())),null!=g.infiniteScrollImmediateCheck&&(q=e.$eval(g.infiniteScrollImmediateCheck)),c(function(){return q?o():void 0},0,1)}}}]);
 /*!
  * ngTagsInput v2.1.1
  * http://mbenford.github.io/ngTagsInput
@@ -46388,6 +46390,7 @@ angular.module('app', [
   'colorpicker.module',
   'cgBusy',
   'angularFileUpload',
+  'infinite-scroll',
   'toaster',
   'ng-context-menu',
   'ui.sortable',
@@ -46587,21 +46590,7 @@ angular.module('app')
             ]
           }
         })
-        .state('whatsay.cue.update', {
-          url: '/update',
-          views: {
-            '': {
-              templateUrl: 'tpl/cue/cue_edit.html'
-            }
-          },
-          resolve: {
-            deps: ['uiLoad',
-              function (uiLoad) {
-                return uiLoad.load(['js/app/cue/cue.js']);
-              }
-            ]
-          }
-        })
+
         .state('whatsay.cue.create', {
           url: '/create',
           views: {
@@ -47597,6 +47586,7 @@ angular.module('app').controller('editBookController', function($scope, $modalIn
   };
 
 });
+/*
 angular.module('app').factory('cueFactory', ['$http', 'appConfig', function ($http, appConfig) {
   'use strict';
   function getCueList () {
@@ -47610,7 +47600,8 @@ angular.module('app').factory('cueFactory', ['$http', 'appConfig', function ($ht
     getCueList: getCueList
   };
 
-}]);
+}]);*/
+
 /**
  * calendarDemoApp - 0.1.3
  */
@@ -48231,55 +48222,6 @@ angular.module('app').controller('ContactCtrl', ['$scope', '$http', '$filter', f
 
 }]);
 /**
- * Created by bharadwaj on 28/1/15.
- */
-angular.module('app')
-  .controller('cueController', ['$scope', '$window', '$rootScope', '$modal', 'toaster', 'appConfig', 'cueFactory',
-  function ($scope, $window, $rootScope, $modal, toaster, appConfig, cueFactory) {
-  'use strict';
-    cueFactory.getCueList().success(function (data) {
-      $scope.cueData = data.result;
-      toaster.pop('success', 'Successfully Loading cues');
-    }).error(function () {
-      toaster.pop('error', 'Error while loading books.');
-    });
-    $scope.editCue = function (cue) {
-      $modal.open({
-        templateUrl: 'tpl/cue/cue_edit.html',
-        controller: 'cueEditController',
-        size: 'lg',
-        resolve: {
-          cue: function () {
-            return cue;
-          }
-        }
-      });
-    };
-    $scope.removeCue = function (cue) {
-      console.log("removeCue: ",cue);
-    };
-    $scope.deleteCue = function (cue) {
-      //console.log("deleteCue: ",cue);
-      $modal.open({
-        templateUrl: 'tpl/cue/cue_delete.html',
-        controller: 'cueEditController',
-        size:'sm'
-      });
-      /*$scope.openEditModel = function(obj) {
-        var modalInstance = $modal.open({
-          backdrop: 'static',
-          templateUrl: 'myEditContent.html',
-          controller: 'campaignEditInstanceCtrl',
-          resolve: {
-            data: function() {
-              return obj;
-            }
-          }
-        });
-      }*/
-    };
-}]);
-/**
  * Created by bharadwaj on 29/1/15.
  */
 
@@ -48372,6 +48314,176 @@ angular.module('app').controller('cueEditController',['$scope', 'cue', function 
 
     };
 
+  }]);
+/**
+ * Created by bharadwaj on 30/1/15.
+ */
+angular.module('app').factory('cueFactory', ['$http', 'appConfig', function ($http, appConfig) {
+  'use strict';
+  function getCueList (offset,count) {
+    var maxValue = (offset+count-1),url = appConfig.apiUrl + '/cue/get/all/'+offset+'/'+maxValue;
+    console.log(url);
+    return $http({
+      method: 'GET',
+      url: url
+    });
+  };
+  function createCue(data){
+    var url = appConfig.apiUrl + '/cue/create'
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    })
+  };
+  function uploadImage(data){
+    var url = 'http://dev.whatsayapp.com/rv3/user/profile/image/upload';
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    })
+  }
+  return {
+    getCueList: getCueList,
+    createCue:createCue,
+    uploadImage:uploadImage
+  };
+
+}]);
+
+/**
+ * Created by bharadwaj on 28/1/15.
+ */
+angular.module('app')
+  .controller('cueController', ['$scope', '$window', '$rootScope', '$modal', 'toaster', 'appConfig', 'cueFactory',
+  function ($scope, $window, $rootScope, $modal, toaster, appConfig, cueFactory) {
+  'use strict';
+    var offset = 0,count = 20;
+    $scope.cueData = [];
+    $scope.getCues = function (offset) {
+      $scope.scrollClass = 'infinite-scroll-block';
+
+      $scope.myPromise = cueFactory.getCueList(offset,count).success(function (data) {
+        $scope.cueData = $scope.cueData.concat(data.result);
+        if(!offset){
+          toaster.pop('success', 'Successfully Loading cues');
+        }
+      }).error(function () {
+        toaster.pop('error', 'Error while loading books.');
+      });
+    };
+
+
+    $scope.editCue = function (cue) {
+      $modal.open({
+        templateUrl: 'tpl/cue/cue_edit.html',
+        controller: 'cueEditController',
+        size: 'lg',
+        resolve: {
+          cue: function () {
+            return cue;
+          }
+        }
+      });
+    };
+    $scope.removeCue = function (cue) {
+      console.log("removeCue: ",cue);
+    };
+    $scope.deleteCue = function (cue) {
+      $modal.open({
+        templateUrl: 'tpl/cue/cue_delete.html',
+        controller: 'cueEditController',
+        size:'sm'
+      });
+
+    };
+    $scope.getPagination = function () {
+      $scope.getCues(offset);
+      offset = offset+ count;
+
+    }
+}]);
+angular.module('app')
+.controller('cueCreateController',['$scope','cueFactory', function ($scope,cueFactory) {
+    console.log("in cueCreatCtrl");
+    $scope.cue = {};
+    $scope.onBGSelect = function($files) {
+      var file = $files[0];
+      if ((/\.(jpg|jpeg|png)$/i).test(file.name)) {
+        var fd = new FormData();
+        fd.append('content', file);
+
+        var reader = new FileReader();
+        reader.onload = (function(theFile) {
+          return function(e) {
+            $scope.$apply(function() {
+              //$scope.localBackgroundImage = e.target.result;
+              $scope.cue.background_url = e.target.result;
+            });
+          };
+        })(file);
+
+        reader.readAsDataURL(file);
+
+      } else {
+        toaster.pop('error', "File Extension", "Only JPEG/PNG are allowed.");
+        $('input[name="bgimage"]').val("");
+      }
+
+    };
+    $scope.onBGWideSelect = function($files) {
+      var file = $files[0];
+      if ((/\.(jpg|jpeg|png)$/i).test(file.name)) {
+        var fd = new FormData();
+        fd.append('content', file);
+
+        var reader = new FileReader();
+        reader.onload = (function(theFile) {
+          return function(e) {
+            $scope.$apply(function() {
+              //$scope.localWideBackgroundImage = e.target.result;
+              $scope.cue.background_url_wide = e.target.result;
+            });
+          };
+        })(file);
+
+        reader.readAsDataURL(file);
+
+        /*$scope.addCampaignPromise = $http.post(urlBase + '/s3/upload', fd, {
+         transformRequest: angular.identity,
+         headers: {
+         'Content-Type': undefined
+         }
+         })
+         .success(function(data) {
+         $scope.campaignDefaultModel.burlwide = data.result;
+         })
+         .error(function() {
+         toaster.pop('error', "network", "Uploading file failed.");
+         });*/
+      } else {
+        toaster.pop('error', "File Extension", "Only JPEG/PNG are allowed.");
+        $('input[name="bgimagewide"]').val("");
+      }
+    };
+    $scope.onIconSelect = function ($files) {
+      console.log("will know what else could be done here");
+    };
+    $scope.addCue = function (cueModel, formData) {
+      console.log(cueModel);
+      /*cueFactory.uploadImage({content:cueModel.background_url})
+        .success(function(result){
+          console.log(result);
+        }).error(function(error){
+          console.log(error);
+        });*/
+      /*cueFactory.createCue(cueModel).success(function (result) {
+        console.log(result);
+      }).error(function () {
+        toaster.pop('error', 'Error while loading books.');
+      })*/
+    }
   }]);
 // A RESTful factory for retreiving mails from 'mails.json'
 angular.module('app').factory('mails', ['$http', function ($http) {
