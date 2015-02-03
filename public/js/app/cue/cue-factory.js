@@ -22,9 +22,11 @@ angular.module('app').factory('cueFactory', ['$http', 'appConfig', function ($ht
   function uploadImage(data){
     var url = 'http://dev.whatsayapp.com/rv3/user/profile/image/upload';
     return $http({
-      method:'POST',
-      url:url,
-      data:data
+      'method':'POST',
+      'url':url,
+      'content-type':'multipart/form-data',
+      'data':data,
+      'J290EeGRFyIYRdXES7outLUbZKr': 'l0FQ5cmpRcADmREyUY4DKwH3CnxejQtpb1cM'
     })
   }
   return {

@@ -11,46 +11,50 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label>Text </label>
-                    <input type="text" class="form-control" ng-model="cue.text" required>
+                    <input type="text" name="cueText" class="form-control" ng-model="cue.text" required>
+                    <div ng-show="addForm.cueText.$dirty" ng-messages="addForm.cueText.$error" ng-messages-include="error_messages.html"></div>
                 </div>
                 <div class="form-group">
-                    <label>BackGround color </label>
-                    <input colorpicker colorpicker-position="left" type="text" ng-model="cue.bgcolor" class="color-pointer form-control" readonly required/>
+                    <label>Background color </label>
+                    <input colorpicker colorpicker-position="left" name="cueBackgroundColor" type="text" ng-model="cue.bgcolor" class="color-pointer form-control" readonly required/>
+                    <div ng-show="addForm.cueBackgroundColor.$dirty" ng-messages="addForm.cueBackgroundColor.$error" ng-messages-include="error_messages.html"></div>
                 </div>
                 <div class="form-group">
-                    <label>ForeGround color </label>
-                    <input colorpicker colorpicker-position="left" type="text" ng-model="cue.fcolor" class="color-pointer form-control" readonly required/>
+                    <label>Foreground color </label>
+                    <input colorpicker colorpicker-position="left" type="text" name="cueForegroundColor" ng-model="cue.fcolor" class="color-pointer form-control" readonly required/>
+                    <div ng-show="addForm.cueForegroundColor.$dirty" ng-messages="addForm.cueForegroundColor.$error" ng-messages-include="error_messages.html"></div>
                 </div>
 
                 <div class="form-group">
                     <label>Scale</label>
                     <div class="input-group">
                     <label class="i-checks checkbox-inline">
-                        <input type="radio" name="scale" ng-model="cue.scale" value="TILE"><i></i>Tiles
+                        <input type="radio" name="cueScale" ng-model="cue.scale" value="TILE" required><i></i>Tiles
                     </label>
                     <label class="i-checks checkbox-inline">
-                        <input type="radio" name="scale" ng-model="cue.scale" value="STRETCHED"><i></i>Stretched
+                        <input type="radio" name="cueScale" ng-model="cue.scale" value="STRETCHED" required><i></i>Stretched
                     </label>
+                        <div ng-show="addForm.cueScale.$dirty" ng-messages="addForm.scale.$error" ng-messages-include="error_messages.html"></div>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Font</label>
-                    <select name="account" class="form-control m-b" data-ng-model="cue.font" required>
+                    <select name="cueAccount" class="form-control m-b" data-ng-model="cue.font" required>
                         <option>option 1</option>
                         <option>option 2</option>
                         <option>option 3</option>
                         <option>option 4</option>
                     </select>
+                    <div ng-show="addForm.cueAccount.$dirty" ng-messages="addForm.account.$error" ng-messages-include="error_messages.html"></div>
                 </div>
                 <div class="form-group">
                     <label>Font Size</label>
                     <div class="input-group m-b">
-                        <!--<input type="text" class="form-control" ng-model="cue.font_size">-->
-                        <!--<span class="input-group-addon">px</span>-->
-                        <!--<input ui-jq="TouchSpin" type="text" value="0" class="form-control" data-min='0' data-max="32" data-step="1" data-decimals="0" >-->
+
                         <input ui-jq="TouchSpin" type="text" value="14" class="form-control" data-step="2"
                                data-min='8' data-max="48" data-verticalbuttons="true" data-verticalupclass="fa fa-caret-up"
-                               data-verticaldownclass="fa fa-caret-down" required>
+                               data-verticaldownclass="fa fa-caret-down" name="cueFontsize" required>
+                        <div ng-show="addForm.cueFontsize.$dirty" ng-messages="addForm.cueFontsize.$error" ng-messages-include="error_messages.html"></div>
                     </div>
                 </div>
 
@@ -98,7 +102,7 @@
         </div>
         <footer class="panel-footer text-right bg-light lter">
             <button class="btn m-b-xs btn-sm btn-default btn-addon" ng-click="cueReset()"><i class="fa fa-circle"></i>Reset</button>
-            <button ng-disabled="addForm.$invalid && imageUploaded" class="btn m-b-xs btn-sm btn-primary btn-addon" ng-click="addCue(cue,addForm)"><i class="fa fa-plus"></i>Add</button>
+            <button ng-disabled="addForm.$invalid" class="btn m-b-xs btn-sm btn-primary btn-addon" ng-click="addCue(cue,addForm)"><i class="fa fa-plus"></i>Add</button>
         </footer>
     </div>
 </form>

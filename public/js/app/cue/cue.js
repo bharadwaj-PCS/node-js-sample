@@ -48,8 +48,26 @@ angular.module('app')
       $scope.getCues(offset);
       offset = offset+ count;
 
-    }
-}]);
+    };
+    $scope.log = [];
+    $scope.superheroes = [
+      'Spiderman'
+    ];
+    /*$scope.loadSuperheroes = function(query) {
+      // An arrays of strings here will also be converted into an
+      // array of objects
+
+      return ary;
+    };*/
+    $scope.tagAdded = function(tag) {
+
+    };
+
+    $scope.tagRemoved = function(tag) {
+
+    };
+
+  }]);
 angular.module('app')
 .controller('cueCreateController',['$scope','cueFactory', function ($scope,cueFactory) {
     console.log("in cueCreatCtrl");
@@ -118,12 +136,12 @@ angular.module('app')
     };
     $scope.addCue = function (cueModel, formData) {
       console.log(cueModel);
-      /*cueFactory.uploadImage({content:cueModel.background_url})
+      cueFactory.uploadImage({content:cueModel.background_url})
         .success(function(result){
           console.log(result);
         }).error(function(error){
           console.log(error);
-        });*/
+        });
       /*cueFactory.createCue(cueModel).success(function (result) {
         console.log(result);
       }).error(function () {

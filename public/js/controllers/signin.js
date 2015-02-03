@@ -1,6 +1,7 @@
 /* Controllers */
 // signin controller
-angular.module('app').controller('SigninFormController', ['$scope', '$http', '$state', function ($scope, $http, $state) {
+angular.module('app').controller('SigninFormController', ['$scope', '$http', '$state','Facebook',
+  function ($scope, $http, $state,Facebook) {
   'use strict';
   $scope.user = {};
   $scope.authError = null;
@@ -9,7 +10,7 @@ angular.module('app').controller('SigninFormController', ['$scope', '$http', '$s
     var emailList = ['admin@whatsay.com'],passwordList = ['123'];
     var index = emailList.indexOf($scope.user.email);
     if (index !== -1 && $scope.user.password === passwordList[index]) {
-      $state.go('whatsay.cue');
+      $state.go('app.cue');
     } else {
       $scope.authError = 'Email or Password not right';
     }
@@ -25,5 +26,12 @@ angular.module('app').controller('SigninFormController', ['$scope', '$http', '$s
      $scope.authError = 'Server Error';
      });*/
   };
+    $scope.fbLogin = function () {
+      Facebook.login(function (response) {
+        if(response.status === 'connected'){
+          $state.go('app.cue');
+        }
+      })
+    };
 }])
 ;

@@ -18,6 +18,30 @@
                                 <!--<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi id neque quam. Aliquam sollicitudin egestas dui nec, fermentum diam. Vivamus vel tincidunt libero, vitae elementum ligula venenatis ipsum ac feugiat. Vestibulum ullamcorper sodales nisi nec condimentum</p>
                                 <p><span class="label bg-primary pos-rlt m-r inline wrapper-xs"><i class="arrow right arrow-primary"></i> Tags:</span> <a href class="m-r-sm">admin</a> <a href>app</a>
                                 </p>-->
+                                <!--<p ng-dblclick="showTags=true" ng-show="!showTags" style="cursor: pointer;" >
+                                    <span class="label bg-primary pos-rlt m-r inline wrapper-xs"><i class="arrow right arrow-primary"></i> Tags:</span>
+                                    <a href class="m-r-sm">admin</a>
+                                    <a href>app</a>
+
+                                </p>
+                                <tags-input ng-show="showTags" ng-model="cue.tags"></tags-input>
+                                <span ng-show="showTags"  class="label bg-primary pos-rlt m-r inline wrapper-xs" ng-click="showTags = false" style="cursor: pointer;">
+                                    Add
+                                </span>-->
+                                <p ng-show="!showTags" style="cursor: pointer;" >
+                                    <span class="label bg-primary pos-rlt m-r inline wrapper-xs"><i class="arrow right arrow-primary"></i> Tags:</span>
+                                <tags-input ng-model="superheroes"
+                                            placeholder="Add more tags"
+                                            replace-spaces-with-dashes="false"
+                                            add-from-autocomplete-only="false"
+                                            on-tag-added="tagAdded($tag)"
+                                            on-tag-removed="tagRemoved($tag)">
+                                    <auto-complete source="loadSuperheroes($query)"
+                                                   min-length="0"
+                                                   debounce-delay="0"
+                                                   max-results-to-show="10"></auto-complete>
+                                </tags-input>
+                                </p>
                             </li>
                         </ul>
                         <div class="cue_editor">
@@ -61,62 +85,6 @@
 
                         </tbody>
                     </table>
-                </tab>
-                <tab>
-                    <tab-heading>
-                        Delete
-                    </tab-heading>
-                    <!--<ul class="list-group list-group-lg no-borders pull-in m-b-none">
-                        <li class="list-group-item">
-                            <a href="#" class="h4 text-primary m-b-sm block">Mauris convallis mauris at pellentesque
-                                volutpat</a>
-
-                            <p class="b wrapper-md pos-rlt bg-light r r-2x"><span
-                                    class="arrow top pull-left arrow-light"></span>Lorem ipsum dolor sit amet, fermentum
-                                diam. Vivamus vel tincidunt libero, vitae elementum ligula venenatis ipsum ac feugiat.
-                                Vestibulum ullamcorper sodales nisi nec condimentum</p>
-                        </li>
-
-                    </ul>-->
-                    <form editable-form name="editableForm" onaftersave="saveUser()">
-                        <div class="form-horizontal">
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">Username:</label>
-                                <div class="col-sm-9">
-                                    <p class="form-control-static">
-                                        <span editable-text="user.name">{{ user.name || 'empty' }}</span>
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">Status:</label>
-                                <div class="col-sm-9">
-                                    <p class="form-control-static">
-                    <span editable-select="user.status" e-ng-options="s.value as s.text for s in statuses">
-                      {{ showStatus() }}
-                    </span>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="col-sm-9 col-sm-offset-3">
-                                    <button type="button" class="btn btn-default" ng-click="editableForm.$show()" ng-show="!editableForm.$visible">
-                                        Edit
-                                    </button>
-                                    <!-- buttons to submit / cancel form -->
-                  <span ng-show="editableForm.$visible">
-                    <button type="submit" class="btn btn-primary" ng-disabled="editableForm.$waiting">
-                        Save
-                    </button>
-                    <button type="button" class="btn btn-default" ng-disabled="editableForm.$waiting" ng-click="editableForm.$cancel()">
-                        Cancel
-                    </button>
-                  </span>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
                 </tab>
             </tabset>
         </div>
