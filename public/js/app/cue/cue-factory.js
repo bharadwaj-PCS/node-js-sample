@@ -28,11 +28,20 @@ angular.module('app').factory('cueFactory', ['$http', 'appConfig', function ($ht
       'data':data,
       'J290EeGRFyIYRdXES7outLUbZKr': 'l0FQ5cmpRcADmREyUY4DKwH3CnxejQtpb1cM'
     })
-  }
+  };
+  function deleteCue(data){
+    var url = appConfig.apiUrl+'/cue/delete';
+    return $http({
+      'method':'POST',
+      'url':url,
+      data:data
+    });
+  };
   return {
     getCueList: getCueList,
     createCue:createCue,
-    uploadImage:uploadImage
+    uploadImage:uploadImage,
+    deleteCue:deleteCue
   };
 
 }]);

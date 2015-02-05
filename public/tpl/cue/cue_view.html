@@ -52,10 +52,10 @@
                                     class="glyphicon glyphicon-edit"></span> Edit
                             </button>
                             <button class="btn btn-primary"
-                                    ng-click="removeCue(cue)"><span
+                                    ng-click="openDeleteCueModal(cue,$index,false)"><span
                                     class="glyphicon glyphicon-pencil"></span> Remove
                             </button>
-                            <button class="btn btn-primary " ng-click="deleteCue(cue)"><span
+                            <button class="btn btn-primary " ng-click="openDeleteCueModal(cue,$index,true)"><span
                                     class="glyphicon glyphicon-trash"></span> Delete
                             </button>
 
@@ -91,3 +91,19 @@
     </div>
 </div>
 <div ng-class="scrollClass"></div>
+
+<!-- Delete Confirmation Box-->
+
+<script type="text/ng-template" id="myDeleteContent.html">
+    <div class="modal-header">
+        <h3 class="modal-title" ng-if="flag">Delete Cue</h3>
+        <h3 class="modal-title" ng-if="!flag">Remove Cue</h3>
+    </div>
+    <div class="modal-body">
+        <div style="font:bold;">Are you sure want to <span ng-if="!flag">remove?</span><span ng-if="flag">delete?</span></div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-success" ng-click="deleteItem()">Delete</button>
+        <button class="btn btn-danger" ng-click="cancel()">Cancel</button>
+    </div>
+</script>
