@@ -61,7 +61,7 @@ var app =
     }])
     .config(['FacebookProvider',function(FacebookProvider){
       FacebookProvider.init('804274249657423');
-    }]).constant('appConfig', {apiUrl: 'http://smacx-node-server-dev.herokuapp.com/api/v1',bookPermissions: ['PUBLIC', 'PRIVATE', 'DRAFT'],bookSubType: ['FREE', 'PAID'],currencyType: ['INR', 'USD']
+    }]).constant('appConfig', {apiUrl: 'https://smacx-node-server-dev.herokuapp.com/api/v1',bookPermissions: ['PUBLIC', 'PRIVATE', 'DRAFT'],bookSubType: ['FREE', 'PAID'],currencyType: ['INR', 'USD']
     });
 // lazyload config
 

@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a4bf2daa-d649-46fa-b75f-48dad2dc74e1" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/app.min.js" afterPath="$PROJECT_DIR$/public/js/app.min.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/dist_app.js" afterPath="$PROJECT_DIR$/public/js/dist_app.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/tpl/page_signin.html" afterPath="$PROJECT_DIR$/public/tpl/page_signin.html" />
     </list>
     <ignored path="node-js-sample.iws" />
