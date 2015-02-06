@@ -1,66 +1,69 @@
-<toaster-container toaster-options="{'time-out': 3000, 'close-button':true}"></toaster-container>
-<div class="bg-light lter b-b wrapper-md">
-    <h1 class="m-n font-thin h3">Cues</h1>
-</div>
-<div class="wrapper-md" ng-controller="cueController">
-    <div class="row" infinite-scroll="getPagination()" cg-busy="{promise:myPromise}">
-        <div class="col-lg-6" ng-repeat="cue in cueData">
-            <tabset class="tab-container">
-                <tab>
-                    <tab-heading>
-                        Over view
-                    </tab-heading>
-                    <div class="cue_thumbs">
-                        <img ng-src="{{cue.background_url_wide || 'http://placehold.it/500x250' }}" alt="" style="width:100%"/>
-                        <ul class="list-group no-borders pull-in m-b-none">
-                            <li class="list-group-item">
-                                <span href="" class="h4 text-primary m-b-sm m-t-sm block">{{cue.text}}</span>
+<div  ng-controller="cueController" cg-busy="{promise:myPromise}">
+    <toaster-container toaster-options="{'time-out': 3000, 'close-button':true}"></toaster-container>
+    <div class="bg-light lter b-b wrapper-md">
+        <h1 class="m-n font-thin h3">Cues</h1>
+    </div>
+    <div class="wrapper-md">
+        <div class="row" infinite-scroll="getPagination()">
+            <div class="col-lg-6" ng-repeat="cue in cueData">
+                <tabset class="tab-container">
+                    <tab>
+                        <tab-heading>
+                            Over view
+                        </tab-heading>
+                        <div class="cue_thumbs">
+                            <img ng-src="{{cue.background_url_wide || 'http://placehold.it/500x250' }}" alt=""
+                                 style="width:100%"/>
+                            <ul class="list-group no-borders pull-in m-b-none">
+                                <li class="list-group-item">
+                                    <span href="" class="h4 text-primary m-b-sm m-t-sm block">{{cue.text}}</span>
 
-                            </li>
-                        </ul>
-                        <div class="cue_editor">
-                            <!--<button class="btn btn-primary " ng-click="UploadImg(cue)"><span
-                                    class="glyphicon glyphicon-edit"></span> Upload Image
-                            </button>-->
-                            <button href="#" class="btn btn-primary" ng-click="editCue(cue,$index)"><span
-                                    class="glyphicon glyphicon-edit"></span> Edit
-                            </button>
-                            <button class="btn btn-primary"
-                                    ng-click="openDeleteCueModal(cue,$index,false)"><span
-                                    class="glyphicon glyphicon-pencil"></span> Remove
-                            </button>
-                            <button class="btn btn-primary " ng-click="openDeleteCueModal(cue,$index,true)"><span
-                                    class="glyphicon glyphicon-trash"></span> Delete
-                            </button>
+                                </li>
+                            </ul>
+                            <div class="cue_editor">
+                                <!--<button class="btn btn-primary " ng-click="UploadImg(cue)"><span
+                                        class="glyphicon glyphicon-edit"></span> Upload Image
+                                </button>-->
+                                <button href="#" class="btn btn-primary" ng-click="editCue(cue,$index)"><span
+                                        class="glyphicon glyphicon-edit"></span> Edit
+                                </button>
+                                <button class="btn btn-primary"
+                                        ng-click="openDeleteCueModal(cue,$index,false)"><span
+                                        class="glyphicon glyphicon-pencil"></span> Remove
+                                </button>
+                                <button class="btn btn-primary " ng-click="openDeleteCueModal(cue,$index,true)"><span
+                                        class="glyphicon glyphicon-trash"></span> Delete
+                                </button>
 
+                            </div>
                         </div>
-                    </div>
 
-                </tab>
-                <tab>
-                    <tab-heading>
-                        Parameters
-                    </tab-heading>
-                    <table class="table table-striped m-b-none cue-table" style="width:100%;table-layout: fixed;">
-                        <thead>
-                        <tr>
-                            <th>Key</th>
-                            <th>Value</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="(key,value) in cue">
-                            <td>
-                                {{key}}
-                            </td>
-                            <td>{{value}}</td>
-                        </tr>
+                    </tab>
+                    <tab>
+                        <tab-heading>
+                            Parameters
+                        </tab-heading>
+                        <table class="table table-striped m-b-none cue-table" style="width:100%;table-layout: fixed;">
+                            <thead>
+                            <tr>
+                                <th>Key</th>
+                                <th>Value</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="(key,value) in cue">
+                                <td>
+                                    {{key}}
+                                </td>
+                                <td>{{value}}</td>
+                            </tr>
 
 
-                        </tbody>
-                    </table>
-                </tab>
-            </tabset>
+                            </tbody>
+                        </table>
+                    </tab>
+                </tabset>
+            </div>
         </div>
     </div>
 </div>
@@ -71,10 +74,12 @@
 <script type="text/ng-template" id="myDeleteContent.html">
     <div class="modal-header">
         <h3 class="modal-title" ng-if="flag">Delete Cue</h3>
+
         <h3 class="modal-title" ng-if="!flag">Remove Cue</h3>
     </div>
     <div class="modal-body">
-        <div style="font:bold;">Are you sure want to <span ng-if="!flag">remove?</span><span ng-if="flag">delete?</span></div>
+        <div style="font:bold;">Are you sure want to <span ng-if="!flag">remove?</span><span ng-if="flag">delete?</span>
+        </div>
     </div>
     <div class="modal-footer">
         <button class="btn btn-success" ng-click="deleteItem()">Ok</button>

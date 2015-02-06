@@ -2086,9 +2086,7 @@ angular.module('app')
           console.log('Modal dismissed at: ' + new Date());
         });
       };
-      $scope.removeCue = function (cue) {
-        console.log("removeCue: ", cue);
-      };
+
       $scope.openDeleteCueModal = function (cue, $index, flag) {
         //console.log(cue);
         //$scope.cueData.splice($index,1);
@@ -2101,17 +2099,23 @@ angular.module('app')
             cue: function () {
               return cue;
             },
-            index: function () {
-              return $index;
-            },
-            cueData: function () {
-              return $scope.cueData;
-            },
             flag: function () {
               return flag;
             }
           }
         });
+        modalInstance.result.then(function (data) {
+          console.log(data);
+          cueFactory.deleteCue(data).success(function (res) {
+            toaster.pop('success', 'Successfully deleted the cue');
+            $scope.cueData.splice($index, 1);
+
+          }).error(function (err) {
+            toaster.pop('error', 'Error while deleting the cue');
+          });
+        },function () {
+          console.log('Modal dismissed at: ' + new Date());
+        })
       };
       $scope.getPagination = function () {
         $scope.getCues(offset);
@@ -2215,6 +2219,7 @@ angular.module('app')
       $scope.myPromise = cueFactory.createCue(cueModel).success(function (result) {
         console.log(result);
         toaster.pop('success', 'cues created sucessfuly.');
+        $scope.resetCue();
       }).error(function () {
         toaster.pop('error', 'Error while creating cues.');
       })
@@ -2225,25 +2230,9 @@ angular.module('app')
     };
 
   }]);
+
 angular.module('app')
-  .controller('sampleCtrl', ['$scope', function ($scope) {
-    console.log("sample ctrl");
-    $scope.value = 'hello karma';
-    $scope.password = '';
-    $scope.save = true;
-    $scope.grade = function () {
-      var size = $scope.password.length;
-      if (size > 8) {
-        $scope.strength = 'strong';
-      } else if (size > 3) {
-        $scope.strength = 'medium';
-      } else {
-        $scope.strength = 'weak';
-      }
-    };
-  }]);
-angular.module('app')
-  .controller('cueDeleteInstanceCtrl', function ($scope, $modalInstance, cueFactory, cue, index, cueData, flag) {
+  .controller('cueDeleteInstanceCtrl',['$scope','$modalInstance','cue','flag', function ($scope, $modalInstance, cue, flag) {
 
     $scope.flag = flag;
     $scope.deleteItem = function () {
@@ -2251,21 +2240,13 @@ angular.module('app')
         id: cue.id,
         hard: flag
       };
-
-      console.log(data, "from deleCtrl");
-      cueFactory.deleteCue(data).success(function (res) {
-        toaster.pop('success', 'Successfully deleted the cue');
-        cueData.splice(index, 1);
-
-      }).error(function (err) {
-        toaster.pop('error', 'Error while deleting the cue');
-      });
-      $modalInstance.close(cue);
+      //console.log(data, "from deleCtrl");
+      $modalInstance.close(data);
     };
     $scope.cancel = function () {
       $modalInstance.dismiss('cancel');
     };
-  });
+  }]);
 // A RESTful factory for retreiving mails from 'mails.json'
 angular.module('app').factory('mails', ['$http', function ($http) {
   'use strict';
