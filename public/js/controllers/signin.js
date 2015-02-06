@@ -29,7 +29,9 @@ angular.module('app').controller('SigninFormController', ['$scope', '$http', '$s
     $scope.fbLogin = function () {
       Facebook.login(function (response) {
         if(response.status === 'connected'){
-          $state.go('app.cue');
+          console.log(response)
+          //$state.go('app.cue');
+        //  call usser profile func
         }
       })
     };

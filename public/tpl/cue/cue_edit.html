@@ -6,59 +6,72 @@
         <div cg-busy="{promise:imagePromise}">
             <form role="form" ng-model="cue" name="cueUpdate">
                 <div class="row">
-                <div class="col-md-6">
-                <div class="form-group">
-                    <label>Background color</label>
-                    <input colorpicker colorpicker-position="left" type="text"
-                           ng-model="cue.bgcolor" class="color-pointer form-control" readonly/>
-                </div>
-                <div class="form-group">
-                    <label>ForeGround  color</label>
-                    <input colorpicker colorpicker-position="left" type="text"
-                           ng-model="cue.fcolor" class="color-pointer form-control" readonly/>
-                </div>
-                <div class="form-group">
-                    <label>Text</label>
-                    <input type="text" class="form-control" ng-model="cue.text"/>
-                </div>
-                </div>
-                <div class="col-md-6">
-                <div class="form-group">
-                    <label>Background Image [PNG/JPEG, 600x600]</label>
-                    <div class="input-group">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Text </label>
+                            <input type="text" name="cueText" class="form-control" ng-model="cue.text" required>
+                            <div ng-show="cueUpdate.cueText.$dirty" ng-messages="cueUpdate.cueText.$error" ng-messages-include="error_messages.html"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Background color </label>
+                            <input colorpicker colorpicker-position="left" name="cueBackgroundColor" type="text" ng-model="cue.bgcolor" class="color-pointer form-control" readonly required/>
+                            <div ng-show="cueUpdate.cueBackgroundColor.$dirty" ng-messages="cueUpdate.cueBackgroundColor.$error" ng-messages-include="error_messages.html"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Type</label>
+                            <div class="input-group">
+                                <label class="i-checks checkbox-inline">
+                                    <input type="radio" name="cueType" ng-model="cue.type" value="POLL" required><i></i>Poll
+                                </label>
+                                <label class="i-checks checkbox-inline">
+                                    <input type="radio" name="cueType" ng-model="cue.type" value="GENERAL" required><i></i>General
+                                </label>
+                                <div ng-show="cueUpdate.cueType.$dirty" ng-messages="cueUpdate.cueType.$error" ng-messages-include="error_messages.html"></div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Background Image</label>
+                            <div class="input-group">
                                     <span class="input-group-btn">
                                     <span class="btn btn-primary btn-file">
-                                    Browse&hellip; <input type="file" name="bgimage" ng-file-select="onBGSelect($files)"
-                                                          accept="image/*" >
+                                    Browse&hellip; <input type="file" name="bgimage" ng-file-select="onBGSelect($files)" accept="image/*" >
                                     </span>
                                     </span>
-                    </div>
-                    <div data-ng-if="cue.background_url"><img ng-src="{{cue.background_url}}" class="img-thumbnail" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Background Image wide [PNG/JPEG, 1200x600]</label>
-                    <div class="input-group">
+                            </div>
+                            <div data-ng-if="(cue.background_url_data || cue.background_url)">
+                                <img ng-src="{{cue.background_url_data || cue.background_url}}" class="img-upload-thimb" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Background Image wide</label>
+                            <div class="input-group">
                                     <span class="input-group-btn">
                                         <span class="btn btn-primary btn-file">
                                             Browse&hellip; <input type="file" name="bgimagewide" ng-file-select="onBGWideSelect($files)" accept="image/*">
                                         </span>
                                     </span>
-                    </div>
+                            </div>
 
-                    <div data-ng-if="cue.background_url_wide"><img ng-src="{{cue.background_url_wide}}" class="img-thumbnail" />
+                            <div data-ng-if="(cue.background_url_wide_data || cue.background_url_wide)">
+                                <img ng-src="{{cue.background_url_wide_data || cue.background_url_wide }}" class="img-upload-thimb" />
+                            </div>
+                        </div>
                     </div>
-                    </div>
-                </div>
                 </div>
             </form>
             </div>
         </div>
     <div class="modal-footer">
-        <input type="button" class="btn btn-primary" value="Update" ng-disabled="cueUpdate.$invalid"
+        <!--<input type="button" class="btn btn-primary" value="Update" ng-disabled="cueUpdate.$pristine && !cueUpdate.$invalid"-->
+        <input type="button" class="btn btn-primary" value="Update"
                ng-click="updateCue(cue,cueUpdate);" id="btn-update">
-        <input type="button" class="btn btn-primary" value="Reset"
-               ng-click="resetCue(cue,cueUpdate);" id="btn-reset">
+        <!--<input type="button" class="btn btn-primary" value="Reset"
+               ng-click="resetCue(cue,cueUpdate);" id="btn-reset">-->
         <button class="btn btn-warning" ng-click="cancel();"><span class="glyphicon glyphicon-remove"></span> Cancel</button>
     </div>
 </div>

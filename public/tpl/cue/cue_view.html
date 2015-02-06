@@ -15,40 +15,14 @@
                         <ul class="list-group no-borders pull-in m-b-none">
                             <li class="list-group-item">
                                 <span href="" class="h4 text-primary m-b-sm m-t-sm block">{{cue.text}}</span>
-                                <!--<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi id neque quam. Aliquam sollicitudin egestas dui nec, fermentum diam. Vivamus vel tincidunt libero, vitae elementum ligula venenatis ipsum ac feugiat. Vestibulum ullamcorper sodales nisi nec condimentum</p>
-                                <p><span class="label bg-primary pos-rlt m-r inline wrapper-xs"><i class="arrow right arrow-primary"></i> Tags:</span> <a href class="m-r-sm">admin</a> <a href>app</a>
-                                </p>-->
-                                <!--<p ng-dblclick="showTags=true" ng-show="!showTags" style="cursor: pointer;" >
-                                    <span class="label bg-primary pos-rlt m-r inline wrapper-xs"><i class="arrow right arrow-primary"></i> Tags:</span>
-                                    <a href class="m-r-sm">admin</a>
-                                    <a href>app</a>
 
-                                </p>
-                                <tags-input ng-show="showTags" ng-model="cue.tags"></tags-input>
-                                <span ng-show="showTags"  class="label bg-primary pos-rlt m-r inline wrapper-xs" ng-click="showTags = false" style="cursor: pointer;">
-                                    Add
-                                </span>-->
-                                <p ng-show="!showTags" style="cursor: pointer;" >
-                                    <span class="label bg-primary pos-rlt m-r inline wrapper-xs"><i class="arrow right arrow-primary"></i> Tags:</span>
-                                <tags-input ng-model="superheroes"
-                                            placeholder="Add more tags"
-                                            replace-spaces-with-dashes="false"
-                                            add-from-autocomplete-only="false"
-                                            on-tag-added="tagAdded($tag)"
-                                            on-tag-removed="tagRemoved($tag)">
-                                    <auto-complete source="loadSuperheroes($query)"
-                                                   min-length="0"
-                                                   debounce-delay="0"
-                                                   max-results-to-show="10"></auto-complete>
-                                </tags-input>
-                                </p>
                             </li>
                         </ul>
                         <div class="cue_editor">
                             <!--<button class="btn btn-primary " ng-click="UploadImg(cue)"><span
                                     class="glyphicon glyphicon-edit"></span> Upload Image
                             </button>-->
-                            <button href="#" class="btn btn-primary" ng-click="editCue(cue)"><span
+                            <button href="#" class="btn btn-primary" ng-click="editCue(cue,$index)"><span
                                     class="glyphicon glyphicon-edit"></span> Edit
                             </button>
                             <button class="btn btn-primary"
@@ -103,7 +77,7 @@
         <div style="font:bold;">Are you sure want to <span ng-if="!flag">remove?</span><span ng-if="flag">delete?</span></div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-success" ng-click="deleteItem()">Delete</button>
+        <button class="btn btn-success" ng-click="deleteItem()">Ok</button>
         <button class="btn btn-danger" ng-click="cancel()">Cancel</button>
     </div>
 </script>

@@ -1,13 +1,13 @@
 /**
  * Created by bharadwaj on 29/1/15.
  */
-
-angular.module('app').controller('cueEditController',['$scope', 'cue', function ($scope,cue) {
+'use strict';
+angular.module('app').controller('cueEditController',['$scope','$modalInstance', 'cue','cueFactory',
+  function ($scope,$modalInstance,cue,cueFactory) {
     //console.log("In CueEdit",cue);
     var originalCue = angular.copy(cue);
     $scope.cue = cue;
-    /*$scope.localWideBackgroundImage = cue.background_url_wide;
-    $scope.localBackgroundImage = cue.background_url ;*/
+  var originalCue = angular.copy(cue);
     $scope.onBGSelect = function($files) {
       var file = $files[0];
       if ((/\.(jpg|jpeg|png)$/i).test(file.name)) {
@@ -19,25 +19,19 @@ angular.module('app').controller('cueEditController',['$scope', 'cue', function 
           return function(e) {
             $scope.$apply(function() {
               //$scope.localBackgroundImage = e.target.result;
-              $scope.cue.background_url = e.target.result;
+              $scope.cue.background_url_data = e.target.result;
             });
           };
         })(file);
 
         reader.readAsDataURL(file);
+        cueFactory.uploadImage(fd).success(function (result) {
+          console.log(result);
+          $scope.cue.background_url = result.url;
+        }).error(function (err) {
+          console.log(err);
+        });
 
-       /* $scope.addCampaignPromise = $http.post(urlBase + '/s3/upload', fd, {
-          transformRequest: angular.identity,
-          headers: {
-            'Content-Type': undefined
-          }
-        })
-          .success(function(data) {
-            $scope.campaignDefaultModel.burl = data.result;
-          })
-          .error(function() {
-            toaster.pop('error', "network", "Uploading file failed.");
-          });*/
       } else {
         toaster.pop('error', "File Extension", "Only JPEG/PNG are allowed.");
         $('input[name="bgimage"]').val("");
@@ -56,25 +50,18 @@ angular.module('app').controller('cueEditController',['$scope', 'cue', function 
           return function(e) {
             $scope.$apply(function() {
               //$scope.localWideBackgroundImage = e.target.result;
-              $scope.cue.background_url_wide = e.target.result;
+              $scope.cue.background_url_wide_data = e.target.result;
             });
           };
         })(file);
 
         reader.readAsDataURL(file);
+        cueFactory.uploadImage(fd).success(function (result) {
+          $scope.cue.background_url_wide = result.url;
+        }).error(function (err) {
+          console.log(err);
+        });
 
-        /*$scope.addCampaignPromise = $http.post(urlBase + '/s3/upload', fd, {
-          transformRequest: angular.identity,
-          headers: {
-            'Content-Type': undefined
-          }
-        })
-          .success(function(data) {
-            $scope.campaignDefaultModel.burlwide = data.result;
-          })
-          .error(function() {
-            toaster.pop('error', "network", "Uploading file failed.");
-          });*/
       } else {
         toaster.pop('error', "File Extension", "Only JPEG/PNG are allowed.");
         $('input[name="bgimagewide"]').val("");
@@ -82,13 +69,17 @@ angular.module('app').controller('cueEditController',['$scope', 'cue', function 
     };
     $scope.updateCue = function (cueModel,formData) {
       console.log(cueModel,formData);
+      cueModel.cue_id = cueModel.id;
+      $modalInstance.close(cueModel);
     };
     $scope.resetCue = function (cueModel, formData) {
-      $scope.cue = originalCue;
+      $scope.cue =  angular.copy(originalCue);
       $scope.cue.text = originalCue.text;
     };
     $scope.cancel = function () {
-
+      $scope.cue =  angular.copy(originalCue);
+      $modalInstance.dismiss('cancel');
+      //$scope.$apply();
     };
 
   }]);

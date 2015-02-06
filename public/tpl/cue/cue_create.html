@@ -1,8 +1,10 @@
-<toaster-container toaster-options="{'position-class': 'toast-top-right', 'showDuration':'200', 'hideDuration':'200','showMethod':'fadeIn','hideMethod':'fadeOut'}"></toaster-container>
+
+<div ng-controller="cueCreateController" cg-busy="{promise:myPromise}">
+    <toaster-container toaster-options="{'position-class': 'toast-top-right', 'showDuration':'200', 'hideDuration':'200','showMethod':'fadeIn','hideMethod':'fadeOut'}"></toaster-container>
 <div class="bg-light lter b-b wrapper-md">
     <h1 class="m-n font-thin h3">Create Cue</h1>
 </div>
-<form name="addForm" class="form-validation" novalidate ng-controller="cueCreateController">
+<form name="addForm" class="form-validation" novalidate>
     <div class="panel panel-default">
         <div class="panel-heading">
             <span class="h4">Cue Details</span>
@@ -19,44 +21,20 @@
                     <input colorpicker colorpicker-position="left" name="cueBackgroundColor" type="text" ng-model="cue.bgcolor" class="color-pointer form-control" readonly required/>
                     <div ng-show="addForm.cueBackgroundColor.$dirty" ng-messages="addForm.cueBackgroundColor.$error" ng-messages-include="error_messages.html"></div>
                 </div>
-                <div class="form-group">
-                    <label>Foreground color </label>
-                    <input colorpicker colorpicker-position="left" type="text" name="cueForegroundColor" ng-model="cue.fcolor" class="color-pointer form-control" readonly required/>
-                    <div ng-show="addForm.cueForegroundColor.$dirty" ng-messages="addForm.cueForegroundColor.$error" ng-messages-include="error_messages.html"></div>
-                </div>
 
                 <div class="form-group">
-                    <label>Scale</label>
+                    <label>Type</label>
                     <div class="input-group">
                     <label class="i-checks checkbox-inline">
-                        <input type="radio" name="cueScale" ng-model="cue.scale" value="TILE" required><i></i>Tiles
+                        <input type="radio" name="cueType" ng-model="cue.type" value="POLL" required><i></i>Poll
                     </label>
                     <label class="i-checks checkbox-inline">
-                        <input type="radio" name="cueScale" ng-model="cue.scale" value="STRETCHED" required><i></i>Stretched
+                        <input type="radio" name="cueType" ng-model="cue.type" value="GENERAL" required><i></i>General
                     </label>
-                        <div ng-show="addForm.cueScale.$dirty" ng-messages="addForm.scale.$error" ng-messages-include="error_messages.html"></div>
+                        <div ng-show="addForm.cueType.$dirty" ng-messages="addForm.cueType.$error" ng-messages-include="error_messages.html"></div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Font</label>
-                    <select name="cueAccount" class="form-control m-b" data-ng-model="cue.font" required>
-                        <option>option 1</option>
-                        <option>option 2</option>
-                        <option>option 3</option>
-                        <option>option 4</option>
-                    </select>
-                    <div ng-show="addForm.cueAccount.$dirty" ng-messages="addForm.account.$error" ng-messages-include="error_messages.html"></div>
-                </div>
-                <div class="form-group">
-                    <label>Font Size</label>
-                    <div class="input-group m-b">
 
-                        <input ui-jq="TouchSpin" type="text" value="14" class="form-control" data-step="2"
-                               data-min='8' data-max="48" data-verticalbuttons="true" data-verticalupclass="fa fa-caret-up"
-                               data-verticaldownclass="fa fa-caret-down" name="cueFontsize" required>
-                        <div ng-show="addForm.cueFontsize.$dirty" ng-messages="addForm.cueFontsize.$error" ng-messages-include="error_messages.html"></div>
-                    </div>
-                </div>
 
             </div>
             <div class="col-md-6">
@@ -69,7 +47,7 @@
                                     </span>
                                     </span>
                     </div>
-                    <div data-ng-if="cue.background_url"><img ng-src="{{cue.background_url}}" class=" img-thumbnail" />
+                    <div data-ng-if="cue.background_url_data"><img ng-src="{{cue.background_url_data}}" class=" img-upload-thimb" />
                     </div>
                 </div>
                 <div class="form-group">
@@ -82,14 +60,15 @@
                                     </span>
                     </div>
 
-                    <div data-ng-if="cue.background_url_wide"><img ng-src="{{cue.background_url_wide}}" class="img-thumbnail" />
+                    <div data-ng-if="cue.background_url_wide_data"><img ng-src="{{cue.background_url_wide_data}}" class="img-upload-thimb" />
                     </div>
                 </div>
             </div>
         </div>
         <footer class="panel-footer text-right bg-light lter">
-            <button class="btn m-b-xs btn-sm btn-default btn-addon" ng-click="cueReset()"><i class="fa fa-circle"></i>Reset</button>
+            <button class="btn m-b-xs btn-sm btn-default btn-addon" ng-click="resetCue()"><i class="fa fa-circle"></i>Reset</button>
             <button ng-disabled="addForm.$invalid" class="btn m-b-xs btn-sm btn-primary btn-addon" ng-click="addCue(cue,addForm)"><i class="fa fa-plus"></i>Add</button>
         </footer>
     </div>
 </form>
+</div>

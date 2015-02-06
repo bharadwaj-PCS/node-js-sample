@@ -1,5 +1,6 @@
 // signup controller
-angular.module('app').controller('SignupFormController', ['$scope', '$http', '$state', function ($scope, $http, $state) {
+angular.module('app').controller('SignupFormController', ['$scope', '$http', '$state','Facebook',
+  function ($scope, $http, $state,Facebook) {
   'use strict';
   $scope.user = {};
   $scope.authError = null;
@@ -17,5 +18,12 @@ angular.module('app').controller('SignupFormController', ['$scope', '$http', '$s
         $scope.authError = 'Server Error';
       });
   };
+    $scope.fbLogin = function(){
+      Facebook.login(function (response) {
+        if(response.status === 'connected'){
+
+        }
+      });
+    }
 }])
 ;
