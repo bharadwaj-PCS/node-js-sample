@@ -61,3 +61,4 @@ angular.module('app').factory('cueFactory', ['$http', 'appConfig', function ($ht
   };
 
 }]);
+

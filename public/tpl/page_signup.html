@@ -1,23 +1,19 @@
-<div class="container w-xxl w-auto-xs" ng-controller="SignupFormController" ng-init="app.settings.container = false;">
+<div cg-busy="{promise:myPromise}" ng-controller="SignupFormController" ng-init="app.settings.container = false;">
+<toaster-container toaster-options="{'position-class': 'toast-top-right', 'showDuration':'200', 'hideDuration':'200','showMethod':'fadeIn','hideMethod':'fadeOut'}"></toaster-container>
+<div class="container w-xxl w-auto-xs">
     <a href class="navbar-brand block m-t">{{app.name}}</a>
 
     <div class="m-b-lg">
 
-        <div class="text-center m-t m-b">
-            <div class="">
-                <input type="image" src="../img/facebook-icon.png" ng-click="fbLogin()">
-                <!--<input type="image" src="../img/google_plus.png">-->
-            </div>
 
-        </div>
-        <!--<form name="form" class="form-validation">
+        <form name="signupForm" class="form-validation">
             <div class="text-danger wrapper text-center" ng-show="authError">
                 {{authError}}
             </div>
             <div class="list-group list-group-sm">
-                <div class="list-group-item">
+                <!--<div class="list-group-item">
                     <input placeholder="Name" class="form-control no-border" ng-model="user.name" required>
-                </div>
+                </div>-->
                 <div class="list-group-item">
                     <input type="email" placeholder="Email" class="form-control no-border" ng-model="user.email"
                            required>
@@ -33,14 +29,22 @@
                 </label>
             </div>
             <button type="submit" class="btn btn-lg btn-primary btn-block" ng-click="signup()"
-                    ng-disabled='form.$invalid'>Sign up
+                    ng-disabled='signupForm.$invalid'>Sign up
             </button>
             <div class="line line-dashed"></div>
             <p class="text-center">
                 <small>Already have an account?</small>
             </p>
-            <a ui-sref="access.signin" class="btn btn-lg btn-default btn-block">Sign in</a>
-        </form>-->
+            <a ui-sref="whatsay.login" class="btn btn-lg btn-default btn-block">Sign in</a>
+            <div class="text-center m-t m-b">
+            <div class="">
+                <input type="image" src="../img/facebook-icon.png" ng-click="fbLogin()">
+                <!--<input type="image" src="../img/google_plus.png">-->
+            </div>
+
+            </div>
+        </form>
     </div>
     <div class="text-center" ng-include="'tpl/blocks/page_footer.html'"></div>
+</div>
 </div>

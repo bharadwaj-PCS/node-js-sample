@@ -109,7 +109,8 @@ angular.module('app')
 
     }]);
 angular.module('app')
-  .controller('cueCreateController', ['$scope', 'cueFactory', 'toaster', function ($scope, cueFactory, toaster) {
+  .controller('cueCreateController', ['$scope', 'cueFactory', 'toaster','imageBrowse',
+    function ($scope, cueFactory, toaster, imageBrowse) {
     console.log("in cueCreatCtrl");
     $scope.cue = {
       text:'',
@@ -121,6 +122,7 @@ angular.module('app')
       background_url_wide_data:''
     };
     var originalCue = angular.copy($scope.cue);
+      imageBrowse.onBGSelect();
 
     $scope.onBGSelect = function ($files) {
       var file = $files[0];
