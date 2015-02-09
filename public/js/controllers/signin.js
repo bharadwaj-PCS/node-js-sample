@@ -7,12 +7,12 @@ angular.module('app').controller('SigninFormController', ['$scope', '$http', '$s
   $scope.authError = null;
     $scope.me = function(accessToken){
       Facebook.api('/me', function (response) {
-        $http.get('http://jsonip.com').then(function (result) {
+        /*$http.get('http://jsonip.com').then(function (result) {
           return result;
         })
           .then(function(result){
 
-          });
+          });*/
         $http.get('http://jsonip.com').then(function (result) {
           var details = {
             device_id:result.data.ip,

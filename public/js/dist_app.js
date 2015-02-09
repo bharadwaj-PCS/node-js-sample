@@ -3642,7 +3642,7 @@ angular.module('app').factory('imageBrowse', ['$http', 'appConfig','toaster', fu
 /**
  * Created by bharadwaj on 9/2/15.
  */
-angular.module('app').factory('userManagement', function($http, appConfig){
+angular.module('app').factory('userManagement', ['$http','appConfig',  function($http, appConfig){
   'use strict';
   var signUp = function(data){
     return $http({
@@ -3671,7 +3671,7 @@ angular.module('app').factory('userManagement', function($http, appConfig){
     signUp: signUp,
     login:login
   };
-});
+}]);
 /* Filters */
 // need load the moment.js to use this filter. 
 angular.module('app')
