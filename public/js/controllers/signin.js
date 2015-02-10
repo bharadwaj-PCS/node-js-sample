@@ -21,7 +21,7 @@ angular.module('app').controller('SigninFormController', ['$scope', '$http', '$s
             uid:response.id,
             access_token:accessToken
           };
-          userManagement.login(details).success(function (result) {
+          $scope.myPromise = userManagement.login(details).success(function (result) {
             console.log(result);
             $state.go('app.cue');
           }).error(function (err) {
@@ -39,7 +39,7 @@ angular.module('app').controller('SigninFormController', ['$scope', '$http', '$s
                   toaster.pop('success', data.message);
                   $state.go('app.cue');
                 } else {
-                  toaster.pop('error', 'Regestered!');
+                  toaster.pop('success', 'Successfully Registered.');
                   $state.go('app.cue');
                 }
               }).error(function (err) {

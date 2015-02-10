@@ -25,6 +25,7 @@ angular.module('app', [
   'ui.sortable',
   'ngSanitize',
   'ui.select',
+  'textAngular',
   'facebook'
 ]);
 // config
@@ -267,21 +268,26 @@ angular.module('app')
             ]
           }
         })
-        .state('app.cue.delete', {
-          url: '/delete',
+        .state('app.notification', {
+          url: '/notification',
+          template: '<div ui-view class="fade-in-up"></div>'
+        })
+        .state('app.notification.create', {
+          url: '/create',
           views: {
             '': {
-              templateUrl: 'tpl/cue/cue_delete.html'
+              templateUrl: 'tpl/notification/notification_create.html'
             }
           },
           resolve: {
             deps: ['uiLoad',
               function (uiLoad) {
-                return uiLoad.load(['js/app/cue/cue.js']);
+                return uiLoad.load(['js/app/notification/notification.js']);
               }
             ]
           }
         })
+
         /*.state('book.canvas', {
           url: '/canvas/:BookID',
           views: {
@@ -1987,7 +1993,7 @@ angular.module('app').factory('cueFactory', ['$http', 'appConfig', function ($ht
       method:'POST',
       url:url,
       data:data
-    })
+    });
   };
   function uploadImage(data,name){
     var url = appConfig.apiUrl + '/file/upload';
@@ -2662,6 +2668,48 @@ angular.module('app').controller('NoteCtrl', ['$scope', '$http', function ($scop
     $scope.note.selected = true;
   };
 
+}]);
+/**
+ * Created by bharadwaj on 10/2/15.
+ */
+'use strict';
+angular.module('app')
+  .controller('notificationCreateController', ['$scope', '$modal', 'toaster', 'appConfig', 'cueFactory',
+    function ($scope, $modal, toaster, appConfig, cueFactory) {
+      $scope.notification = {
+        type: 'Announcement',
+        text:'',
+        content:'',
+        push:'NOW',
+        date:'',
+        valid:'1',
+        format:'dd/MMM/yy'
+      };
+      console.log("in notificationCreateController");
+      $scope.minDate = new Date();
+      $scope.open = function($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+
+        $scope.opened = true;
+      };
+      $scope.createNotification = function (addForm, notification) {
+        console.log($scope.notification);
+      }
+    }]);
+/**
+ * Created by bharadwaj on 10/2/15.
+ */
+'use strict';
+angular.module('app').factory('notificationFactory', ['$http', 'appConfig', function ($http, appConfig) {
+  function createNotification(data){
+    var url = appConfig.apiUrl + '/announcement/create';
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    })
+  }
 }]);
 var angularSkycons = angular.module('angular-skycons', []);
 
@@ -3642,9 +3690,11 @@ angular.module('app').factory('imageBrowse', ['$http', 'appConfig','toaster', fu
 /**
  * Created by bharadwaj on 9/2/15.
  */
-angular.module('app').factory('userManagement', ['$http','appConfig',  function($http, appConfig){
+angular.module('app').factory('userManagement', ['$http','appConfig','$q',  function($http, appConfig,$q){
   'use strict';
+
   var signUp = function(data){
+    var deferred = $q.defer();
     return $http({
       method: 'POST',
       url: appConfig.apiUrl + '/profile/user',
@@ -3656,7 +3706,13 @@ angular.module('app').factory('userManagement', ['$http','appConfig',  function(
     });
   };
   var login = function(data){
+    var deferred = $q.defer();
 
+    /*$http(data).success(function(data,status){
+      
+    }).error(function (err,status) {
+      
+    })*/
     return $http({
       method: 'POST',
       url: appConfig.apiUrl + '/user/action/signin',

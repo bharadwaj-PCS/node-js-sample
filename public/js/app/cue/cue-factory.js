@@ -18,7 +18,7 @@ angular.module('app').factory('cueFactory', ['$http', 'appConfig', function ($ht
       method:'POST',
       url:url,
       data:data
-    })
+    });
   };
   function uploadImage(data,name){
     var url = appConfig.apiUrl + '/file/upload';
