@@ -268,21 +268,36 @@ angular.module('app')
             ]
           }
         })
-        .state('app.notification', {
-          url: '/notification',
+        .state('app.announcement', {
+          url: '/announcement',
           template: '<div ui-view class="fade-in-up"></div>'
         })
-        .state('app.notification.create', {
-          url: '/create',
+        .state('app.announcement.view', {
+          url: '/view',
           views: {
             '': {
-              templateUrl: 'tpl/notification/notification_create.html'
+              templateUrl: 'tpl/announcement/announcement_view.html'
             }
           },
           resolve: {
             deps: ['uiLoad',
               function (uiLoad) {
-                return uiLoad.load(['js/app/notification/notification.js']);
+                return uiLoad.load(['js/app/announcement/announcement.js']);
+              }
+            ]
+          }
+        })
+        .state('app.announcement.create', {
+          url: '/create',
+          views: {
+            '': {
+              templateUrl: 'tpl/announcement/announcement_create.html'
+            }
+          },
+          resolve: {
+            deps: ['uiLoad',
+              function (uiLoad) {
+                return uiLoad.load(['js/app/announcement/announcement.js']);
               }
             ]
           }
@@ -355,7 +370,7 @@ angular.module('app')
 
       // config
       $scope.app = {
-        name: 'WHAT SAY',
+        name: 'WHATSAY',
         version: '0.0.1',
         // for chart colors
         color: {
@@ -1133,6 +1148,186 @@ angular.module('ui.load', [])
       return deferred.promise;
     };
   }]);
+/**
+ * Created by bharadwaj on 10/2/15.
+ */
+'use strict';
+angular.module('app')
+  .controller('announcementCreateController', ['$scope', '$modal', 'toaster', 'appConfig', 'announcementFactory',
+    function ($scope, $modal, toaster, appConfig, announcementFactory) {
+      $scope.announcement = {
+        type: 'Announcement',
+        text:'',
+        content:''
+      };
+      //$scope.flag = false;
+      var originalAnnoun = angular.copy($scope.announcement);
+      console.log("in announcementCreateController");
+      $scope.minDate = new Date();
+      $scope.open = function($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+
+        $scope.opened = true;
+      };
+      $scope.resetAnnouncement = function () {
+        $scope.announcement = angular.copy(originalAnnoun);
+        $scope.addForm.$setPristine();
+      };
+      $scope.createAnnouncement = function () {
+        if(!$scope.announcement.content){
+          //$scope.flag = true;
+          //console.log($scope.flag);
+          //return;
+        }
+        $scope.myPromise = announcementFactory.createAnnouncement($scope.announcement)
+          .success(function (result){
+            console.log(result);
+            $scope.resetAnnouncement();
+            if(result.id){
+              toaster.pop('success','Created announcement.');
+            }else {
+              toaster.pop('error','Unable to create announcement.');
+            }
+          });
+      };
+    }]);
+angular.module('app')
+  .controller('announcementViewController', ['$scope', '$modal', 'toaster', 'appConfig', 'announcementFactory',
+    function ($scope, $modal, toaster, appConfig, announcementFactory) {
+      console.log("in announcementViewController");
+      $scope.announcementData = [
+        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
+        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
+        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
+        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
+        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
+        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
+        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
+        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
+        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
+        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
+        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
+        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
+        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
+      ];
+      $scope.editAnnouncement = function (announcement,index) {
+        var cpyAnnouncement = angular.copy(announcement);
+        var modelInstance = $modal.open({
+          templateUrl: 'tpl/announcement/announcement_edit.html',
+          controller: 'announcementEditController',
+          size: 'lg',
+          resolve: {
+            announcement: function () {
+              return cpyAnnouncement;
+            }
+          }
+        });
+        modelInstance.result.then(function (updateAnnouncement) {
+          console.log(updateAnnouncement);
+          var data = {
+            id:updateAnnouncement.id,
+            text:updateAnnouncement.text,
+            content:updateAnnouncement.content
+          };
+
+          announcementFactory.updateAnnouncement(data)
+            .success(function (result) {
+              console.log(result);
+              $scope.announcementData[index] = updateAnnouncement;
+              toaster.pop('success', 'Successfully updated the announcement');
+            }).error(function (err) {
+              console.log(err);
+            })
+        }, function () {
+          console.log('Modal dismissed at: ' + new Date());
+        });
+      };
+      $scope.deleteAnnouncement = function (announcement,index) {
+        var modalInstance = $modal.open({
+          templateUrl: 'myDeleteContent.html',
+          backdrop: 'static',
+          size: 'sm',
+          controller: 'announcementDeleteController',
+          resolve: {
+            announcement: function () {
+              return announcement;
+            }
+          }
+        });
+        modalInstance.result.then(function (data) {
+          console.log(data);
+          announcementFactory.deleteAnnouncement(data)
+            .success(function (result) {
+              console.log(result);
+              $scope.announcementData.splice(index, 1);
+              toaster.pop('success','deleted successfully');
+            }).error(function (err) {
+              console.log(err);
+            });
+        });
+      };
+    }]);
+angular.module('app')
+  .controller('announcementDeleteController',['$scope','$modalInstance','announcement', function ($scope, $modalInstance, announcement) {
+    $scope.deleteItem = function () {
+      var data = {
+        id: announcement.id
+      };
+      //console.log(data, "from deleCtrl");
+      $modalInstance.close(data);
+    };
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    };
+  }]);
+/**
+ * Created by bharadwaj on 13/2/15.
+ */
+'use strict';
+angular.module('app').controller('announcementEditController',['$scope','$modalInstance', 'announcement','announcementFactory',
+  function ($scope,$modalInstance,announcement,announcementFactory){
+    console.log("announcement edit");
+    var originalAnnouncement = angular.copy(announcement);
+    $scope.announcement = announcement;
+    $scope.EditAnnouncement = function (announcement,announcementEdit) {
+      $modalInstance.close(announcement);
+    };
+  }]);
+/**
+ * Created by bharadwaj on 10/2/15.
+ */
+'use strict';
+angular.module('app').factory('announcementFactory', ['$http', 'appConfig', function ($http, appConfig) {
+  function createAnnouncement(data){
+    var url = appConfig.apiUrl + '/announcement/create';
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    });
+  };
+  function updateAnnouncement(data){
+    var url = appConfig.apiUrl+'/announcement/update';
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    });
+  };
+  function deleteAnnouncement(data){
+    var url = appConfig.apiUrl+'/announcement/remove/'+data.id;
+    return $http({
+      method:'POST',
+      url:url
+    });
+  };
+  return {
+    createAnnouncement:createAnnouncement,
+    updateAnnouncement:updateAnnouncement,
+    deleteAnnouncement:deleteAnnouncement
+  };
+}]);
 /**
  * Get book list
  * redirect to canvas page
@@ -2701,7 +2896,8 @@ angular.module('app')
  * Created by bharadwaj on 10/2/15.
  */
 'use strict';
-angular.module('app').factory('notificationFactory', ['$http', 'appConfig', function ($http, appConfig) {
+/*
+angular.module('app').factory('announcementFactory', ['$http', 'appConfig', function ($http, appConfig) {
   function createNotification(data){
     var url = appConfig.apiUrl + '/announcement/create';
     return $http({
@@ -2710,7 +2906,8 @@ angular.module('app').factory('notificationFactory', ['$http', 'appConfig', func
       data:data
     })
   }
-}]);
+}]);*/
+
 var angularSkycons = angular.module('angular-skycons', []);
 
 

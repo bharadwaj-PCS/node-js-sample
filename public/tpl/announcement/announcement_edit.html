@@ -1,0 +1,37 @@
+<div class="modal-header">
+    <h4 class="modal-title">Edit Announcement</h4>
+</div>
+<div>
+    <div class="modal-body">
+        <div cg-busy="{promise:imagePromise}">
+            <form role="form" ng-model="announcement" name="announcementEdit">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Text </label>
+                            <input type="text" name="announcementText" class="form-control" ng-model="announcement.text" required>
+                            <div ng-show="announcementEdit.announcementText.$dirty" ng-messages="announcementEdit.announcementText.$error"
+                                 ng-messages-include="error_messages.html"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Content </label>
+                            <div text-angular ng-model="announcement.content" class="btn-groups" name="announcementContent"
+                                 ta-toolbar="[['bold','italics','underline'],['html']]"></div>
+                            <!--<input type="text" name="notificationText" class="form-control" ng-model="notification.text" required>-->
+                            <div ng-show="flag" ng-messages="announcementEdit.announcementText.$dirty"
+                                 ng-messages-include="error_messages.html"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <input type="button" class="btn btn-primary" value="Edit"
+               ng-click="EditAnnouncement(announcement,announcementEdit);" id="btn-Edit">
+        <!--<input type="button" class="btn btn-primary" value="Reset"
+               ng-click="resetCue(cue,cueEdit);" id="btn-reset">-->
+        <button class="btn btn-warning" ng-click="cancel();"><span class="glyphicon glyphicon-remove"></span>Cancel</button>
+    </div>
+</div>
