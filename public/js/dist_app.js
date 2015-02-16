@@ -1196,21 +1196,11 @@ angular.module('app')
   .controller('announcementViewController', ['$scope', '$modal', 'toaster', 'appConfig', 'announcementFactory',
     function ($scope, $modal, toaster, appConfig, announcementFactory) {
       console.log("in announcementViewController");
-      $scope.announcementData = [
-        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
-        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
-        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
-        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
-        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
-        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
-        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
-        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
-        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
-        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
-        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
-        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
-        {"id":"54dda91e81911c03005febf7","text":"test announ","content":"<p>hello</p>","created_at":1423812894,"updated_at":null},
-      ];
+      $scope.myPromise = announcementFactory.getAllAnnouncement().success(function (data) {
+        $scope.announcementData = data;
+      }).error(function (error) {
+        console.log(error);
+      });
       $scope.editAnnouncement = function (announcement,index) {
         var cpyAnnouncement = angular.copy(announcement);
         var modelInstance = $modal.open({
@@ -1267,6 +1257,33 @@ angular.module('app')
             });
         });
       };
+      $scope.notifiyAnnouncement = function(announcement,index){
+        console.log("firing notification");
+        var modelInstance = $modal.open({
+          templateUrl: 'tpl/announcement/announcement_notify.html',
+          controller: 'announcementNotifyController',
+          size: 'lg',
+          resolve: {
+            announcement: function () {
+              return announcement;
+            }
+          }
+        });
+        modelInstance.result.then(function (notifyAnnouncement) {
+          console.log(notifyAnnouncement);
+
+
+          announcementFactory.notifyAnnouncement(notifyAnnouncement)
+            .success(function (result) {
+              //$scope.announcementData[index] = updateAnnouncement;
+              toaster.pop('success', 'sent!!');
+            }).error(function (err) {
+              console.log(err);
+            })
+        }, function () {
+          console.log('Modal dismissed at: ' + new Date());
+        });
+      }
     }]);
 angular.module('app')
   .controller('announcementDeleteController',['$scope','$modalInstance','announcement', function ($scope, $modalInstance, announcement) {
@@ -1276,6 +1293,30 @@ angular.module('app')
       };
       //console.log(data, "from deleCtrl");
       $modalInstance.close(data);
+    };
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    };
+  }]);//announcementNotifyController
+angular.module('app')
+  .controller('announcementNotifyController',['$scope','$modalInstance','announcement', function ($scope, $modalInstance, announcement) {
+    $scope.notify = true;
+    $scope.announcement = announcement;
+    $scope.announcement.notify_to = "ALL_USERS";
+    $scope.notifyAnnouncement = function () {
+      console.log($scope.announcement);
+      $modalInstance.close($scope.announcement);
+    };
+    $scope.setModel = function (announcement) {
+      //if(announcement.select)
+      if(announcement.notify_to === 'ALL_USERS' || announcement.notify_to === 'INACTIVE_USERS' || announcement.notify_to === 'ALL_GROUPS'){
+        announcement.platform = '';
+        announcement.gender = '';
+      } else if(announcement.notify_to === 'PLATFORM'){
+        announcement.gender = '';
+      }else if(announcement.notify_to = 'GENDER'){
+        announcement.platform = '';
+      }
     };
     $scope.cancel = function () {
       $modalInstance.dismiss('cancel');
@@ -1322,10 +1363,28 @@ angular.module('app').factory('announcementFactory', ['$http', 'appConfig', func
       url:url
     });
   };
+  function getAllAnnouncement(){
+    var url = appConfig.apiUrl+'/announcement/list/all';
+    return $http({
+      method:'GET',
+      url:url
+    });
+  };
+  function notifyAnnouncement(data){
+    var url = appConfig.apiUrl+'/announcement/notify';
+    console.log(data);
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    });
+  };
   return {
     createAnnouncement:createAnnouncement,
     updateAnnouncement:updateAnnouncement,
-    deleteAnnouncement:deleteAnnouncement
+    deleteAnnouncement:deleteAnnouncement,
+    getAllAnnouncement:getAllAnnouncement,
+    notifyAnnouncement:notifyAnnouncement
   };
 }]);
 /**

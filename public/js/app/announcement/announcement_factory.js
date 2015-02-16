@@ -26,9 +26,27 @@ angular.module('app').factory('announcementFactory', ['$http', 'appConfig', func
       url:url
     });
   };
+  function getAllAnnouncement(){
+    var url = appConfig.apiUrl+'/announcement/list/all';
+    return $http({
+      method:'GET',
+      url:url
+    });
+  };
+  function notifyAnnouncement(data){
+    var url = appConfig.apiUrl+'/announcement/notify';
+    console.log(data);
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    });
+  };
   return {
     createAnnouncement:createAnnouncement,
     updateAnnouncement:updateAnnouncement,
-    deleteAnnouncement:deleteAnnouncement
+    deleteAnnouncement:deleteAnnouncement,
+    getAllAnnouncement:getAllAnnouncement,
+    notifyAnnouncement:notifyAnnouncement
   };
 }]);

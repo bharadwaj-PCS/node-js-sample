@@ -1,0 +1,72 @@
+<div class="modal-header">
+    <h4 class="modal-title">Notify Announcement</h4>
+</div>
+<div>
+    <div class="modal-body">
+        <div cg-busy="{promise:imagePromise}">
+            <form role="form" ng-model="announcement" name="announcementNotify">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Text </label>
+                            <input type="text" name="announcementText" class="form-control" ng-model="announcement.text" readonly required>
+                            <div ng-show="announcementNotify.announcementText.$dirty" ng-messages="announcementNotify.announcementText.$error"
+                                 ng-messages-include="error_messages.html"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Content </label>
+                            <div text-angular ng-model="announcement.content" class="btn-groups" name="announcementContent"
+                                 ta-toolbar="[['bold','italics','underline'],['html']]"></div>
+                            <!--<input type="text" name="notificationText" class="form-control" ng-model="notification.text" required>-->
+                            <div ng-show="flag" ng-messages="announcementNotify.announcementText.$dirty"
+                                 ng-messages-include="error_messages.html"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Notify To </label>
+                            <select name="account" class="form-control m-b" data-ng-model="announcement.notify_to" data-ng-change="setModel(announcement)">
+                                <option value="ALL_USERS">All Users</option>
+                                <option value="PLATFORM">Platform</option>
+                                <option value="GENDER">Gender</option>
+                                <option value="INACTIVE_USERS">Inactive Users</option>
+                                <option value="ALL_GROUPS">All Groups</option>
+                            </select>
+                            <div ng-if="announcement.notify_to === 'PLATFORM'" class="form-group">
+                                <div class="col-sm-10">
+                                    <label class="checkbox-inline">
+                                        <input type="radio" value="ANDROID" name="platform" ng-model="announcement.platform">Android
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="radio" value="IOS" name="platform" ng-model="announcement.platform"> i OS
+                                    </label>
+                                </div>
+                            </div>
+                            <div ng-if="announcement.notify_to === 'GENDER'" class="form-group">
+                                <div class="col-sm-10">
+                                    <label class="checkbox-inline">
+                                        <input type="radio" value="male" name="gender" ng-model="announcement.gender"> Male
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="radio" value="female" name="gender" ng-model="announcement.gender"> Female
+                                    </label>
+                                </div>
+                            </div>
+                            <div ng-show="announcementNotify.announcementText.$dirty" ng-messages="announcementEdit.announcementText.$error"
+                                 ng-messages-include="error_messages.html"></div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <input type="button" class="btn btn-primary" value="Notify"
+               ng-click="notifyAnnouncement(announcement,announcementEdit);" id="btn-Edit">
+        <!--<input type="button" class="btn btn-primary" value="Reset"
+               ng-click="resetCue(cue,cueEdit);" id="btn-reset">-->
+        <button class="btn btn-warning" ng-click="cancel();"><span class="glyphicon glyphicon-remove"></span>Cancel</button>
+    </div>
+</div>
