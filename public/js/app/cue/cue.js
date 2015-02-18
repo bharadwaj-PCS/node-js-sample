@@ -41,7 +41,7 @@ angular.module('app')
         });
         modelInstance.result.then(function (updateCue) {
           //console.log(updateCue);
-          cueFactory.updateCue(updateCue)
+          $scope.myPromise = cueFactory.updateCue(updateCue)
             .success(function (result) {
               //console.log(result);
               $scope.cueData[index] = updateCue;
@@ -109,8 +109,8 @@ angular.module('app')
 
     }]);
 angular.module('app')
-  .controller('cueCreateController', ['$scope', 'cueFactory', 'toaster','imageBrowse',
-    function ($scope, cueFactory, toaster, imageBrowse) {
+  .controller('cueCreateController', ['$scope', 'cueFactory', 'toaster',
+    function ($scope, cueFactory, toaster) {
     console.log("in cueCreatCtrl");
     $scope.cue = {
       text:'',
@@ -122,10 +122,11 @@ angular.module('app')
       background_url_wide_data:''
     };
     var originalCue = angular.copy($scope.cue);
-      imageBrowse.onBGSelect();
+      //imageBrowse.onBGSelect();
 
     $scope.onBGSelect = function ($files) {
       var file = $files[0];
+      if(!file){return;}
       console.log(file,"file");
       if ((/\.(jpg|jpeg|png)$/i).test(file.name)) {
         var fd = new FormData();

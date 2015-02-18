@@ -424,6 +424,101 @@ angular.module('app')
       };
 
     }]);
+/**
+ * 0.1.1
+ * Deferred load js/css file, used for ui-jq.js and Lazy Loading.
+ *
+ * @ flatfull.com All Rights Reserved.
+ * Author url: http://themeforest.net/user/flatfull
+ */
+
+angular.module('ui.load', [])
+  .service('uiLoad', ['$document', '$q', '$timeout', function ($document, $q, $timeout) {
+    'use strict';
+    var loaded = [];
+    var promise = false;
+    var deferred = $q.defer();
+
+    /**
+     * Chain loads the given sources
+     * @param srcs array, script or css
+     * @returns {*} Promise that will be resolved once the sources has been loaded.
+     */
+    this.load = function (srcs) {
+      srcs = angular.isArray(srcs) ? srcs : srcs.split(/\s+/);
+      var self = this;
+      if (!promise) {
+        promise = deferred.promise;
+      }
+      angular.forEach(srcs, function (src) {
+        promise = promise.then(function () {
+          return src.indexOf('.css') >= 0 ? self.loadCSS(src) : self.loadScript(src);
+        });
+      });
+      deferred.resolve();
+      return promise;
+    };
+
+    /**
+     * Dynamically loads the given script
+     * @param src The url of the script to load dynamically
+     * @returns {*} Promise that will be resolved once the script has been loaded.
+     */
+    this.loadScript = function (src) {
+      if (loaded[src]) {
+        return loaded[src].promise;
+      }
+
+      var deferred = $q.defer();
+      var script = $document[0].createElement('script');
+      script.src = src;
+      script.onload = function (e) {
+        $timeout(function () {
+          deferred.resolve(e);
+        });
+      };
+      script.onerror = function (e) {
+        $timeout(function () {
+          deferred.reject(e);
+        });
+      };
+      $document[0].body.appendChild(script);
+      loaded[src] = deferred;
+
+      return deferred.promise;
+    };
+
+    /**
+     * Dynamically loads the given CSS file
+     * @param href The url of the CSS to load dynamically
+     * @returns {*} Promise that will be resolved once the CSS file has been loaded.
+     */
+    this.loadCSS = function (href) {
+      if (loaded[href]) {
+        return loaded[href].promise;
+      }
+
+      var deferred = $q.defer();
+      var style = $document[0].createElement('link');
+      style.rel = 'stylesheet';
+      style.type = 'text/css';
+      style.href = href;
+      style.onload = function (e) {
+        $timeout(function () {
+          deferred.resolve(e);
+        });
+      };
+      style.onerror = function (e) {
+        $timeout(function () {
+          deferred.reject(e);
+        });
+      };
+      $document[0].head.appendChild(style);
+      loaded[href] = deferred;
+
+      return deferred.promise;
+    };
+  }]);
 
 angular.module('app').directive('browse', function () {
   'use strict';
@@ -1053,101 +1148,6 @@ angular.module('ui.validate', []).directive('uiValidate', function () {
   };
 });
 
-/**
- * 0.1.1
- * Deferred load js/css file, used for ui-jq.js and Lazy Loading.
- *
- * @ flatfull.com All Rights Reserved.
- * Author url: http://themeforest.net/user/flatfull
- */
-
-angular.module('ui.load', [])
-  .service('uiLoad', ['$document', '$q', '$timeout', function ($document, $q, $timeout) {
-    'use strict';
-    var loaded = [];
-    var promise = false;
-    var deferred = $q.defer();
-
-    /**
-     * Chain loads the given sources
-     * @param srcs array, script or css
-     * @returns {*} Promise that will be resolved once the sources has been loaded.
-     */
-    this.load = function (srcs) {
-      srcs = angular.isArray(srcs) ? srcs : srcs.split(/\s+/);
-      var self = this;
-      if (!promise) {
-        promise = deferred.promise;
-      }
-      angular.forEach(srcs, function (src) {
-        promise = promise.then(function () {
-          return src.indexOf('.css') >= 0 ? self.loadCSS(src) : self.loadScript(src);
-        });
-      });
-      deferred.resolve();
-      return promise;
-    };
-
-    /**
-     * Dynamically loads the given script
-     * @param src The url of the script to load dynamically
-     * @returns {*} Promise that will be resolved once the script has been loaded.
-     */
-    this.loadScript = function (src) {
-      if (loaded[src]) {
-        return loaded[src].promise;
-      }
-
-      var deferred = $q.defer();
-      var script = $document[0].createElement('script');
-      script.src = src;
-      script.onload = function (e) {
-        $timeout(function () {
-          deferred.resolve(e);
-        });
-      };
-      script.onerror = function (e) {
-        $timeout(function () {
-          deferred.reject(e);
-        });
-      };
-      $document[0].body.appendChild(script);
-      loaded[src] = deferred;
-
-      return deferred.promise;
-    };
-
-    /**
-     * Dynamically loads the given CSS file
-     * @param href The url of the CSS to load dynamically
-     * @returns {*} Promise that will be resolved once the CSS file has been loaded.
-     */
-    this.loadCSS = function (href) {
-      if (loaded[href]) {
-        return loaded[href].promise;
-      }
-
-      var deferred = $q.defer();
-      var style = $document[0].createElement('link');
-      style.rel = 'stylesheet';
-      style.type = 'text/css';
-      style.href = href;
-      style.onload = function (e) {
-        $timeout(function () {
-          deferred.resolve(e);
-        });
-      };
-      style.onerror = function (e) {
-        $timeout(function () {
-          deferred.reject(e);
-        });
-      };
-      $document[0].head.appendChild(style);
-      loaded[href] = deferred;
-
-      return deferred.promise;
-    };
-  }]);
 /**
  * Created by bharadwaj on 10/2/15.
  */
@@ -2335,7 +2335,7 @@ angular.module('app')
         });
         modelInstance.result.then(function (updateCue) {
           //console.log(updateCue);
-          cueFactory.updateCue(updateCue)
+          $scope.myPromise = cueFactory.updateCue(updateCue)
             .success(function (result) {
               //console.log(result);
               $scope.cueData[index] = updateCue;
@@ -2403,8 +2403,8 @@ angular.module('app')
 
     }]);
 angular.module('app')
-  .controller('cueCreateController', ['$scope', 'cueFactory', 'toaster','imageBrowse',
-    function ($scope, cueFactory, toaster, imageBrowse) {
+  .controller('cueCreateController', ['$scope', 'cueFactory', 'toaster',
+    function ($scope, cueFactory, toaster) {
     console.log("in cueCreatCtrl");
     $scope.cue = {
       text:'',
@@ -2416,10 +2416,11 @@ angular.module('app')
       background_url_wide_data:''
     };
     var originalCue = angular.copy($scope.cue);
-      imageBrowse.onBGSelect();
+      //imageBrowse.onBGSelect();
 
     $scope.onBGSelect = function ($files) {
       var file = $files[0];
+      if(!file){return;}
       console.log(file,"file");
       if ((/\.(jpg|jpeg|png)$/i).test(file.name)) {
         var fd = new FormData();
@@ -3934,6 +3935,7 @@ angular.module('app').factory('createFactory', function($http, appConfig){
 /**
  * Created by bharadwaj on 8/2/15.
  */
+/*
 'use strict';
 angular.module('app').factory('imageBrowse', ['$http', 'appConfig','toaster', function ($http, appConfig,toaster) {
   function onBGSelect(){
@@ -3942,7 +3944,8 @@ angular.module('app').factory('imageBrowse', ['$http', 'appConfig','toaster', fu
   return {
     onBGSelect: onBGSelect
   }
-}]);
+}]);*/
+
 /**
  * Created by bharadwaj on 9/2/15.
  */
@@ -4314,3 +4317,1112 @@ angular.module('app').controller('TimepickerDemoCtrl', ['$scope', function ($sco
     $scope.mytime = null;
   };
 }]);
+/* Controllers */
+
+angular.module('app')
+  // Flot Chart controller
+  .controller('FlotChartDemoCtrl', ['$scope', function ($scope) {
+    'use strict';
+    $scope.d = [
+      [1, 6.5],
+      [2, 6.5],
+      [3, 7],
+      [4, 8],
+      [5, 7.5],
+      [6, 7],
+      [7, 6.8],
+      [8, 7],
+      [9, 7.2],
+      [10, 7],
+      [11, 6.8],
+      [12, 7]
+    ];
+
+    $scope.d0_1 = [
+      [0, 7],
+      [1, 6.5],
+      [2, 12.5],
+      [3, 7],
+      [4, 9],
+      [5, 6],
+      [6, 11],
+      [7, 6.5],
+      [8, 8],
+      [9, 7]
+    ];
+
+    $scope.d0_2 = [
+      [0, 4],
+      [1, 4.5],
+      [2, 7],
+      [3, 4.5],
+      [4, 3],
+      [5, 3.5],
+      [6, 6],
+      [7, 3],
+      [8, 4],
+      [9, 3]
+    ];
+
+    $scope.d1_1 = [
+      [10, 120],
+      [20, 70],
+      [30, 70],
+      [40, 60]
+    ];
+
+    $scope.d1_2 = [
+      [10, 50],
+      [20, 60],
+      [30, 90],
+      [40, 35]
+    ];
+
+    $scope.d1_3 = [
+      [10, 80],
+      [20, 40],
+      [30, 30],
+      [40, 20]
+    ];
+
+    $scope.d2 = [];
+
+    for (var i = 0; i < 20; ++i) {
+      $scope.d2.push([i, Math.sin(i)]);
+    }
+
+    $scope.d3 = [
+      {label: 'iPhone5S', data: 40},
+      {label: 'iPad Mini', data: 10},
+      {label: 'iPad Mini Retina', data: 20},
+      {label: 'iPhone4S', data: 12},
+      {label: 'iPad Air', data: 18}
+    ];
+
+    $scope.refreshData = function () {
+      $scope.d0_1 = $scope.d0_2;
+    };
+
+    $scope.getRandomData = function () {
+      var data = [],
+        totalPoints = 150;
+      if (data.length > 0) {
+        data = data.slice(1);
+      }
+      while (data.length < totalPoints) {
+        var prev = data.length > 0 ? data[data.length - 1] : 50,
+          y = prev + Math.random() * 10 - 5;
+        if (y < 0) {
+          y = 0;
+        } else if (y > 100) {
+          y = 100;
+        }
+        data.push(y);
+      }
+      // Zip the generated y values with the x values
+      var res = [];
+      for (var i = 0; i < data.length; ++i) {
+        res.push([i, data[i]]);
+      }
+      return res;
+    };
+
+    $scope.d4 = $scope.getRandomData();
+  }]);
+angular.module('app').controller('EditorCtrl', function ($scope) {
+  'use strict';
+  $scope.htmlVariable = '<h3>Try me!</h3><p>textAngular is a super cool WYSIWYG Text Editor directive for AngularJS</p><p><b>Features:</b></p><ol><li>Automatic Seamless Two-Way-Binding</li><li style="color: blue;">Super Easy <b>Theming</b> Options</li><li>Simple Editor Instance Creation</li><li>Safely Parses Html for Custom Toolbar Icons</li><li>Doesn&apos;t Use an iFrame</li><li>Works with Firefox, Chrome, and IE8+</li></ol><p><b>Code at GitHub:</b> <a href="https://github.com/fraywing/textAngular">Here</a> </p>';
+});
+angular.module('app').controller('FileUploadCtrl', ['$scope', 'FileUploader', function ($scope, FileUploader) {
+  'use strict';
+  var uploader = $scope.uploader = new FileUploader({
+    url: 'js/controllers/upload.php'
+  });
+
+  // FILTERS
+
+  uploader.filters.push({
+    name: 'customFilter',
+    fn: function (item /*{File|FileLikeObject}*/, options) {
+      return this.queue.length < 10;
+    }
+  });
+
+  // CALLBACKS
+
+  uploader.onWhenAddingFileFailed = function (item /*{File|FileLikeObject}*/, filter, options) {
+    console.info('onWhenAddingFileFailed', item, filter, options);
+  };
+  uploader.onAfterAddingFile = function (fileItem) {
+    console.info('onAfterAddingFile', fileItem);
+  };
+  uploader.onAfterAddingAll = function (addedFileItems) {
+    console.info('onAfterAddingAll', addedFileItems);
+  };
+  uploader.onBeforeUploadItem = function (item) {
+    console.info('onBeforeUploadItem', item);
+  };
+  uploader.onProgressItem = function (fileItem, progress) {
+    console.info('onProgressItem', fileItem, progress);
+  };
+  uploader.onProgressAll = function (progress) {
+    console.info('onProgressAll', progress);
+  };
+  uploader.onSuccessItem = function (fileItem, response, status, headers) {
+    console.info('onSuccessItem', fileItem, response, status, headers);
+  };
+  uploader.onErrorItem = function (fileItem, response, status, headers) {
+    console.info('onErrorItem', fileItem, response, status, headers);
+  };
+  uploader.onCancelItem = function (fileItem, response, status, headers) {
+    console.info('onCancelItem', fileItem, response, status, headers);
+  };
+  uploader.onCompleteItem = function (fileItem, response, status, headers) {
+    console.info('onCompleteItem', fileItem, response, status, headers);
+  };
+  uploader.onCompleteAll = function () {
+    console.info('onCompleteAll');
+  };
+
+  console.info('uploader', uploader);
+}]);
+/* Controllers */
+
+// Form controller
+angular.module('app').controller('FormDemoCtrl', ['$scope', function ($scope) {
+  'use strict';
+  $scope.notBlackListed = function (value) {
+    var blacklist = ['bad@domain.com', 'verybad@domain.com'];
+    return blacklist.indexOf(value) === -1;
+  };
+
+  $scope.val = 15;
+  var updateModel = function (val) {
+    $scope.$apply(function () {
+      $scope.val = val;
+    });
+  };
+  angular.element('#slider').on('slideStop', function (data) {
+    updateModel(data.value);
+  });
+
+  $scope.select2Number = [
+    {text: 'First', value: 'One'},
+    {text: 'Second', value: 'Two'},
+    {text: 'Third', value: 'Three'}
+  ];
+
+  $scope.list_of_string = ['tag1', 'tag2'];
+  $scope.select2Options = {
+    'multiple': true,
+    'simple_tags': true,
+    'tags': ['tag1', 'tag2', 'tag3', 'tag4']  // Can be empty list.
+  };
+
+}])
+;
+angular.module('app').controller('GridDemoCtrl', ['$scope', '$http', function ($scope, $http) {
+  'use strict';
+  $scope.filterOptions = {
+    filterText: '',
+    useExternalFilter: true
+  };
+  $scope.totalServerItems = 0;
+  $scope.pagingOptions = {
+    pageSizes: [250, 500, 1000],
+    pageSize: 250,
+    currentPage: 1
+  };
+  $scope.setPagingData = function (data, page, pageSize) {
+    var pagedData = data.slice((page - 1) * pageSize, page * pageSize);
+    $scope.myData = pagedData;
+    $scope.totalServerItems = data.length;
+    if (!$scope.$$phase) {
+      $scope.$apply();
+    }
+  };
+  $scope.getPagedDataAsync = function (pageSize, page, searchText) {
+    setTimeout(function () {
+      var data;
+      if (searchText) {
+        var ft = searchText.toLowerCase();
+        $http.get('js/controllers/largeLoad.json').success(function (largeLoad) {
+          data = largeLoad.filter(function (item) {
+            return JSON.stringify(item).toLowerCase().indexOf(ft) !== -1;
+          });
+          $scope.setPagingData(data, page, pageSize);
+        });
+      } else {
+        $http.get('js/controllers/largeLoad.json').success(function (largeLoad) {
+          $scope.setPagingData(largeLoad, page, pageSize);
+        });
+      }
+    }, 100);
+  };
+
+  $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+
+  $scope.$watch('pagingOptions', function (newVal, oldVal) {
+    if (newVal !== oldVal && newVal.currentPage !== oldVal.currentPage) {
+      $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+    }
+  }, true);
+  $scope.$watch('filterOptions', function (newVal, oldVal) {
+    if (newVal !== oldVal) {
+      $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+    }
+  }, true);
+
+  $scope.gridOptions = {
+    data: 'myData',
+    enablePaging: true,
+    showFooter: true,
+    totalServerItems: 'totalServerItems',
+    pagingOptions: $scope.pagingOptions,
+    filterOptions: $scope.filterOptions
+  };
+}]);
+angular.module('app').controller('ImgCropCtrl', ['$scope', function ($scope) {
+  'use strict';
+  $scope.myImage = '';
+  $scope.myCroppedImage = '';
+  $scope.cropType = 'circle';
+
+  var handleFileSelect = function (evt) {
+    var file = evt.currentTarget.files[0];
+    var reader = new FileReader();
+    reader.onload = function (evt) {
+      $scope.$apply(function ($scope) {
+        $scope.myImage = evt.target.result;
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+  angular.element(document.querySelector('#fileInput')).on('change', handleFileSelect);
+}]);
+// this is a lazy load controller, 
+// so start with "app." to register this controller
+
+angular.module('app').filter('propsFilter', function () {
+  'use strict';
+  return function (items, props) {
+    var out = [];
+
+    if (angular.isArray(items)) {
+      items.forEach(function (item) {
+        var itemMatches = false;
+
+        var keys = Object.keys(props);
+        for (var i = 0; i < keys.length; i++) {
+          var prop = keys[i];
+          var text = props[prop].toLowerCase();
+          if (item[prop].toString().toLowerCase().indexOf(text) !== -1) {
+            itemMatches = true;
+            break;
+          }
+        }
+
+        if (itemMatches) {
+          out.push(item);
+        }
+      });
+    } else {
+      // Let the output be the input untouched
+      out = items;
+    }
+
+    return out;
+  };
+});
+angular.module('app').controller('SelectCtrl', function ($scope, $http, $timeout) {
+  'use strict';
+  $scope.disabled = undefined;
+  $scope.searchEnabled = undefined;
+
+  $scope.enable = function () {
+    $scope.disabled = false;
+  };
+
+  $scope.disable = function () {
+    $scope.disabled = true;
+  };
+
+  $scope.enableSearch = function () {
+    $scope.searchEnabled = true;
+  };
+
+  $scope.disableSearch = function () {
+    $scope.searchEnabled = false;
+  };
+
+  $scope.clear = function () {
+    $scope.person.selected = undefined;
+    $scope.address.selected = undefined;
+    $scope.country.selected = undefined;
+  };
+
+  $scope.someGroupFn = function (item) {
+
+    if (item.name[0] >= 'A' && item.name[0] <= 'M') {
+      return 'From A - M';
+    }
+
+    if (item.name[0] >= 'N' && item.name[0] <= 'Z') {
+      return 'From N - Z';
+    }
+
+  };
+
+  $scope.personAsync = {selected: 'wladimir@email.com'};
+  $scope.peopleAsync = [];
+
+  $timeout(function () {
+    $scope.peopleAsync = [
+      {name: 'Adam', email: 'adam@email.com', age: 12, country: 'United States'},
+      {name: 'Amalie', email: 'amalie@email.com', age: 12, country: 'Argentina'},
+      {name: 'Estefanía', email: 'estefania@email.com', age: 21, country: 'Argentina'},
+      {name: 'Adrian', email: 'adrian@email.com', age: 21, country: 'Ecuador'},
+      {name: 'Wladimir', email: 'wladimir@email.com', age: 30, country: 'Ecuador'},
+      {name: 'Samantha', email: 'samantha@email.com', age: 30, country: 'United States'},
+      {name: 'Nicole', email: 'nicole@email.com', age: 43, country: 'Colombia'},
+      {name: 'Natasha', email: 'natasha@email.com', age: 54, country: 'Ecuador'},
+      {name: 'Michael', email: 'michael@email.com', age: 15, country: 'Colombia'},
+      {name: 'Nicolás', email: 'nicole@email.com', age: 43, country: 'Colombia'}
+    ];
+  }, 3000);
+
+  $scope.counter = 0;
+  $scope.someFunction = function (item, model) {
+    $scope.counter++;
+    $scope.eventResult = {item: item, model: model};
+  };
+
+  $scope.removed = function (item, model) {
+    $scope.lastRemoved = {
+      item: item,
+      model: model
+    };
+  };
+
+  $scope.person = {};
+  $scope.people = [
+    {name: 'Adam', email: 'adam@email.com', age: 12, country: 'United States'},
+    {name: 'Amalie', email: 'amalie@email.com', age: 12, country: 'Argentina'},
+    {name: 'Estefanía', email: 'estefania@email.com', age: 21, country: 'Argentina'},
+    {name: 'Adrian', email: 'adrian@email.com', age: 21, country: 'Ecuador'},
+    {name: 'Wladimir', email: 'wladimir@email.com', age: 30, country: 'Ecuador'},
+    {name: 'Samantha', email: 'samantha@email.com', age: 30, country: 'United States'},
+    {name: 'Nicole', email: 'nicole@email.com', age: 43, country: 'Colombia'},
+    {name: 'Natasha', email: 'natasha@email.com', age: 54, country: 'Ecuador'},
+    {name: 'Michael', email: 'michael@email.com', age: 15, country: 'Colombia'},
+    {name: 'Nicolás', email: 'nicolas@email.com', age: 43, country: 'Colombia'}
+  ];
+
+  $scope.availableColors = ['Red', 'Green', 'Blue', 'Yellow', 'Magenta', 'Maroon', 'Umbra', 'Turquoise'];
+
+  $scope.multipleDemo = {};
+  $scope.multipleDemo.colors = ['Blue', 'Red'];
+  $scope.multipleDemo.selectedPeople = [$scope.people[5], $scope.people[4]];
+  $scope.multipleDemo.selectedPeopleWithGroupBy = [$scope.people[8], $scope.people[6]];
+  $scope.multipleDemo.selectedPeopleSimple = ['samantha@email.com', 'wladimir@email.com'];
+
+
+  $scope.address = {};
+  $scope.refreshAddresses = function (address) {
+    var params = {address: address, sensor: false};
+    return $http.get(
+      'http://maps.googleapis.com/maps/api/geocode/json',
+      {params: params}
+    ).then(function (response) {
+        $scope.addresses = response.data.results;
+      });
+  };
+
+  $scope.country = {};
+  $scope.countries = [ // Taken from https://gist.github.com/unceus/6501985
+    {name: 'Afghanistan', code: 'AF'},
+    {name: 'Åland Islands', code: 'AX'},
+    {name: 'Albania', code: 'AL'},
+    {name: 'Algeria', code: 'DZ'},
+    {name: 'American Samoa', code: 'AS'},
+    {name: 'Andorra', code: 'AD'},
+    {name: 'Angola', code: 'AO'},
+    {name: 'Anguilla', code: 'AI'},
+    {name: 'Antarctica', code: 'AQ'},
+    {name: 'Antigua and Barbuda', code: 'AG'},
+    {name: 'Argentina', code: 'AR'},
+    {name: 'Armenia', code: 'AM'},
+    {name: 'Aruba', code: 'AW'},
+    {name: 'Australia', code: 'AU'},
+    {name: 'Austria', code: 'AT'},
+    {name: 'Azerbaijan', code: 'AZ'},
+    {name: 'Bahamas', code: 'BS'},
+    {name: 'Bahrain', code: 'BH'},
+    {name: 'Bangladesh', code: 'BD'},
+    {name: 'Barbados', code: 'BB'},
+    {name: 'Belarus', code: 'BY'},
+    {name: 'Belgium', code: 'BE'},
+    {name: 'Belize', code: 'BZ'},
+    {name: 'Benin', code: 'BJ'},
+    {name: 'Bermuda', code: 'BM'},
+    {name: 'Bhutan', code: 'BT'},
+    {name: 'Bolivia', code: 'BO'},
+    {name: 'Bosnia and Herzegovina', code: 'BA'},
+    {name: 'Botswana', code: 'BW'},
+    {name: 'Bouvet Island', code: 'BV'},
+    {name: 'Brazil', code: 'BR'},
+    {name: 'British Indian Ocean Territory', code: 'IO'},
+    {name: 'Brunei Darussalam', code: 'BN'},
+    {name: 'Bulgaria', code: 'BG'},
+    {name: 'Burkina Faso', code: 'BF'},
+    {name: 'Burundi', code: 'BI'},
+    {name: 'Cambodia', code: 'KH'},
+    {name: 'Cameroon', code: 'CM'},
+    {name: 'Canada', code: 'CA'},
+    {name: 'Cape Verde', code: 'CV'},
+    {name: 'Cayman Islands', code: 'KY'},
+    {name: 'Central African Republic', code: 'CF'},
+    {name: 'Chad', code: 'TD'},
+    {name: 'Chile', code: 'CL'},
+    {name: 'China', code: 'CN'},
+    {name: 'Christmas Island', code: 'CX'},
+    {name: 'Cocos (Keeling) Islands', code: 'CC'},
+    {name: 'Colombia', code: 'CO'},
+    {name: 'Comoros', code: 'KM'},
+    {name: 'Congo', code: 'CG'},
+    {name: 'Congo, The Democratic Republic of the', code: 'CD'},
+    {name: 'Cook Islands', code: 'CK'},
+    {name: 'Costa Rica', code: 'CR'},
+    {name: 'Cote D\'Ivoire', code: 'CI'},
+    {name: 'Croatia', code: 'HR'},
+    {name: 'Cuba', code: 'CU'},
+    {name: 'Cyprus', code: 'CY'},
+    {name: 'Czech Republic', code: 'CZ'},
+    {name: 'Denmark', code: 'DK'},
+    {name: 'Djibouti', code: 'DJ'},
+    {name: 'Dominica', code: 'DM'},
+    {name: 'Dominican Republic', code: 'DO'},
+    {name: 'Ecuador', code: 'EC'},
+    {name: 'Egypt', code: 'EG'},
+    {name: 'El Salvador', code: 'SV'},
+    {name: 'Equatorial Guinea', code: 'GQ'},
+    {name: 'Eritrea', code: 'ER'},
+    {name: 'Estonia', code: 'EE'},
+    {name: 'Ethiopia', code: 'ET'},
+    {name: 'Falkland Islands (Malvinas)', code: 'FK'},
+    {name: 'Faroe Islands', code: 'FO'},
+    {name: 'Fiji', code: 'FJ'},
+    {name: 'Finland', code: 'FI'},
+    {name: 'France', code: 'FR'},
+    {name: 'French Guiana', code: 'GF'},
+    {name: 'French Polynesia', code: 'PF'},
+    {name: 'French Southern Territories', code: 'TF'},
+    {name: 'Gabon', code: 'GA'},
+    {name: 'Gambia', code: 'GM'},
+    {name: 'Georgia', code: 'GE'},
+    {name: 'Germany', code: 'DE'},
+    {name: 'Ghana', code: 'GH'},
+    {name: 'Gibraltar', code: 'GI'},
+    {name: 'Greece', code: 'GR'},
+    {name: 'Greenland', code: 'GL'},
+    {name: 'Grenada', code: 'GD'},
+    {name: 'Guadeloupe', code: 'GP'},
+    {name: 'Guam', code: 'GU'},
+    {name: 'Guatemala', code: 'GT'},
+    {name: 'Guernsey', code: 'GG'},
+    {name: 'Guinea', code: 'GN'},
+    {name: 'Guinea-Bissau', code: 'GW'},
+    {name: 'Guyana', code: 'GY'},
+    {name: 'Haiti', code: 'HT'},
+    {name: 'Heard Island and Mcdonald Islands', code: 'HM'},
+    {name: 'Holy See (Vatican City State)', code: 'VA'},
+    {name: 'Honduras', code: 'HN'},
+    {name: 'Hong Kong', code: 'HK'},
+    {name: 'Hungary', code: 'HU'},
+    {name: 'Iceland', code: 'IS'},
+    {name: 'India', code: 'IN'},
+    {name: 'Indonesia', code: 'ID'},
+    {name: 'Iran, Islamic Republic Of', code: 'IR'},
+    {name: 'Iraq', code: 'IQ'},
+    {name: 'Ireland', code: 'IE'},
+    {name: 'Isle of Man', code: 'IM'},
+    {name: 'Israel', code: 'IL'},
+    {name: 'Italy', code: 'IT'},
+    {name: 'Jamaica', code: 'JM'},
+    {name: 'Japan', code: 'JP'},
+    {name: 'Jersey', code: 'JE'},
+    {name: 'Jordan', code: 'JO'},
+    {name: 'Kazakhstan', code: 'KZ'},
+    {name: 'Kenya', code: 'KE'},
+    {name: 'Kiribati', code: 'KI'},
+    {name: 'Korea, Democratic People\'s Republic of', code: 'KP'},
+    {name: 'Korea, Republic of', code: 'KR'},
+    {name: 'Kuwait', code: 'KW'},
+    {name: 'Kyrgyzstan', code: 'KG'},
+    {name: 'Lao People\'s Democratic Republic', code: 'LA'},
+    {name: 'Latvia', code: 'LV'},
+    {name: 'Lebanon', code: 'LB'},
+    {name: 'Lesotho', code: 'LS'},
+    {name: 'Liberia', code: 'LR'},
+    {name: 'Libyan Arab Jamahiriya', code: 'LY'},
+    {name: 'Liechtenstein', code: 'LI'},
+    {name: 'Lithuania', code: 'LT'},
+    {name: 'Luxembourg', code: 'LU'},
+    {name: 'Macao', code: 'MO'},
+    {name: 'Macedonia, The Former Yugoslav Republic of', code: 'MK'},
+    {name: 'Madagascar', code: 'MG'},
+    {name: 'Malawi', code: 'MW'},
+    {name: 'Malaysia', code: 'MY'},
+    {name: 'Maldives', code: 'MV'},
+    {name: 'Mali', code: 'ML'},
+    {name: 'Malta', code: 'MT'},
+    {name: 'Marshall Islands', code: 'MH'},
+    {name: 'Martinique', code: 'MQ'},
+    {name: 'Mauritania', code: 'MR'},
+    {name: 'Mauritius', code: 'MU'},
+    {name: 'Mayotte', code: 'YT'},
+    {name: 'Mexico', code: 'MX'},
+    {name: 'Micronesia, Federated States of', code: 'FM'},
+    {name: 'Moldova, Republic of', code: 'MD'},
+    {name: 'Monaco', code: 'MC'},
+    {name: 'Mongolia', code: 'MN'},
+    {name: 'Montserrat', code: 'MS'},
+    {name: 'Morocco', code: 'MA'},
+    {name: 'Mozambique', code: 'MZ'},
+    {name: 'Myanmar', code: 'MM'},
+    {name: 'Namibia', code: 'NA'},
+    {name: 'Nauru', code: 'NR'},
+    {name: 'Nepal', code: 'NP'},
+    {name: 'Netherlands', code: 'NL'},
+    {name: 'Netherlands Antilles', code: 'AN'},
+    {name: 'New Caledonia', code: 'NC'},
+    {name: 'New Zealand', code: 'NZ'},
+    {name: 'Nicaragua', code: 'NI'},
+    {name: 'Niger', code: 'NE'},
+    {name: 'Nigeria', code: 'NG'},
+    {name: 'Niue', code: 'NU'},
+    {name: 'Norfolk Island', code: 'NF'},
+    {name: 'Northern Mariana Islands', code: 'MP'},
+    {name: 'Norway', code: 'NO'},
+    {name: 'Oman', code: 'OM'},
+    {name: 'Pakistan', code: 'PK'},
+    {name: 'Palau', code: 'PW'},
+    {name: 'Palestinian Territory, Occupied', code: 'PS'},
+    {name: 'Panama', code: 'PA'},
+    {name: 'Papua New Guinea', code: 'PG'},
+    {name: 'Paraguay', code: 'PY'},
+    {name: 'Peru', code: 'PE'},
+    {name: 'Philippines', code: 'PH'},
+    {name: 'Pitcairn', code: 'PN'},
+    {name: 'Poland', code: 'PL'},
+    {name: 'Portugal', code: 'PT'},
+    {name: 'Puerto Rico', code: 'PR'},
+    {name: 'Qatar', code: 'QA'},
+    {name: 'Reunion', code: 'RE'},
+    {name: 'Romania', code: 'RO'},
+    {name: 'Russian Federation', code: 'RU'},
+    {name: 'Rwanda', code: 'RW'},
+    {name: 'Saint Helena', code: 'SH'},
+    {name: 'Saint Kitts and Nevis', code: 'KN'},
+    {name: 'Saint Lucia', code: 'LC'},
+    {name: 'Saint Pierre and Miquelon', code: 'PM'},
+    {name: 'Saint Vincent and the Grenadines', code: 'VC'},
+    {name: 'Samoa', code: 'WS'},
+    {name: 'San Marino', code: 'SM'},
+    {name: 'Sao Tome and Principe', code: 'ST'},
+    {name: 'Saudi Arabia', code: 'SA'},
+    {name: 'Senegal', code: 'SN'},
+    {name: 'Serbia and Montenegro', code: 'CS'},
+    {name: 'Seychelles', code: 'SC'},
+    {name: 'Sierra Leone', code: 'SL'},
+    {name: 'Singapore', code: 'SG'},
+    {name: 'Slovakia', code: 'SK'},
+    {name: 'Slovenia', code: 'SI'},
+    {name: 'Solomon Islands', code: 'SB'},
+    {name: 'Somalia', code: 'SO'},
+    {name: 'South Africa', code: 'ZA'},
+    {name: 'South Georgia and the South Sandwich Islands', code: 'GS'},
+    {name: 'Spain', code: 'ES'},
+    {name: 'Sri Lanka', code: 'LK'},
+    {name: 'Sudan', code: 'SD'},
+    {name: 'Suriname', code: 'SR'},
+    {name: 'Svalbard and Jan Mayen', code: 'SJ'},
+    {name: 'Swaziland', code: 'SZ'},
+    {name: 'Sweden', code: 'SE'},
+    {name: 'Switzerland', code: 'CH'},
+    {name: 'Syrian Arab Republic', code: 'SY'},
+    {name: 'Taiwan, Province of China', code: 'TW'},
+    {name: 'Tajikistan', code: 'TJ'},
+    {name: 'Tanzania, United Republic of', code: 'TZ'},
+    {name: 'Thailand', code: 'TH'},
+    {name: 'Timor-Leste', code: 'TL'},
+    {name: 'Togo', code: 'TG'},
+    {name: 'Tokelau', code: 'TK'},
+    {name: 'Tonga', code: 'TO'},
+    {name: 'Trinidad and Tobago', code: 'TT'},
+    {name: 'Tunisia', code: 'TN'},
+    {name: 'Turkey', code: 'TR'},
+    {name: 'Turkmenistan', code: 'TM'},
+    {name: 'Turks and Caicos Islands', code: 'TC'},
+    {name: 'Tuvalu', code: 'TV'},
+    {name: 'Uganda', code: 'UG'},
+    {name: 'Ukraine', code: 'UA'},
+    {name: 'United Arab Emirates', code: 'AE'},
+    {name: 'United Kingdom', code: 'GB'},
+    {name: 'United States', code: 'US'},
+    {name: 'United States Minor Outlying Islands', code: 'UM'},
+    {name: 'Uruguay', code: 'UY'},
+    {name: 'Uzbekistan', code: 'UZ'},
+    {name: 'Vanuatu', code: 'VU'},
+    {name: 'Venezuela', code: 'VE'},
+    {name: 'Vietnam', code: 'VN'},
+    {name: 'Virgin Islands, British', code: 'VG'},
+    {name: 'Virgin Islands, U.S.', code: 'VI'},
+    {name: 'Wallis and Futuna', code: 'WF'},
+    {name: 'Western Sahara', code: 'EH'},
+    {name: 'Yemen', code: 'YE'},
+    {name: 'Zambia', code: 'ZM'},
+    {name: 'Zimbabwe', code: 'ZW'}
+  ];
+});
+/* Controllers */
+// signin controller
+angular.module('app').controller('SigninFormController', ['$scope', '$http', '$state','Facebook','userManagement','toaster',
+  function ($scope, $http, $state,Facebook,userManagement,toaster) {
+  'use strict';
+  $scope.user = {};
+  $scope.authError = null;
+    $scope.me = function(accessToken){
+      Facebook.api('/me', function (response) {
+        /*$http.get('http://jsonip.com').then(function (result) {
+          return result;
+        })
+          .then(function(result){
+
+          });*/
+        $http.get('http://jsonip.com').then(function (result) {
+          var details = {
+            device_id:result.data.ip,
+            platform:'WEB',
+            provider:'FACEBOOK',
+            uid:response.id,
+            access_token:accessToken
+          };
+          $scope.myPromise = userManagement.login(details).success(function (result) {
+            console.log(result);
+            $state.go('app.cue');
+          }).error(function (err) {
+            if(err.type === 400){
+              var accounts = [],account = {};
+              account.provider = 'FACEBOOK';
+              account.uid = details.uid;
+              account.access_token = details.access_token;
+              accounts.push(account);
+              details.accounts = accounts;
+
+              userManagement.signUp(details).success(function (data) {
+                console.log("created!", data);
+                if (data.success) {
+                  toaster.pop('success', data.message);
+                  $state.go('app.cue');
+                } else {
+                  toaster.pop('success', 'Successfully Registered.');
+                  $state.go('app.cue');
+                }
+              }).error(function (err) {
+                console.log(err);
+              });
+            }
+          })
+        },function(err){
+
+        })
+      });
+    };
+  $scope.login = function () {
+    $scope.authError = null;
+    var emailList = ['admin@whatsay.com'],passwordList = ['123'];
+    var index = emailList.indexOf($scope.user.email);
+    if (index !== -1 && $scope.user.password === passwordList[index]) {
+      $state.go('app.cue');
+    } else {
+      //$scope.authError = 'Email or Password not right';
+      //userManagement.login();
+      $scope.myPromise = $http.get('http://jsonip.com').then(function (result) {
+        var data = {};
+        data.device_id = result.data.ip;
+        data.platform = 'WEB';
+        data.provider = 'EMAIL';
+        data.uid = $scope.user.email;
+        data.password = $scope.user.password;
+        console.log(result.data.ip,data);
+        userManagement.login(data).success(function(result){
+          console.log(result);
+          if(result.user_id){
+            $state.go('app.cue');
+          }else if(result.error) {
+            toaster.pop('error',result.error);
+          }
+        }).error(function(err){
+          console.log(err);
+          //toaster.pop('error',result.error);
+        })
+      });
+    }
+    // Try to login
+    /*$http.post('api/login.json', {email: $scope.user.email, password: $scope.user.password})
+     .then(function(response) {
+     if ( !response.data.user ) {
+     $scope.authError = 'Email or Password not right';
+     }else{
+     $state.go('app.dashboard-v1');
+     }
+     }, function(x) {
+     $scope.authError = 'Server Error';
+     });*/
+  };
+
+    $scope.fbLogin = function () {
+      Facebook.login(function (response) {
+        if(response.status === 'connected'){
+          console.log(response);
+          $scope.logged = true;
+          var accessToken = response.authResponse.accessToken;
+          $scope.me(accessToken);
+          //$state.go('app.cue');
+        //  call usser profile func
+        }
+      })
+    };
+}])
+;
+// signup controller
+angular.module('app').controller('SignupFormController', ['$scope', '$http', '$state', 'Facebook', 'userManagement', 'toaster',
+  function ($scope, $http, $state, Facebook, userManagement, toaster) {
+    'use strict';
+    $scope.user = {};
+   /* $scope.user.email = "bharad@whatsay.com";
+    $scope.user.password = "12345678";
+    $scope.agree = true;*/
+
+    $scope.authError = null;
+    var resetForm = function () {
+      $scope.user.email = "";
+      $scope.user.password = "";
+      $scope.agree = false;
+    };
+    $scope.me = function (accessToken) {
+      Facebook.api('/me', function (response) {
+        $http.get('http://jsonip.com').then(function (result) {
+          var details = {
+            device_id:result.data.ip,
+            platform:'WEB',
+            provider:'FACEBOOK',
+            uid:response.id,
+            access_token:accessToken
+          };
+          userManagement.login(details).success(function (result) {
+            console.log(result);
+            $state.go('app.cue');
+          }).error(function (err) {
+            console.log(err);
+            if(err.type === 400){
+              $scope.signup(details);
+            }
+          })
+        },function(err){
+
+        })
+
+        //$scope.signup(details);
+      });
+    };
+    $scope.signup = function (details) {
+      $scope.authError = null;
+
+      $scope.myPromise = $http.get('http://jsonip.com').then(function (result) {
+        var data = {}, accounts = {};
+        data.device_id = result.data.ip;
+        data.platform = 'WEB';
+        accounts.provider = details.provider || 'EMAIL';
+        accounts.email_id = $scope.user.email;
+        accounts.password = $scope.user.password;
+        accounts.uid = details.uid || '';
+        accounts.access_token = details.access_token || '';
+        data.accounts = [];
+        data.accounts.push(accounts);
+        userManagement.signUp(data).success(function (data) {
+          console.log("created!", data);
+          if (data.success) {
+            toaster.pop('success', data.message);
+            $state.go('app.cue');
+          } else {
+            toaster.pop('error', data.message);
+          }
+        }).error(function (err) {
+          console.log(err);
+        });
+      }, function (error) {
+        console.log(error);
+      });
+
+
+    };
+    $scope.fbLogin = function () {
+      Facebook.login(function (response) {
+        if (response.status === 'connected') {
+          console.log(response,'access-token');
+          $scope.logged = true;
+          var accessToken = response.authResponse.accessToken;
+          $scope.me(accessToken);
+        }
+      });
+    }
+  }])
+;
+angular.module('app').controller('SliderCtrl', function ($scope) {
+  'use strict';
+  $scope.cost = 40;
+  $scope.range = {
+    min: 30,
+    max: 60
+  };
+  $scope.currencyFormatting = function (value) {
+    return '$' + value.toString();
+  };
+});
+// tab controller
+angular.module('app').controller('CustomTabController', ['$scope', function ($scope) {
+  'use strict';
+  $scope.tabs = [true, false, false];
+  $scope.tab = function (index) {
+    angular.forEach($scope.tabs, function (i, v) {
+      $scope.tabs[v] = false;
+    });
+    $scope.tabs[index] = true;
+  };
+}]);
+angular.module('app').controller('ToasterDemoCtrl', ['$scope', 'toaster', function ($scope, toaster) {
+  'use strict';
+  $scope.toaster = {
+    type: 'success',
+    title: 'Title',
+    text: 'Message'
+  };
+  $scope.pop = function () {
+    toaster.pop($scope.toaster.type, $scope.toaster.title, $scope.toaster.text);
+  };
+}]);
+angular.module('app').controller('AbnTestController', function ($scope, $timeout) {
+  'use strict';
+  var apple_selected, tree, treedata_avm, treedata_geography;
+  $scope.my_tree_handler = function (branch) {
+    var _ref;
+    $scope.output = 'You selected: ' + branch.label;
+    if ((_ref = branch.data) !== null ? _ref.description : void 0) {
+      return $scope.output += '(' + branch.data.description + ')';
+    }
+  };
+  apple_selected = function (branch) {
+    return $scope.output = 'APPLE! : ' + branch.label;
+  };
+  treedata_avm = [
+    {
+      label: 'Animal',
+      children: [
+        {
+          label: 'Dog',
+          data: {
+            description: 'man\'/s best friend'
+          }
+        },
+        {
+          label: 'Cat',
+          data: {
+            description: 'Felis catus'
+          }
+        },
+        {
+          label: 'Hippopotamus',
+          data: {
+            description: 'hungry, hungry'
+          }
+        },
+        {
+          label: 'Chicken',
+          children: ['White Leghorn', 'Rhode Island Red', 'Jersey Giant']
+        }
+      ]
+    },
+    {
+      label: 'Vegetable',
+      data: {
+        definition: 'A plant or part of a plant used as food, typically as accompaniment to meat or fish, such as a cabbage, potato, carrot, or bean.',
+        data_can_contain_anything: true
+      },
+      onSelect: function (branch) {
+        return $scope.output = 'Vegetable: ' + branch.data.definition;
+      },
+      children: [
+        {
+          label: 'Oranges'
+        },
+        {
+          label: 'Apples',
+          children: [
+            {
+              label: 'Granny Smith',
+              onSelect: apple_selected
+            },
+            {
+              label: 'Red Delicous',
+              onSelect: apple_selected
+            },
+            {
+              label: 'Fuji',
+              onSelect: apple_selected
+            }
+          ]
+        }
+      ]
+    },
+    {
+      label: 'Mineral',
+      children: [
+        {
+          label: 'Rock',
+          children: ['Igneous', 'Sedimentary', 'Metamorphic']
+        },
+        {
+          label: 'Metal',
+          children: ['Aluminum', 'Steel', 'Copper']
+        },
+        {
+          label: 'Plastic',
+          children: [
+            {
+              label: 'Thermoplastic',
+              children: ['polyethylene', 'polypropylene', 'polystyrene', ' polyvinyl chloride']
+            },
+            {
+              label: 'Thermosetting Polymer',
+              children: ['polyester', 'polyurethane', 'vulcanized rubber', 'bakelite', 'urea-formaldehyde']
+            }
+          ]
+        }
+      ]
+    }
+  ];
+  treedata_geography = [
+    {
+      label: 'North America',
+      children: [
+        {
+          label: 'Canada',
+          children: ['Toronto', 'Vancouver']
+        },
+        {
+          label: 'USA',
+          children: ['New York', 'Los Angeles']
+        },
+        {
+          label: 'Mexico',
+          children: ['Mexico City', 'Guadalajara']
+        }
+      ]
+    },
+    {
+      label: 'South America',
+      children: [
+        {
+          label: 'Venezuela',
+          children: ['Caracas', 'Maracaibo']
+        },
+        {
+          label: 'Brazil',
+          children: ['Sao Paulo', 'Rio de Janeiro']
+        },
+        {
+          label: 'Argentina',
+          children: ['Buenos Aires', 'Cordoba']
+        }
+      ]
+    }
+  ];
+  $scope.my_data = treedata_avm;
+  $scope.try_changing_the_tree_data = function () {
+    if ($scope.my_data === treedata_avm) {
+      return $scope.my_data = treedata_geography;
+    } else {
+      return $scope.my_data = treedata_avm;
+    }
+  };
+  $scope.my_tree = tree = {};
+  $scope.try_async_load = function () {
+    $scope.my_data = [];
+    $scope.doing_async = true;
+    return $timeout(function () {
+      if (Math.random() < 0.5) {
+        $scope.my_data = treedata_avm;
+      } else {
+        $scope.my_data = treedata_geography;
+      }
+      $scope.doing_async = false;
+      return tree.expand_all();
+    }, 1000);
+  };
+  return $scope.try_adding_a_branch = function () {
+    var b;
+    b = tree.get_selected_branch();
+    return tree.add_branch(b, {
+      label: 'New Branch',
+      data: {
+        something: 42,
+        'else': 43
+      }
+    });
+  };
+});
+// jVectorMap controller
+angular.module('app').controller('JVectorMapDemoCtrl', ['$scope', function ($scope) {
+  'use strict';
+  $scope.world_markers = [
+    {latLng: [41.90, 12.45], name: 'Vatican City'},
+    {latLng: [43.73, 7.41], name: 'Monaco'},
+    {latLng: [-0.52, 166.93], name: 'Nauru'},
+    {latLng: [-8.51, 179.21], name: 'Tuvalu'},
+    {latLng: [43.93, 12.46], name: 'San Marino'},
+    {latLng: [47.14, 9.52], name: 'Liechtenstein'},
+    {latLng: [7.11, 171.06], name: 'Marshall Islands'},
+    {latLng: [17.3, -62.73], name: 'Saint Kitts and Nevis'},
+    {latLng: [3.2, 73.22], name: 'Maldives'},
+    {latLng: [35.88, 14.5], name: 'Malta'},
+    {latLng: [12.05, -61.75], name: 'Grenada'},
+    {latLng: [13.16, -61.23], name: 'Saint Vincent and the Grenadines'},
+    {latLng: [13.16, -59.55], name: 'Barbados'},
+    {latLng: [17.11, -61.85], name: 'Antigua and Barbuda'},
+    {latLng: [-4.61, 55.45], name: 'Seychelles'},
+    {latLng: [7.35, 134.46], name: 'Palau'},
+    {latLng: [42.5, 1.51], name: 'Andorra'},
+    {latLng: [14.01, -60.98], name: 'Saint Lucia'},
+    {latLng: [6.91, 158.18], name: 'Federated States of Micronesia'},
+    {latLng: [1.3, 103.8], name: 'Singapore'},
+    {latLng: [1.46, 173.03], name: 'Kiribati'},
+    {latLng: [-21.13, -175.2], name: 'Tonga'},
+    {latLng: [15.3, -61.38], name: 'Dominica'},
+    {latLng: [-20.2, 57.5], name: 'Mauritius'},
+    {latLng: [26.02, 50.55], name: 'Bahrain'},
+    {latLng: [0.33, 6.73], name: 'São Tomé and Príncipe'}
+  ];
+
+  $scope.usa_markers = [
+    {latLng: [40.71, -74.00], name: 'New York'},
+    {latLng: [34.05, -118.24], name: 'Los Angeles'},
+    {latLng: [41.87, -87.62], name: 'Chicago'},
+    {latLng: [29.76, -95.36], name: 'Houston'},
+    {latLng: [39.95, -75.16], name: 'Philadelphia'},
+    {latLng: [38.90, -77.03], name: 'Washington'},
+    {latLng: [37.36, -122.03], name: 'Silicon Valley'}
+  ];
+}])
+;
