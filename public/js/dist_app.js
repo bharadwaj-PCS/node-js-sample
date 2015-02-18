@@ -1162,7 +1162,7 @@ angular.module('app')
       };
       //$scope.flag = false;
       var originalAnnoun = angular.copy($scope.announcement);
-      console.log("in announcementCreateController");
+      console.log('in announcementCreateController');
       $scope.minDate = new Date();
       $scope.open = function($event) {
         $event.preventDefault();
@@ -1195,7 +1195,7 @@ angular.module('app')
 angular.module('app')
   .controller('announcementViewController', ['$scope', '$modal', 'toaster', 'appConfig', 'announcementFactory',
     function ($scope, $modal, toaster, appConfig, announcementFactory) {
-      console.log("in announcementViewController");
+      console.log('in announcementViewController');
       $scope.myPromise = announcementFactory.getAllAnnouncement().success(function (data) {
         $scope.announcementData = data;
       }).error(function (error) {
@@ -1258,7 +1258,7 @@ angular.module('app')
         });
       };
       $scope.notifiyAnnouncement = function(announcement,index){
-        console.log("firing notification");
+        console.log('firing notification');
         var modelInstance = $modal.open({
           templateUrl: 'tpl/announcement/announcement_notify.html',
           controller: 'announcementNotifyController',
@@ -1273,13 +1273,13 @@ angular.module('app')
           console.log(notifyAnnouncement);
 
 
-          announcementFactory.notifyAnnouncement(notifyAnnouncement)
+          /*announcementFactory.notifyAnnouncement(notifyAnnouncement)
             .success(function (result) {
               //$scope.announcementData[index] = updateAnnouncement;
               toaster.pop('success', 'sent!!');
             }).error(function (err) {
               console.log(err);
-            })
+            });*/
         }, function () {
           console.log('Modal dismissed at: ' + new Date());
         });
@@ -1291,7 +1291,7 @@ angular.module('app')
       var data = {
         id: announcement.id
       };
-      //console.log(data, "from deleCtrl");
+      //console.log(data, 'from deleCtrl');
       $modalInstance.close(data);
     };
     $scope.cancel = function () {
@@ -1299,12 +1299,24 @@ angular.module('app')
     };
   }]);//announcementNotifyController
 angular.module('app')
-  .controller('announcementNotifyController',['$scope','$modalInstance','announcement', function ($scope, $modalInstance, announcement) {
+  .controller('announcementNotifyController',['$scope','$modalInstance','announcement','$http','announcementFactory', function ($scope, $modalInstance, announcement, $http, announcementFactory) {
+    $scope.itemsToNotify = [
+      {name:'All Users', value:'ALL_USERS'},
+      {name:'Platform', value:'PLATFORM'},
+      {name:'Gender', value:'GENDER'},
+      {name:'Inactive Users', value:'INACTIVE_USERS'},
+      {name:'All Groups', value:'ALL_GROUPS'},
+      {name:'User Group', value:'USER_GROUP'},
+      {name:'Friends', value:'FRIENDS'}
+    ];
     $scope.notify = true;
     $scope.announcement = announcement;
-    $scope.announcement.notify_to = "ALL_USERS";
+    $scope.announcement.notify_to = 'ALL_USERS';
     $scope.notifyAnnouncement = function () {
-      console.log($scope.announcement);
+      if($scope.announcement.notify_to === 'FRIENDS' || $scope.announcement.notify_to === 'USER_GROUP'){
+        console.log($scope.announcement);
+        $scope.announcement.user_id = $scope.userInfo.selected.id;
+      }
       $modalInstance.close($scope.announcement);
     };
     $scope.setModel = function (announcement) {
@@ -1314,10 +1326,33 @@ angular.module('app')
         announcement.gender = '';
       } else if(announcement.notify_to === 'PLATFORM'){
         announcement.gender = '';
-      }else if(announcement.notify_to = 'GENDER'){
+      }else if(announcement.notify_to === 'GENDER'){
         announcement.platform = '';
       }
     };
+
+    //$scope.address = {};
+    $scope.userInfo = {};
+    $scope.refreshAddresses = function(address) {
+      var data = {
+        sort_param:'name',
+        sort_order:'DESC',
+        name_like:address
+      };
+      if(address) {
+        announcementFactory.searchUsers(data).success(function(result){
+          console.log(result);
+          //$scope.addresses = result;
+          $scope.usersList = result;
+        }).error(function(err){
+          console.log(err);
+        });
+      }
+    };
+    $scope.availableColors = ['Red','Green','Blue','Yellow','Magenta','Maroon','Umbra','Turquoise'];
+
+    $scope.multipleDemo = {};
+    $scope.multipleDemo.colors = ['Blue','Red'];
     $scope.cancel = function () {
       $modalInstance.dismiss('cancel');
     };
@@ -1379,12 +1414,21 @@ angular.module('app').factory('announcementFactory', ['$http', 'appConfig', func
       data:data
     });
   };
+  function searchUsers(data){
+    var url = appConfig.apiUrl+'/search/user/namelike';
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    });
+  };
   return {
     createAnnouncement:createAnnouncement,
     updateAnnouncement:updateAnnouncement,
     deleteAnnouncement:deleteAnnouncement,
     getAllAnnouncement:getAllAnnouncement,
-    notifyAnnouncement:notifyAnnouncement
+    notifyAnnouncement:notifyAnnouncement,
+    searchUsers:searchUsers
   };
 }]);
 /**

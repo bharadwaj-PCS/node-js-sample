@@ -42,11 +42,20 @@ angular.module('app').factory('announcementFactory', ['$http', 'appConfig', func
       data:data
     });
   };
+  function searchUsers(data){
+    var url = appConfig.apiUrl+'/search/user/namelike';
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    });
+  };
   return {
     createAnnouncement:createAnnouncement,
     updateAnnouncement:updateAnnouncement,
     deleteAnnouncement:deleteAnnouncement,
     getAllAnnouncement:getAllAnnouncement,
-    notifyAnnouncement:notifyAnnouncement
+    notifyAnnouncement:notifyAnnouncement,
+    searchUsers:searchUsers
   };
 }]);
