@@ -1,68 +1,144 @@
-<div  ng-controller="cueController" cg-busy="{promise:myPromise}">
+<div ng-controller="cueController" cg-busy="{promise:myPromise}">
     <toaster-container toaster-options="{'time-out': 3000, 'close-button':true}"></toaster-container>
     <div class="bg-light lter b-b wrapper-md">
-        <h1 class="m-n font-thin h3">Cues</h1>
+        <span class="m-n font-thin h3">Cues</span>
+
+        <div class="btn-group m-r pull-right">
+            <label class="btn btn-primary" ng-model="layoutModel" btn-radio="'thumbnail'" uncheckable>
+                <i class="glyphicon glyphicon-th-large"></i>
+            </label>
+            <label class="btn btn-primary" ng-model="layoutModel" btn-radio="'list'" uncheckable>
+                <i class="glyphicon glyphicon-th-list"></i>
+            </label>
+        </div>
     </div>
     <div class="wrapper-md">
         <div class="row" infinite-scroll="getPagination()">
-            <div class="col-lg-6" ng-repeat="cue in cueData">
-                <tabset class="tab-container">
-                    <tab>
-                        <tab-heading>
-                            Over view
-                        </tab-heading>
-                        <div class="cue_thumbs">
-                            <img ng-src="{{cue.background_url_wide || 'http://placehold.it/500x250' }}" alt=""
-                                 style="width:100%"/>
-                            <ul class="list-group no-borders pull-in m-b-none">
-                                <li class="list-group-item">
-                                    <span href="" class="h4 text-primary m-b-sm m-t-sm block">{{cue.text}}</span>
+            <div ng-if="layoutModel === 'thumbnail'">
+                <div class="col-lg-6" ng-repeat="cue in cueData">
+                    <tabset class="tab-container">
+                        <tab>
+                            <tab-heading>
+                                Over view
+                            </tab-heading>
+                            <div class="cue_thumbs">
+                                <img ng-src="{{cue.background_url_wide || 'http://placehold.it/500x250' }}" alt=""
+                                     style="width:100%"/>
+                                <ul class="list-group no-borders pull-in m-b-none">
+                                    <li class="list-group-item">
+                                        <span href="" class="h4 text-primary m-b-sm m-t-sm block">{{cue.text}}</span>
 
+                                    </li>
+                                </ul>
+                                <div class="cue_editor">
+                                    <!--<button class="btn btn-primary " ng-click="UploadImg(cue)"><span
+                                            class="glyphicon glyphicon-edit"></span> Upload Image
+                                    </button>-->
+                                    <button href="#" class="btn btn-primary" ng-click="editCue(cue,$index)"><span
+                                            class="glyphicon glyphicon-edit"></span> Edit
+                                    </button>
+                                    <button class="btn btn-primary"
+                                            ng-click="openDeleteCueModal(cue,$index,false)"><span
+                                            class="glyphicon glyphicon-pencil"></span> Remove
+                                    </button>
+                                    <button class="btn btn-primary "
+                                            ng-click="openDeleteCueModal(cue,$index,true)"><span
+                                            class="glyphicon glyphicon-trash"></span> Delete
+                                    </button>
+
+                                </div>
+                            </div>
+
+                        </tab>
+                        <tab>
+                            <tab-heading>
+                                Parameters
+                            </tab-heading>
+                            <table class="table table-striped m-b-none cue-table"
+                                   style="width:100%;table-layout: fixed;">
+                                <thead>
+                                <tr>
+                                    <th>Key</th>
+                                    <th>Value</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="(key,value) in cue">
+                                    <td>
+                                        {{key}}
+                                    </td>
+                                    <td>{{value}}</td>
+                                </tr>
+
+
+                                </tbody>
+                            </table>
+                        </tab>
+                    </tabset>
+                </div>
+            </div>
+            <div ng-if="layoutModel === 'list'">
+                <div ng-repeat="cue in cueData">
+                    <div class="col-lg-12">
+                        <div class="panel">
+                            <div class="panel-heading b-b b-light row">
+                                <span class="h3 col-lg-10">{{cue.text}}<small class="text-muted"><span class="label label-success">{{cue.type | lowercase}}</span></small></span>
+                                <div class="m-b-sm col-lg-2 pull-right">
+                                    <div class="btn-group pull-right">
+                                        <button href="#" class="btn btn-primary" ng-click="editCue(cue,$index)"><span
+                                                class="glyphicon glyphicon-edit"></span>
+                                        </button>
+                                        <button class="btn btn-primary"
+                                                ng-click="openDeleteCueModal(cue,$index,false)"><span
+                                                class="glyphicon glyphicon-pencil"></span>
+                                        </button>
+                                        <button class="btn btn-primary "
+                                                ng-click="openDeleteCueModal(cue,$index,true)"><span
+                                                class="glyphicon glyphicon-trash"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <ul class="list-group alt">
+                                <li class="list-group-item">
+                                    <div class="media">
+                                        <div class="media-body">
+                                            <div><a href>Id</a></div>
+                                            <small class="text-muted">{{cue.id}}</small>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item">
+                                    <div class="media">
+                                        <span class="pull-left thumb-sm"><img ng-src="{{cue.background_url_wide || 'http://placehold.it/500x250' }}" alt="..." class="img-circle"></span>
+                                        <div class="media-body">
+                                            <div><a href>background image wide</a></div>
+                                            <small class="text-muted">{{cue.background_url_wide}}</small>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item">
+                                    <div class="media">
+                                        <span class="pull-left thumb-sm"><img ng-src="{{cue.background_url ||'http://placehold.it/500x250' }}" alt="..." class="img-circle"></span>
+                                        <div class="media-body">
+                                            <div><a href>background image</a></div>
+                                            <small class="text-muted">{{cue.background_url}}</small>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item">
+                                    <div class="media">
+                                        <!--<span class="pull-left thumb-sm"><img src="img/a3.jpg" alt="..." class="img-circle"></span>-->
+                                        <div class="media-body">
+                                            <div><a href>background color</a></div>
+                                            <small class="text-muted">{{cue.bgcolor}}</small>
+                                        </div>
+                                    </div>
                                 </li>
                             </ul>
-                            <div class="cue_editor">
-                                <!--<button class="btn btn-primary " ng-click="UploadImg(cue)"><span
-                                        class="glyphicon glyphicon-edit"></span> Upload Image
-                                </button>-->
-                                <button href="#" class="btn btn-primary" ng-click="editCue(cue,$index)"><span
-                                        class="glyphicon glyphicon-edit"></span> Edit
-                                </button>
-                                <button class="btn btn-primary"
-                                        ng-click="openDeleteCueModal(cue,$index,false)"><span
-                                        class="glyphicon glyphicon-pencil"></span> Remove
-                                </button>
-                                <button class="btn btn-primary " ng-click="openDeleteCueModal(cue,$index,true)"><span
-                                        class="glyphicon glyphicon-trash"></span> Delete
-                                </button>
-
-                            </div>
                         </div>
-
-                    </tab>
-                    <tab>
-                        <tab-heading>
-                            Parameters
-                        </tab-heading>
-                        <table class="table table-striped m-b-none cue-table" style="width:100%;table-layout: fixed;">
-                            <thead>
-                            <tr>
-                                <th>Key</th>
-                                <th>Value</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="(key,value) in cue">
-                                <td>
-                                    {{key}}
-                                </td>
-                                <td>{{value}}</td>
-                            </tr>
-
-
-                            </tbody>
-                        </table>
-                    </tab>
-                </tabset>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

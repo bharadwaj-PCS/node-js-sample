@@ -2,6 +2,9 @@
  * Created by bharadwaj on 10/2/15.
  */
 'use strict';
+//THis module allows the user to create an announcement with the following features
+//User can upload a back ground image
+//user can upload a headline
 angular.module('app')
   .controller('announcementCreateController', ['$scope', '$modal', 'toaster', 'appConfig', 'announcementFactory',
     function ($scope, $modal, toaster, appConfig, announcementFactory) {
@@ -46,6 +49,7 @@ angular.module('app')
   .controller('announcementViewController', ['$scope', '$modal', 'toaster', 'appConfig', 'announcementFactory',
     function ($scope, $modal, toaster, appConfig, announcementFactory) {
       console.log('in announcementViewController');
+      $scope.layoutModel = 'thumbnail';
       $scope.myPromise = announcementFactory.getAllAnnouncement().success(function (data) {
         $scope.announcementData = data;
       }).error(function (error) {
@@ -121,15 +125,13 @@ angular.module('app')
         });
         modelInstance.result.then(function (notifyAnnouncement) {
           console.log(notifyAnnouncement);
-
-
-          /*announcementFactory.notifyAnnouncement(notifyAnnouncement)
+          announcementFactory.notifyAnnouncement(notifyAnnouncement)
             .success(function (result) {
               //$scope.announcementData[index] = updateAnnouncement;
               toaster.pop('success', 'sent!!');
             }).error(function (err) {
               console.log(err);
-            });*/
+            });
         }, function () {
           console.log('Modal dismissed at: ' + new Date());
         });
@@ -157,20 +159,29 @@ angular.module('app')
       {name:'Inactive Users', value:'INACTIVE_USERS'},
       {name:'All Groups', value:'ALL_GROUPS'},
       {name:'User Group', value:'USER_GROUP'},
+      {name:'Users', value:'USERS'},
       {name:'Friends', value:'FRIENDS'}
     ];
+    $scope.validate = {};
     $scope.notify = true;
     $scope.announcement = announcement;
     $scope.announcement.notify_to = 'ALL_USERS';
     $scope.notifyAnnouncement = function () {
-      if($scope.announcement.notify_to === 'FRIENDS' || $scope.announcement.notify_to === 'USER_GROUP'){
-        console.log($scope.announcement);
-        $scope.announcement.user_id = $scope.userInfo.selected.id;
+      if(validateNotifyForm()){
+        if($scope.announcement.notify_to === 'FRIENDS' || $scope.announcement.notify_to === 'USER_GROUP'){
+          console.log($scope.announcement);
+          $scope.announcement.user_id = $scope.userInfo.selected.id;
+        }else if($scope.announcement.notify_to === 'USERS'){
+          $scope.announcement.users = [];
+          $scope.userInfo.selectedUsers.forEach(function (ele, index) {
+            $scope.announcement.users.push(ele.id);
+          });
+          console.log($scope.announcement,'USERS');
+        }
+        $modalInstance.close($scope.announcement);
       }
-      $modalInstance.close($scope.announcement);
     };
     $scope.setModel = function (announcement) {
-      //if(announcement.select)
       if(announcement.notify_to === 'ALL_USERS' || announcement.notify_to === 'INACTIVE_USERS' || announcement.notify_to === 'ALL_GROUPS'){
         announcement.platform = '';
         announcement.gender = '';
@@ -180,8 +191,24 @@ angular.module('app')
         announcement.platform = '';
       }
     };
-
-    //$scope.address = {};
+    function validateNotifyForm(){
+      var flag = true;
+      if($scope.announcement.notify_to === 'PLATFORM' && !$scope.announcement.platform){
+        $scope.validate.platform = true;
+        flag = false;
+      }else if($scope.announcement.notify_to === 'GENDER' && !$scope.announcement.gender){
+        $scope.validate.gender = true;
+        flag = false;
+      }else if($scope.announcement.notify_to === 'USERS' && !$scope.userInfo.selectedUsers.length){
+        $scope.validate.users = true;
+        flag = false;
+      }else if(($scope.announcement.notify_to === 'FRIENDS' || $scope.announcement.notify_to === 'USER_GROUP') && !$scope.userInfo.selectedUsers.length) {
+        console.log("select user");
+        $scope.validate.friends = true;
+        flag = false;
+      }
+      return flag;
+    };
     $scope.userInfo = {};
     $scope.refreshAddresses = function(address) {
       var data = {
@@ -193,17 +220,22 @@ angular.module('app')
         announcementFactory.searchUsers(data).success(function(result){
           console.log(result);
           //$scope.addresses = result;
-          $scope.usersList = result;
+          setUserList( result);
+
         }).error(function(err){
           console.log(err);
         });
+      }else {
+        $scope.usersList = $scope.usersList || [];
       }
     };
-    $scope.availableColors = ['Red','Green','Blue','Yellow','Magenta','Maroon','Umbra','Turquoise'];
-
-    $scope.multipleDemo = {};
-    $scope.multipleDemo.colors = ['Blue','Red'];
+    $scope.userInfo.selectedUsers = [];
     $scope.cancel = function () {
       $modalInstance.dismiss('cancel');
+    };
+    function setUserList(result){
+      console.log($scope.userList);
+      var temp = $scope.usersList.concat(result);
+      $scope.usersList = _.uniq(temp,'id');
     };
   }]);

@@ -3,12 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="a4bf2daa-d649-46fa-b75f-48dad2dc74e1" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/app/announcement/announcement.js" afterPath="$PROJECT_DIR$/public/js/app/announcement/announcement.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/app/announcement/announcement_factory.js" afterPath="$PROJECT_DIR$/public/js/app/announcement/announcement_factory.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/tpl/announcement/announcement_notify.html" afterPath="$PROJECT_DIR$/public/tpl/announcement/announcement_notify.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/tpl/announcement/announcement_view.html" afterPath="$PROJECT_DIR$/public/tpl/announcement/announcement_view.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/app.min.js" afterPath="$PROJECT_DIR$/public/js/app.min.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/app/cue/cue.js" afterPath="$PROJECT_DIR$/public/js/app/cue/cue.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/tpl/cue/cue_view.html" afterPath="$PROJECT_DIR$/public/tpl/cue/cue_view.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/dist_app.js" afterPath="$PROJECT_DIR$/public/js/dist_app.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/dist_lib.js" afterPath="$PROJECT_DIR$/public/js/dist_lib.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/lib.min.js" afterPath="$PROJECT_DIR$/public/js/lib.min.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="node-js-sample.iws" />
@@ -88,7 +88,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -181,6 +180,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">

@@ -9,13 +9,18 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Text </label>
-                            <input type="text" name="announcementText" class="form-control" ng-model="announcement.text" readonly required>
-                            <div ng-show="announcementNotify.announcementText.$dirty" ng-messages="announcementNotify.announcementText.$error"
+                            <input type="text" name="announcementText" class="form-control" ng-model="announcement.text"
+                                   readonly required>
+
+                            <div ng-show="announcementNotify.announcementText.$dirty"
+                                 ng-messages="announcementNotify.announcementText.$error"
                                  ng-messages-include="error_messages.html"></div>
                         </div>
                         <div class="form-group">
                             <label>Content </label>
-                            <div text-angular ng-model="announcement.content" class="btn-groups" name="announcementContent"
+
+                            <div text-angular ng-model="announcement.content" class="btn-groups" ta-disabled="true"
+                                 name="announcementContent"
                                  ta-toolbar="[['bold','italics','underline'],['html']]"></div>
                             <!--<input type="text" name="notificationText" class="form-control" ng-model="notification.text" required>-->
                             <div ng-show="flag" ng-messages="announcementNotify.announcementText.$dirty"
@@ -26,118 +31,112 @@
                         <div class="form-group">
                             <label>Notify To </label>
                             <select name="account" class="form-control m-b" data-ng-model="announcement.notify_to"
-                                    data-ng-change="setModel(announcement)" ng-options="item.value as item.name for item in itemsToNotify">
+                                    data-ng-change="setModel(announcement)"
+                                    ng-options="item.value as item.name for item in itemsToNotify">
                             </select>
+                        </div>
                             <div ng-if="announcement.notify_to === 'PLATFORM'" class="form-group">
                                 <div class="col-sm-10">
                                     <div class="radio">
                                         <label class="i-checks">
-                                            <input type="radio" name="platform" value="ANDROID" ng-model="announcement.platform">
+                                            <input type="radio" name="platform" value="ANDROID"
+                                                   ng-model="announcement.platform">
                                             <i></i>
                                             Android
                                         </label>
                                     </div>
                                     <div class="radio">
                                         <label class="i-checks">
-                                            <input type="radio" name="platform" value="IOS" ng-model="announcement.platform">
+                                            <input type="radio" name="platform" value="IOS"
+                                                   ng-model="announcement.platform">
                                             <i></i>
                                             i OS
                                         </label>
                                     </div>
+                                    <p class="help-block text-danger" ng-show="validate.platform && !announcement.platform">
+                                        Please select platform
+                                    </p>
                                 </div>
                             </div>
                             <div ng-if="announcement.notify_to === 'GENDER'" class="form-group">
                                 <div class="col-sm-10">
                                     <div class="radio">
                                         <label class="i-checks">
-                                            <input type="radio" name="gender" value="male" ng-model="announcement.gender">
+                                            <input type="radio" name="gender" value="male"
+                                                   ng-model="announcement.gender">
                                             <i></i>
                                             Male
                                         </label>
                                     </div>
                                     <div class="radio">
                                         <label class="i-checks">
-                                            <input type="radio" name="gender" value="female" ng-model="announcement.gender">
+                                            <input type="radio" name="gender" value="female"
+                                                   ng-model="announcement.gender">
                                             <i></i>
                                             Female
                                         </label>
                                     </div>
+                                    <p class="help-block text-danger" ng-if="validate.gender && !announcement.gender">Please select gender</p>
                                 </div>
                             </div>
-                            <div ng-if="announcement.notify_to === 'FRIENDSs'" class="form-group">
-                                <label class="col-sm-2 control-label">Select Users</label>
-                                <div class="col-sm-10">
-                                    <!--<ui-select ng-model="userInfo.selected"
-                                               multiple
+                            <div ng-if="announcement.notify_to === 'USERS'" class="form-group">
+                                <label>Select users</label>
+                                <div>
+                                    <ui-select multiple ng-model="userInfo.selectedUsers" class="form-control m-b"
                                                theme="bootstrap"
                                                ng-disabled="disabled"
                                                reset-search-input="true"
-                                               style="width: 300px;">
-                                        <ui-select-match placeholder="Enter an address...">
-                                            {{$item.name}}
+                                               on-select="filterTagging($item,$model)"
+                                               style="width: 100%;">
+                                        <ui-select-match placeholder="Enter username">{{$item.name}}
                                         </ui-select-match>
                                         <ui-select-choices repeat="userInfo in usersList track by $index"
-                                                           refresh="refreshAddresses($select.search)"
+                                                           refresh="refreshAddresses($select.search) | filter:$select.search"
                                                            refresh-delay="0">
                                             <div ng-bind-html="userInfo.name | highlight: $select.search"></div>
                                         </ui-select-choices>
-                                    </ui-select>-->
-                                    <!--<ui-select ng-model="address.selected"
-                                               multiple
-                                               theme="bootstrap"
-                                               ng-disabled="disabled"
-                                               reset-search-input="true"
-                                               style="width: 300px;">
-                                        <ui-select-match placeholder="Enter an address...">
-                                            {{$item.formatted_address}}
-                                        </ui-select-match>
-                                        <ui-select-choices repeat="address in addresses track by $index"
-                                                           refresh="refreshAddresses2($select.search)"
-                                                           refresh-delay="0">
-                                            <div ng-bind-html="address.formatted_address | highlight: $select.search"></div>
-                                        </ui-select-choices>
-                                    </ui-select>-->
-                                    <ui-select multiple ng-model="multipleDemo.colors" theme="select2" ng-disabled="disabled" style="width: 300px;">
-                                        <ui-select-match placeholder="Select colors...">{{$item}}</ui-select-match>
-                                        <ui-select-choices repeat="color in availableColors | filter:$select.search">
-                                            {{color}}
-                                        </ui-select-choices>
                                     </ui-select>
+                                    <p class="help-block text-danger" ng-if="validate.users && !userInfo.selectedUsers.length">
+                                        Please select one or more users
+                                    </p>
                                 </div>
                             </div>
-                            <div ng-if="announcement.notify_to === 'FRIENDS'" class="form-group">
-                                <label class="col-sm-2 control-label text-left">Users</label>
-                                <div class="col-sm-10">
+                            <div ng-if="announcement.notify_to === 'FRIENDS' || announcement.notify_to === 'USER_GROUP'">
+                                <label>Username</label>
+                                <div>
                                     <ui-select ng-model="userInfo.selected"
                                                theme="bootstrap"
                                                ng-disabled="disabled"
                                                reset-search-input="true"
-                                               style="width: 300px;">
-                                        <ui-select-match placeholder="Enter username">{{$select.selected.name}}</ui-select-match>
+                                               style="width: 100%;">
+                                        <ui-select-match placeholder="Enter username">{{$select.selected.name}}
+                                        </ui-select-match>
                                         <ui-select-choices repeat="userInfo in usersList track by $index"
                                                            refresh="refreshAddresses($select.search)"
                                                            refresh-delay="0">
                                             <div ng-bind-html="userInfo.name | highlight: $select.search"></div>
                                         </ui-select-choices>
                                     </ui-select>
-                                    <span class="help-block">{{userInfo.selected.id}}</span>
+                                    <p class="help-block text-danger" ng-if="validate.friends && !userInfo.selected">
+                                        Please select username
+                                    </p>
                                 </div>
                             </div>
-                            <div ng-show="announcementNotify.announcementText.$dirty" ng-messages="announcementEdit.announcementText.$error"
+                            <div ng-show="announcementNotify.announcementText.$dirty"
+                                 ng-messages="announcementEdit.announcementText.$error"
                                  ng-messages-include="error_messages.html"></div>
-                        </div>
-
-
                     </div>
                 </div>
             </form>
         </div>
     </div>
     <div class="modal-footer">
-        <input type="button" class="btn btn-primary" value="Notify"
+        <button class="btn btn-primary"
                ng-click="notifyAnnouncement(announcement,announcementEdit);" id="btn-Edit">
+        <span class="glyphicon glyphicon-bullhorn"></span>Notify</button>
         <!--<input type="button" class="btn btn-primary" value="Reset"
                ng-click="resetCue(cue,cueEdit);" id="btn-reset">-->
-        <button class="btn btn-warning" ng-click="cancel();"><span class="glyphicon glyphicon-remove"></span>Cancel</button>
+        <button class="btn btn-warning" ng-click="cancel();"><span class="glyphicon glyphicon-remove"></span>Cancel
+        </button>
     </div>
 </div>

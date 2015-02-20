@@ -1,62 +1,127 @@
-<div  ng-controller="announcementViewController" cg-busy="{promise:myPromise}">
+<div ng-controller="announcementViewController" cg-busy="{promise:myPromise}">
     <toaster-container toaster-options="{'time-out': 3000, 'close-button':true}"></toaster-container>
     <div class="bg-light lter b-b wrapper-md">
-        <h1 class="m-n font-thin h3">Announcements</h1>
+        <span class="m-n font-thin h3">Announcements</span>
+        <div class="btn-group m-r pull-right">
+            <label class="btn btn-primary" ng-model="layoutModel" btn-radio="'thumbnail'" uncheckable>
+                <i class="glyphicon glyphicon-th-large"></i>
+            </label>
+            <label class="btn btn-primary" ng-model="layoutModel" btn-radio="'list'" uncheckable>
+                <i class="glyphicon glyphicon-th-list"></i>
+            </label>
+        </div>
     </div>
     <div class="wrapper-md">
         <div class="row" infinite-scroll="getPagination()">
-            <div class="col-lg-6" ng-repeat="announcement in announcementData">
-                <tabset class="tab-container">
-                    <tab>
-                        <tab-heading>
-                            Over view
-                        </tab-heading>
-                        <div class="cue_thumbs">
-                            <ul class="list-group no-borders pull-in m-b-none">
-                                <li class="list-group-item">
-                                    <span href="" class="h4 text-primary m-b-sm m-t-sm block">{{announcement.text}}</span>
+            <div ng-if="layoutModel === 'thumbnail'">
+                <div class="col-lg-6" ng-repeat="announcement in announcementData">
+                    <tabset class="tab-container">
+                        <tab>
+                            <tab-heading>
+                                Over view
+                            </tab-heading>
+                            <div class="cue_thumbs">
+                                <ul class="list-group no-borders pull-in m-b-none">
+                                    <li class="list-group-item">
+                                        <span href=""
+                                              class="h4 text-primary m-b-sm m-t-sm block">{{announcement.text}}</span>
 
-                                </li>
-                            </ul>
-                            <div class="cue_editor">
-                                <button class="btn btn-primary " ng-click="notifiyAnnouncement(announcement,$index)"><span
-                                        class="glyphicon glyphicon-search"></span> Notify
-                                </button>
-                                <button href="#" class="btn btn-primary" ng-click="editAnnouncement(announcement,$index)"><span
-                                        class="glyphicon glyphicon-edit"></span> Edit
-                                </button>
-                                <button class="btn btn-primary " ng-click="deleteAnnouncement(announcement,$index)"><span
-                                        class="glyphicon glyphicon-trash"></span> Delete
-                                </button>
+                                    </li>
+                                </ul>
+                                <div class="cue_editor">
+                                    <button class="btn btn-primary "
+                                            ng-click="notifiyAnnouncement(announcement,$index)"><span
+                                            class="glyphicon glyphicon-bullhorn"></span> Notify
+                                    </button>
+                                    <button href="#" class="btn btn-primary"
+                                            ng-click="editAnnouncement(announcement,$index)"><span
+                                            class="glyphicon glyphicon-edit"></span> Edit
+                                    </button>
+                                    <button class="btn btn-primary " ng-click="deleteAnnouncement(announcement,$index)"><span
+                                            class="glyphicon glyphicon-trash"></span> Delete
+                                    </button>
 
+                                </div>
+                            </div>
+
+                        </tab>
+                        <tab>
+                            <tab-heading>
+                                Parameters
+                            </tab-heading>
+                            <table class="table table-striped m-b-none cue-table"
+                                   style="width:100%;table-layout: fixed;">
+                                <thead>
+                                <tr>
+                                    <th>Key</th>
+                                    <th>Value</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="(key,value) in announcement">
+                                    <td>
+                                        {{key}}
+                                    </td>
+                                        <td ng-if="key ==='content'" ng-bind-html="value"></td>
+                                    <td ng-if="key !=='content'">{{value}}</td>
+                                </tr>
+
+
+                                </tbody>
+                            </table>
+                        </tab>
+                    </tabset>
+                </div>
+            </div>
+            <div ng-if="layoutModel === 'list'">
+                <div ng-repeat="announcement in announcementData">
+                    <div class="col-lg-12">
+                        <div class="panel b-a">
+                            <div class="panel-heading b-b b-light row"><span class="h3 col-lg-10">{{announcement.text}}</span>
+                                <div class="m-b-sm col-lg-2 pull-right">
+                                    <div class="btn-group pull-right">
+                                        <button type="button" class="btn btn-primary"
+                                                ng-click="notifiyAnnouncement(announcement,$index)">
+                                            <span class="glyphicon glyphicon-bullhorn"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-primary"
+                                                ng-click="editAnnouncement(announcement,$index)">
+                                            <span class="glyphicon glyphicon-edit"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-primary"
+                                                ng-click="deleteAnnouncement(announcement,$index)">
+                                            <span class="glyphicon glyphicon-trash"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div collapse="isCollapsed" class="panel-body">
+                                <div class="row">
+                                    <div class="form-group col-sm-3">
+                                        <label>Id</label>
+                                        <p>{{announcement.id}}</p>
+                                    </div>
+                                    <div class="form-group col-sm-3">
+                                        <label>Created at:</label>
+                                        <p>{{announcement.created_at | date:'MM/dd/yyyy'}}</p>
+                                    </div>
+                                    <div class="form-group col-sm-3">
+                                        <label>Updated at:</label>
+                                        <p>{{announcement.updated_at | date:'MM/dd/yyyy'}}</p>
+                                    </div>
+                                    <div class="form-group col-sm-3">
+                                        <label>Content:</label>
+                                        <p ng-bind-html="announcement.content"></p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                    </div>
+                    <div>
 
-                    </tab>
-                    <tab>
-                        <tab-heading>
-                            Parameters
-                        </tab-heading>
-                        <table class="table table-striped m-b-none cue-table" style="width:100%;table-layout: fixed;">
-                            <thead>
-                            <tr>
-                                <th>Key</th>
-                                <th>Value</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="(key,value) in announcement">
-                                <td>
-                                    {{key}}
-                                </td>
-                                <td>{{value}}</td>
-                            </tr>
+                    </div>
 
-
-                            </tbody>
-                        </table>
-                    </tab>
-                </tabset>
+                </div>
             </div>
         </div>
     </div>

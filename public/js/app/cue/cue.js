@@ -2,10 +2,14 @@
  * Created by bharadwaj on 28/1/15.
  */
 'use strict';
+/**
+ * This would enable the
+ */
 angular.module('app')
   .controller('cueController', ['$scope', '$modal', 'toaster', 'appConfig', 'cueFactory',
     function ($scope, $modal, toaster, appConfig, cueFactory) {
       'use strict';
+      $scope.layoutModel = 'thumbnail';
       var offset = 0, count = 20;
       $scope.cueData = [];
       $scope.test = "Helo world";
