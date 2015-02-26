@@ -268,59 +268,60 @@ angular.module('app')
     };
     $scope.addCue = function (cueModel, formData) {
       console.log(cueModel);
-      if(cueModel.type === 'POLL'){
-        //update image to assert
-        var track = [];
-        var assetsIdCollection = [];
-        for(var keys in optionFormCollection){
-          var fd = optionFormCollection[keys];
-          fd.append('type','IMAGE');
-          fd.append('description',$scope.options["option"+keys].text);
-          fd.append('label','Poll');
-          fd.append('created_at',+(new Date()));
-          track.push(assetFactory.createAsset(fd));
-        }
+      if(validateCueCreation(cueModel)){
+        if(cueModel.type === 'POLL'){
+          //update image to assert
+          var track = [];
+          var assetsIdCollection = [];
+          for(var keys in optionFormCollection){
+            var fd = optionFormCollection[keys];
+            fd.append('type','IMAGE');
+            fd.append('description',$scope.options["option"+keys].text);
+            fd.append('label','Poll');
+            fd.append('created_at',+(new Date()));
+            track.push(assetFactory.createAsset(fd));
+          }
 
 
-        /*_.each(optionFormCollection, function (col) {
-          track.push(assetFactory.createAsset(col));
-        });*/
-        $scope.myPromise = $q.all(track).then(function (data){
-          //console.log(arguments,'arguments');
-          data.forEach(function(ele,index){
-            //console.log(ele.data.asset_id);
-            assetsIdCollection.push(ele.data.asset_id);
+          /*_.each(optionFormCollection, function (col) {
+           track.push(assetFactory.createAsset(col));
+           });*/
+          $scope.myPromise = $q.all(track).then(function (data){
+            //console.log(arguments,'arguments');
+            data.forEach(function(ele,index){
+              //console.log(ele.data.asset_id);
+              assetsIdCollection.push(ele.data.asset_id);
+            });
+            cueModel.polls = assetsIdCollection;
+            console.log(assetsIdCollection,cueModel);
+            $scope.myPromise = cueFactory.createCue(cueModel).success(function (result) {
+              toaster.pop('success','Successfully create a poll cue');
+              $scope.resetCue();
+            }).error(function (err) {
+              console.log(err);
+              toaster.pop('error', 'Error while creating cue.');
+            });
+          },function (err){
+            console.log(err);
           });
-          cueModel.polls = assetsIdCollection;
-          console.log(assetsIdCollection,cueModel);
+        }else if(cueModel.type === 'GENERAL'){
           $scope.myPromise = cueFactory.createCue(cueModel).success(function (result) {
-            toaster.pop('success','Successfully create a poll cue');
-            $scope.resetCue();
+            console.log(result);
           }).error(function (err) {
             console.log(err);
             toaster.pop('error', 'Error while creating cue.');
+          }).then(function(data){
+            if(data.status === 200){
+              toaster.pop('success', 'cue created sucessfuly.');
+              var result = data.data.result;
+              console.log($scope.options);
+              $scope.resetCue();
+            }
+            console.log('called at then');
           });
-        },function (err){
-          console.log(err);
-        });
-      }else if(cueModel.type === 'GENERAL'){
-        $scope.myPromise = cueFactory.createCue(cueModel).success(function (result) {
-          console.log(result);
-
-          //$scope.resetCue();
-        }).error(function (err) {
-          console.log(err);
-          toaster.pop('error', 'Error while creating cue.');
-        }).then(function(data){
-          if(data.status === 200){
-            toaster.pop('success', 'cue created sucessfuly.');
-            var result = data.data.result;
-            console.log($scope.options);
-            //console.log(data.data);
-          }
-          console.log('called at then');
-        });
+        }
       }
+
 
     };
     $scope.resetCue = function () {
@@ -329,6 +330,40 @@ angular.module('app')
       $scope.background_url_data = '';
       $scope.background_url_wide_data = '';
       $scope.addForm.$setPristine();
+    };
+    function validateCueCreation(cueModel){
+      var flag = true;
+      console.log(cueModel);
+      for(var keys in cueModel){
+        if(!cueModel[keys]){
+          console.log(keys);
+          flag = false;
+          toaster.pop('warning','Please fill all the values to create a cue.');
+          break;
+        }
+      }
+      if(!flag){
+        return flag;
+      }
+      if(cueModel.type === 'POLL' && $scope.options.count){
+        //check for options;
+        var count = 0;
+        for(var keys in $scope.options){
+          if(keys !== 'count'){
+            if($scope.options[keys].text && $scope.options[keys].content){
+              count++;
+            }
+          }
+        }
+        if((count !== 2 && $scope.options.count === 'TWO') || (count !== 4 && $scope.options.count === 'FOUR')){
+          flag = false;
+          toaster.pop('warning','Please fill all the option of poll cue');
+        }
+      }else if(cueModel.type === 'POLL') {
+        flag = false;
+        toaster.pop('warning','Please select options for poll cue');
+      }
+      return flag;
     };
 
   }]);

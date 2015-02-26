@@ -34,19 +34,6 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>Background Image</label>
-                            <div class="input-group">
-                                    <span class="input-group-btn">
-                                    <span class="btn btn-primary btn-file">
-                                    Browse&hellip; <input type="file" name="bgimage" ng-file-select="onBGSelect($files)" accept="image/*" >
-                                    </span>
-                                    </span>
-                            </div>
-                            <div data-ng-if="(background_url_data || cue.background_url)">
-                                <img ng-src="{{background_url_data || cue.background_url}}" class="img-upload-thimb" />
-                            </div>
-                        </div>
-                        <div class="form-group">
                             <label>Background Image wide</label>
                             <div class="input-group">
                                     <span class="input-group-btn">
@@ -60,6 +47,20 @@
                                 <img ng-src="{{background_url_wide_data || cue.background_url_wide }}" class="img-upload-thimb" />
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label>Background Image</label>
+                            <div class="input-group">
+                                    <span class="input-group-btn">
+                                    <span class="btn btn-primary btn-file">
+                                    Browse&hellip; <input type="file" name="bgimage" ng-file-select="onBGSelect($files)" accept="image/*" >
+                                    </span>
+                                    </span>
+                            </div>
+                            <div data-ng-if="(background_url_data || cue.background_url)">
+                                <img ng-src="{{background_url_data || cue.background_url}}" class="img-upload-thimb" />
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </form>
