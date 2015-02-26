@@ -53,11 +53,11 @@ angular.module('app').controller('SignupFormController', ['$scope', '$http', '$s
         accounts.access_token = details.access_token || '';
         data.accounts = [];
         data.accounts.push(accounts);
-        userManagement.signUp(data).success(function (data) {
+        $scope.myPromise = userManagement.signUp(data).success(function (data) {
           console.log("created!", data);
           if (data.success) {
             toaster.pop('success', data.message);
-            $state.go('app.cue');
+            $state.go('whatsay.login');
           } else {
             toaster.pop('error', data.message);
           }

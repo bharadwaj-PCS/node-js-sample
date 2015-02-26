@@ -1,7 +1,7 @@
-<div ng-controller="cueController" cg-busy="{promise:myPromise}">
+<div ng-controller="assetController" cg-busy="{promise:myPromise}">
     <toaster-container toaster-options="{'time-out': 3000, 'close-button':true}"></toaster-container>
     <div class="bg-light lter b-b wrapper-md">
-        <span class="m-n font-thin h3">Cues</span>
+        <span class="m-n font-thin h3">Assets</span>
 
         <div class="btn-group m-r pull-right">
             <label class="btn btn-primary" ng-model="layoutModel" btn-radio="'thumbnail'" uncheckable>
@@ -15,15 +15,14 @@
     <div class="wrapper-md">
         <div class="row" infinite-scroll="getPagination()">
             <div ng-if="layoutModel === 'thumbnail'">
-                <!--9032231403  vijay-->
-                <div class="col-lg-6" ng-repeat="cue in cueData">
+                <div class="col-lg-6" ng-repeat="asset in assetData">
                     <tabset class="tab-container">
                         <tab>
                             <tab-heading>
                                 Over view
                             </tab-heading>
                             <div class="cue_thumbs">
-                                <img ng-src="{{cue.background_url_wide || 'http://placehold.it/500x250' }}" alt=""
+                                <img ng-src="{{asset.snap_url || 'http://placehold.it/500x250' }}" alt=""
                                      style="width:100%"/>
                                 <ul class="list-group no-borders pull-in m-b-none">
                                     <li class="list-group-item">
@@ -35,15 +34,11 @@
                                     <!--<button class="btn btn-primary " ng-click="UploadImg(cue)"><span
                                             class="glyphicon glyphicon-edit"></span> Upload Image
                                     </button>-->
-                                    <button href="#" class="btn btn-primary" ng-click="editCue(cue,$index)"><span
+                                    <button href="#" class="btn btn-primary" ng-click="editAsset(asset,$index)"><span
                                             class="glyphicon glyphicon-edit"></span> Edit
                                     </button>
-                                    <button class="btn btn-primary"
-                                            ng-click="openDeleteCueModal(cue,$index,false)"><span
-                                            class="glyphicon glyphicon-pencil"></span> Remove
-                                    </button>
                                     <button class="btn btn-primary "
-                                            ng-click="openDeleteCueModal(cue,$index,true)"><span
+                                            ng-click="openDeleteAssetModal(asset,$index)"><span
                                             class="glyphicon glyphicon-trash"></span> Delete
                                     </button>
 
@@ -64,7 +59,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr ng-repeat="(key,value) in cue">
+                                <tr ng-repeat="(key,value) in asset">
                                     <td>
                                         {{key}}
                                     </td>
@@ -75,35 +70,26 @@
                                 </tbody>
                             </table>
                         </tab>
-                        <tab ng-if="cue.type === 'POLL'">
-                            <tab-heading ng-click="getPollOptions(cue)">Options</tab-heading>
-                            <div class="row">
-                                <div class="col-lg-6" ng-repeat="opt in cue.options" >
-                                    <p>{{opt.description}}</p>
-                                    <img ng-src="{{opt.thumbnail_url}}" alt=""/>
-                                </div>
-                            </div>
-                        </tab>
                     </tabset>
                 </div>
             </div>
             <div ng-if="layoutModel === 'list'">
-                <div ng-repeat="cue in cueData">
+                <div ng-repeat="asset in assetData">
                     <div class="col-lg-12">
                         <div class="panel">
                             <div class="panel-heading b-b b-light row">
-                                <span class="h3 col-lg-10">{{cue.text}}<small class="text-muted"><span class="label label-success">{{cue.type | lowercase}}</span></small></span>
+                                <span class="h3 col-lg-10">{{asset.text}}<small class="text-muted"><span class="label label-success">{{cue.type | lowercase}}</span></small></span>
                                 <div class="m-b-sm col-lg-2 pull-right">
                                     <div class="btn-group pull-right">
-                                        <button href="#" class="btn btn-primary" ng-click="editCue(cue,$index)"><span
+                                        <button href="#" class="btn btn-primary" ng-click="editAsset(asset,$index)"><span
                                                 class="glyphicon glyphicon-edit"></span>
                                         </button>
                                         <button class="btn btn-primary"
-                                                ng-click="openDeleteCueModal(cue,$index,false)"><span
+                                                ng-click="openDeleteAssetModal(asset,$index,false)"><span
                                                 class="glyphicon glyphicon-pencil"></span>
                                         </button>
                                         <button class="btn btn-primary "
-                                                ng-click="openDeleteCueModal(cue,$index,true)"><span
+                                                ng-click="openDeleteAssetModal(asset,$index)"><span
                                                 class="glyphicon glyphicon-trash"></span>
                                         </button>
                                     </div>
@@ -114,13 +100,13 @@
                                     <div class="media">
                                         <div class="media-body">
                                             <div><a href>Id</a></div>
-                                            <small class="text-muted">{{cue.id}}</small>
+                                            <small class="text-muted">{{asset.id}}</small>
                                         </div>
                                     </div>
                                 </li>
                                 <li class="list-group-item">
                                     <div class="media">
-                                        <span class="pull-left thumb-sm"><img ng-src="{{cue.background_url_wide || 'http://placehold.it/500x250' }}" alt="..." class="img-circle"></span>
+                                        <span class="pull-left thumb-sm"><img ng-src="{{asset.background_url_wide || 'http://placehold.it/500x250' }}" alt="..." class="img-circle"></span>
                                         <div class="media-body">
                                             <div><a href>background image wide</a></div>
                                             <small class="text-muted">{{cue.background_url_wide}}</small>
@@ -129,7 +115,7 @@
                                 </li>
                                 <li class="list-group-item">
                                     <div class="media">
-                                        <span class="pull-left thumb-sm"><img ng-src="{{cue.background_url ||'http://placehold.it/500x250' }}" alt="..." class="img-circle"></span>
+                                        <span class="pull-left thumb-sm"><img ng-src="{{asset.background_url ||'http://placehold.it/500x250' }}" alt="..." class="img-circle"></span>
                                         <div class="media-body">
                                             <div><a href>background image</a></div>
                                             <small class="text-muted">{{cue.background_url}}</small>
@@ -141,7 +127,7 @@
                                         <!--<span class="pull-left thumb-sm"><img src="img/a3.jpg" alt="..." class="img-circle"></span>-->
                                         <div class="media-body">
                                             <div><a href>background color</a></div>
-                                            <small class="text-muted">{{cue.bgcolor}}</small>
+                                            <small class="text-muted">{{asset.bgcolor}}</small>
                                         </div>
                                     </div>
                                 </li>
@@ -159,12 +145,14 @@
 
 <script type="text/ng-template" id="myDeleteContent.html">
     <div class="modal-header">
-        <h3 class="modal-title" ng-if="flag">Delete Cue</h3>
+        <h3 class="modal-title">Delete Asset</h3>
 
-        <h3 class="modal-title" ng-if="!flag">Remove Cue</h3>
+        <!--<h3 class="modal-title" ng-if="!flag">Remove Asset</h3>-->
     </div>
     <div class="modal-body">
-        <div style="font:bold;">Are you sure want to <span ng-if="!flag">remove?</span><span ng-if="flag">delete?</span>
+        <div style="font:bold;">Are you sure want to
+            <span ng-if="flag">delete?</span>
+            <!--<span ng-if="!flag">remove?</span>-->
         </div>
     </div>
     <div class="modal-footer">

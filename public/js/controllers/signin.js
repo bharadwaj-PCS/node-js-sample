@@ -1,7 +1,7 @@
 /* Controllers */
 // signin controller
-angular.module('app').controller('SigninFormController', ['$scope', '$http', '$state','Facebook','userManagement','toaster',
-  function ($scope, $http, $state,Facebook,userManagement,toaster) {
+angular.module('app').controller('SigninFormController', ['$scope', '$http', '$state','Facebook','userManagement','toaster','$cookies',
+  function ($scope, $http, $state,Facebook,userManagement,toaster,$cookies) {
   'use strict';
   $scope.user = {};
   $scope.authError = null;
@@ -23,6 +23,8 @@ angular.module('app').controller('SigninFormController', ['$scope', '$http', '$s
           };
           $scope.myPromise = userManagement.login(details).success(function (result) {
             console.log(result);
+            $cookies['userId'] = result.user_id;
+            console.log($cookies['userId']);
             $state.go('app.cue');
           }).error(function (err) {
             if(err.type === 400){
@@ -37,9 +39,13 @@ angular.module('app').controller('SigninFormController', ['$scope', '$http', '$s
                 console.log("created!", data);
                 if (data.success) {
                   toaster.pop('success', data.message);
+                  $cookies['userId'] = result.user_id;
+                  console.log($cookies['userId'],'cre');
                   $state.go('app.cue');
                 } else {
                   toaster.pop('success', 'Successfully Registered.');
+                  $cookies['userId'] = result.user_id;
+                  console.log($cookies['userId'],'Reg');
                   $state.go('app.cue');
                 }
               }).error(function (err) {
@@ -72,13 +78,15 @@ angular.module('app').controller('SigninFormController', ['$scope', '$http', '$s
         userManagement.login(data).success(function(result){
           console.log(result);
           if(result.user_id){
+            $cookies['userId'] = result.user_id;
+            console.log($cookies['userId']);
             $state.go('app.cue');
           }else if(result.error) {
             toaster.pop('error',result.error);
           }
         }).error(function(err){
           console.log(err);
-          //toaster.pop('error',result.error);
+          toaster.pop('error',err.error);
         })
       });
     }
@@ -106,6 +114,12 @@ angular.module('app').controller('SigninFormController', ['$scope', '$http', '$s
         //  call usser profile func
         }
       })
+    };
+    $scope.logout = function () {
+      delete $cookies['userId'];
+      Facebook.logout();
+      $state.go('whatsay.login');
+    //  kill access token of fb??.
     };
 }])
 ;

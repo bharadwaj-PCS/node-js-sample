@@ -62,7 +62,8 @@ var app =
     }])
     .config(['FacebookProvider',function(FacebookProvider){
       FacebookProvider.init('804274249657423');
-    }]).constant('appConfig', {apiUrl: 'https://smacx-node-server-dev.herokuapp.com/api/v1',bookPermissions: ['PUBLIC', 'PRIVATE', 'DRAFT'],bookSubType: ['FREE', 'PAID'],currencyType: ['INR', 'USD']
+    }])
+    .constant('appConfig', {apiUrl: 'https://smacx-node-server-dev.herokuapp.com/api/v1',groupId: '2323435234654356'
     });
 // lazyload config
 
@@ -228,7 +229,8 @@ angular.module('app')
         .state('app', {
           abstract: true,
           url: '/app',
-          templateUrl: 'tpl/app.html'
+          templateUrl: 'tpl/app.html',
+          controller:''
         })
 
         .state('app.cue', {
@@ -298,6 +300,40 @@ angular.module('app')
             deps: ['uiLoad',
               function (uiLoad) {
                 return uiLoad.load(['js/app/announcement/announcement.js']);
+              }
+            ]
+          }
+        })
+        .state('app.asset', {
+          url: '/asset',
+          template: '<div ui-view class="fade-in-up"></div>'
+        })
+        .state('app.asset.view', {
+          url: '/view',
+          views: {
+            '': {
+              templateUrl: 'tpl/asset/asset_view.html'
+            }
+          },
+          resolve: {
+            deps: ['uiLoad',
+              function (uiLoad) {
+                return uiLoad.load(['js/app/asset/asset.js']);
+              }
+            ]
+          }
+        })
+        .state('app.asset.create', {
+          url: '/create',
+          views: {
+            '': {
+              templateUrl: 'tpl/asset/asset_create.html'
+            }
+          },
+          resolve: {
+            deps: ['uiLoad',
+              function (uiLoad) {
+                return uiLoad.load(['js/app/asset/asset.js']);
               }
             ]
           }
@@ -1464,6 +1500,206 @@ angular.module('app').factory('announcementFactory', ['$http', 'appConfig', func
   };
 }]);
 /**
+ * Created by bharadwaj on 23/2/15.
+ */
+angular.module('app')
+  .controller('assetCreateController', ['$scope', '$modal', 'toaster', 'appConfig', 'assetFactory',
+    function ($scope, $modal, toaster, appConfig, assetFactory) {
+      //console.log("in asset create controller");
+      $scope.typesOfAsset = [
+        //{name:'Book', value:'BOOK'},
+        {name:'Image', value:'IMAGE'},
+        {name:'Text', value:'TEXT'}
+      ];
+      $scope.asset = {};
+      $scope.asset.type = 'IMAGE';
+      var fd;
+      $scope.onBGSelect = function ($files) {
+        var file = $files[0];
+        if(!file){return;}
+        console.log(file,"file");
+        if ((/\.(jpg|jpeg|png)$/i).test(file.name)) {
+          fd = new FormData();
+          fd.append('content', file);
+          //fd.append('key', 'cue/'+file.name);
+
+          var reader = new FileReader();
+          reader.onload = (function (theFile) {
+            return function (e) {
+              $scope.$apply(function () {
+                $scope.asset.content = e.target.result;
+                //$scope.asset.files = fd;
+              });
+            };
+          })(file);
+
+          reader.readAsDataURL(file);
+
+        } else {
+          toaster.pop('error', "File Extension", "Only JPEG/PNG are allowed.");
+          $('input[name="bgimage"]').val("");
+        }
+
+      };
+      $scope.createAsset = function(){
+        console.log($scope.asset,fd);
+        for(var keys in $scope.asset){
+          //console.log($scope.asset[keys]);
+          fd.append(keys,$scope.asset[keys]);
+        }
+        $scope.mypromise = assetFactory.createAsset(fd).success(function(result){
+          console.log(result);
+        }).error(function(err){
+          console.log(err);
+        });
+      };
+    }]);
+angular.module('app')
+  .controller('assetController',['$scope', '$modal', 'toaster', 'appConfig', 'assetFactory',
+    function ($scope, $modal, toaster, appConfig, assetFactory) {
+      console.log('in assetControl');
+      var data = {
+        coverage:'ALL',
+        type:'POLL',
+        label:'Expression'
+      };
+      $scope.layoutModel = 'thumbnail';
+      //$scope.assetData = [];
+      assetFactory.getAsset(data).success(function(result){
+        //console.log(result);
+        $scope.assetData = result.result;
+      }).error(function (error) {
+        console.log(error);
+      });
+      $scope.openDeleteAssetModal = function (asset, $index) {
+        //console.log(cue);
+        //$scope.cueData.splice($index,1);
+        var modalInstance = $modal.open({
+          templateUrl: 'myDeleteContent.html',
+          backdrop: 'static',
+          size: 'sm',
+          controller: 'assetDeleteInstanceCtrl',
+          resolve: {
+            asset: function () {
+              return asset;
+            }
+          }
+        });
+        modalInstance.result.then(function (data) {
+          console.log(data);
+          assetFactory.deleteAsset(data).success(function (res) {
+            toaster.pop('success', 'Successfully deleted the asset');
+            $scope.assetData.splice($index, 1);
+
+          }).error(function (err) {
+            toaster.pop('error', 'Error while deleting the asset');
+          });
+        },function () {
+          console.log('Modal dismissed at: ' + new Date());
+        });
+      };
+      $scope.editAsset = function (asset,index) {
+        var cpyAsset = angular.copy(asset);
+        var modelInstance = $modal.open({
+          templateUrl: 'tpl/asset/asset_edit.html',
+          controller: 'assetEditController',
+          size: 'lg',
+          resolve: {
+            asset: function () {
+              return cpyAsset;
+            }
+          }
+        });
+        modelInstance.result.then(function (updateAsset) {
+          //console.log(updateCue);
+          $scope.myPromise = cueFactory.updateAsset(updateAsset)
+            .success(function (result) {
+              //console.log(result);
+              $scope.assetData[index] = updateAsset;
+              toaster.pop('success', 'Successfully updated the cue');
+            }).error(function (err) {
+              console.log(err);
+            })
+        }, function () {
+          console.log('Modal dismissed at: ' + new Date());
+        });
+      };
+
+    }]);
+angular.module('app')
+  .controller('assetDeleteInstanceCtrl',['$scope','$modalInstance','asset',
+    function ($scope, $modalInstance, asset) {
+      console.log('in del inst ctrl');
+      $scope.deleteItem = function () {
+        var data = {
+          asset_id: asset.id
+        };
+        //console.log(data, "from deleCtrl");
+        $modalInstance.close(data);
+      };
+      $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
+      };
+    }]);
+/**
+ * Created by bharadwaj on 23/2/15.
+ */
+'use strict';
+angular.module('app').controller('assetEditController',['$scope','$modalInstance', 'asset','assetFactory',
+  function ($scope,$modalInstance,asset,assetFactory) {
+    //console.log("In CueEdit",cue);
+
+  }]);
+
+/**
+ * Created by bharadwaj on 23/2/15.
+ */
+'use strict';
+angular.module('app').factory('assetFactory', ['$http', 'appConfig','$cookies', function ($http, appConfig,$cookies) {
+   var userId = $cookies['userId'];
+ function getAssets(data){
+   var url = appConfig.apiUrl + '/stream';
+   data.user_id = $cookies['userId'] || '9ff61f0c-961c-4867-9455-d142ff081c90';
+   console.log(userId);
+   return $http({
+     method:'POST',
+     url:url,
+     data:data
+   });
+ };
+  function createAsset(file){
+    var url = appConfig.apiUrl+'/asset/put';
+
+    //var url = 'http://localhost:5000/api/v1/asset/put';
+    file.append('user_id',$cookies['userId'] || '9ff61f0c-961c-4867-9455-d142ff081c90');
+
+    return $http({
+      method:'POST',
+      url:url,
+      headers:{
+        'Content-Type':undefined
+      },
+      transformRequest: angular.identity,
+      data:file
+    })
+
+  };
+  function deleteAsset(data){
+    var url = appConfig.apiUrl + '/asset/delete';
+    data.user_id = $cookies['userId'] || '9ff61f0c-961c-4867-9455-d142ff081c90';
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    });
+  }
+  return {
+    getAsset:getAssets,
+    createAsset:createAsset,
+    deleteAsset:deleteAsset
+  }
+}]);
+/**
  * Get book list
  * redirect to canvas page
  **/
@@ -2227,6 +2463,8 @@ angular.module('app').controller('cueEditController',['$scope','$modalInstance',
     //console.log("In CueEdit",cue);
     var originalCue = angular.copy(cue);
     $scope.cue = cue;
+    $scope.background_url_data = '';
+    $scope.background_url_wide_data = '';
   var originalCue = angular.copy(cue);
     $scope.onBGSelect = function($files) {
       var file = $files[0];
@@ -2239,7 +2477,7 @@ angular.module('app').controller('cueEditController',['$scope','$modalInstance',
           return function(e) {
             $scope.$apply(function() {
               //$scope.localBackgroundImage = e.target.result;
-              $scope.cue.background_url_data = e.target.result;
+              $scope.background_url_data = e.target.result;
             });
           };
         })(file);
@@ -2270,7 +2508,7 @@ angular.module('app').controller('cueEditController',['$scope','$modalInstance',
           return function(e) {
             $scope.$apply(function() {
               //$scope.localWideBackgroundImage = e.target.result;
-              $scope.cue.background_url_wide_data = e.target.result;
+              $scope.background_url_wide_data = e.target.result;
             });
           };
         })(file);
@@ -2290,6 +2528,7 @@ angular.module('app').controller('cueEditController',['$scope','$modalInstance',
     $scope.updateCue = function (cueModel,formData) {
       console.log(cueModel,formData);
       cueModel.cue_id = cueModel.id;
+      //cueModel.bgcolor = '#'+cueModel.bgcolor;
       $modalInstance.close(cueModel);
     };
     $scope.resetCue = function (cueModel, formData) {
@@ -2333,13 +2572,6 @@ angular.module('app').factory('cueFactory', ['$http', 'appConfig', function ($ht
         'Content-Type':undefined
       }
     });
-    /*return $http({
-      'method':'POST',
-      'url':url,
-      'content-type':'multipart/form-data',
-      'data':data
-      //'J290EeGRFyIYRdXES7outLUbZKr': 'l0FQ5cmpRcADmREyUY4DKwH3CnxejQtpb1cM'
-    })*/
   };
   function updateCue(data){
     var url = appConfig.apiUrl+'/cue/update';
@@ -2357,12 +2589,20 @@ angular.module('app').factory('cueFactory', ['$http', 'appConfig', function ($ht
       data:data
     });
   };
+  function getPollCueOptions(id){
+    var url = appConfig.apiUrl+'/poll/get/'+id;
+    return $http({
+      method: 'GET',
+      url: url
+    });
+  };
   return {
     getCueList: getCueList,
     createCue:createCue,
     uploadImage:uploadImage,
     updateCue:updateCue,
-    deleteCue:deleteCue
+    deleteCue:deleteCue,
+    getPollCueOptions:getPollCueOptions
   };
 
 }]);
@@ -2386,18 +2626,36 @@ angular.module('app')
       $scope.setTest = function () {
         $scope.test = 'my test';
       };
+      var flag = true;
       this.message = 'hello';
       $scope.getCues = function (offset) {
-        $scope.scrollClass = 'infinite-scroll-block';
+        if(flag){
+          $scope.scrollClass = 'infinite-scroll-block';
 
-        $scope.myPromise = cueFactory.getCueList(offset, count).success(function (data) {
-          $scope.cueData = $scope.cueData.concat(data.result);
-          if (!offset) {
-            toaster.pop('success', 'Successfully Loading cues');
-          }
-        }).error(function () {
-          toaster.pop('error', 'Error while loading books.');
+          $scope.myPromise = cueFactory.getCueList(offset, count).success(function (data) {
+            if(!data.length){
+              flag = false;
+            }
+            $scope.cueData = $scope.cueData.concat(data.result);
+            if (!offset) {
+              toaster.pop('success', 'Successfully Loading cues');
+            }
+          }).error(function () {
+            toaster.pop('error', 'Error while loading books.');
+          });
+        }
+
+      };
+
+      $scope.getPollOptions = function (cueData) {
+        console.log(cueData,'getPollOptions');
+        cueFactory.getPollCueOptions(cueData.id).success(function (data) {
+          console.log(data);
+          cueData.options = data.result.options;
+        }).error(function (err) {
+          console.log(err);
         });
+
       };
 
 
@@ -2483,19 +2741,42 @@ angular.module('app')
 
     }]);
 angular.module('app')
-  .controller('cueCreateController', ['$scope', 'cueFactory', 'toaster',
-    function ($scope, cueFactory, toaster) {
-    console.log("in cueCreatCtrl");
+  .controller('cueCreateController', ['$scope', 'cueFactory', 'toaster', 'assetFactory','appConfig','$q',
+    function ($scope, cueFactory, toaster, assetFactory,appConfig, $q) {
     $scope.cue = {
       text:'',
       bgcolor:'',
       type:'',
       background_url:'',
-      background_url_data:'',
-      background_url_wide:'',
-      background_url_wide_data:''
+      //background_url_data:'',
+      //background_url_wide_data:'',
+      background_url_wide:''
     };
+      var optionFormCollection = {};
+
+      $scope.background_url_data = '';
+      $scope.background_url_wide_data = '';
+      $scope.options = {
+        option1:{
+          text:'',
+          content:''
+        },
+        option2:{
+          text:'',
+          content:''
+        },
+        option3:{
+          text:'',
+          content:''
+        },
+        option4:{
+          text:'',
+          content:''
+        },
+        count:''
+      };
     var originalCue = angular.copy($scope.cue);
+    var originalOptions = angular.copy($scope.options);
       //imageBrowse.onBGSelect();
 
     $scope.onBGSelect = function ($files) {
@@ -2511,7 +2792,7 @@ angular.module('app')
         reader.onload = (function (theFile) {
           return function (e) {
             $scope.$apply(function () {
-              $scope.cue.background_url_data = e.target.result;
+              $scope.background_url_data = e.target.result;
             });
           };
         })(file);
@@ -2541,7 +2822,7 @@ angular.module('app')
           return function (e) {
             $scope.$apply(function () {
               //$scope.localWideBackgroundImage = e.target.result;
-              $scope.cue.background_url_wide_data = e.target.result;
+              $scope.background_url_wide_data = e.target.result;
             });
           };
         })(file);
@@ -2558,18 +2839,105 @@ angular.module('app')
         $('input[name="bgimagewide"]').val("");
       }
     };
-    $scope.addCue = function (cueModel, formData) {
+    $scope.onOptionSelect = function ($files, value) {
+      var file = $files[0];
+      if ((/\.(jpg|jpeg|png)$/i).test(file.name)) {
+        var fd = new FormData();
+        fd.append('content', file);
+        optionFormCollection[value] = fd;
 
-      $scope.myPromise = cueFactory.createCue(cueModel).success(function (result) {
-        console.log(result);
-        toaster.pop('success', 'cues created sucessfuly.');
-        $scope.resetCue();
-      }).error(function () {
-        toaster.pop('error', 'Error while creating cues.');
-      })
+        var reader = new FileReader();
+        reader.onload = (function (theFile) {
+          return function (e) {
+            $scope.$apply(function () {
+              //$scope.localWideBackgroundImage = e.target.result;
+              //optionModel = e.target.result;
+              switch (value){
+                case 1:
+                  $scope.options.option1.content = e.target.result;
+                  break;
+                case 2:
+                  $scope.options.option2.content = e.target.result;
+                  break;
+                case 3:
+                  $scope.options.option3.content = e.target.result;
+                  break;
+                case 4:
+                  $scope.options.option4.content = e.target.result;
+                  break;
+              }
+            });
+          };
+        })(file);
+
+        reader.readAsDataURL(file);
+      } else {
+        toaster.pop('error', "File Extension", "Only JPEG/PNG are allowed.");
+        //$('input[name="bgimagewide"]').val("");
+      }
+    };
+    $scope.addCue = function (cueModel, formData) {
+      console.log(cueModel);
+      if(cueModel.type === 'POLL'){
+        //update image to assert
+        var track = [];
+        var assetsIdCollection = [];
+        for(var keys in optionFormCollection){
+          var fd = optionFormCollection[keys];
+          fd.append('type','IMAGE');
+          fd.append('description',$scope.options["option"+keys].text);
+          fd.append('label','Poll');
+          fd.append('created_at',+(new Date()));
+          track.push(assetFactory.createAsset(fd));
+        }
+
+
+        /*_.each(optionFormCollection, function (col) {
+          track.push(assetFactory.createAsset(col));
+        });*/
+        $scope.myPromise = $q.all(track).then(function (data){
+          //console.log(arguments,'arguments');
+          data.forEach(function(ele,index){
+            //console.log(ele.data.asset_id);
+            assetsIdCollection.push(ele.data.asset_id);
+          });
+          cueModel.polls = assetsIdCollection;
+          console.log(assetsIdCollection,cueModel);
+          $scope.myPromise = cueFactory.createCue(cueModel).success(function (result) {
+            toaster.pop('success','Successfully create a poll cue');
+            $scope.resetCue();
+          }).error(function (err) {
+            console.log(err);
+            toaster.pop('error', 'Error while creating cue.');
+          });
+        },function (err){
+          console.log(err);
+        });
+      }else if(cueModel.type === 'GENERAL'){
+        $scope.myPromise = cueFactory.createCue(cueModel).success(function (result) {
+          console.log(result);
+
+          //$scope.resetCue();
+        }).error(function (err) {
+          console.log(err);
+          toaster.pop('error', 'Error while creating cue.');
+        }).then(function(data){
+          if(data.status === 200){
+            toaster.pop('success', 'cue created sucessfuly.');
+            var result = data.data.result;
+            console.log($scope.options);
+            //console.log(data.data);
+          }
+          console.log('called at then');
+        });
+      }
+
     };
     $scope.resetCue = function () {
       $scope.cue = angular.copy(originalCue);
+      $scope.options = angular.copy(originalOptions);
+      $scope.background_url_data = '';
+      $scope.background_url_wide_data = '';
       $scope.addForm.$setPristine();
     };
 
@@ -5067,8 +5435,8 @@ angular.module('app').controller('SelectCtrl', function ($scope, $http, $timeout
 });
 /* Controllers */
 // signin controller
-angular.module('app').controller('SigninFormController', ['$scope', '$http', '$state','Facebook','userManagement','toaster',
-  function ($scope, $http, $state,Facebook,userManagement,toaster) {
+angular.module('app').controller('SigninFormController', ['$scope', '$http', '$state','Facebook','userManagement','toaster','$cookies',
+  function ($scope, $http, $state,Facebook,userManagement,toaster,$cookies) {
   'use strict';
   $scope.user = {};
   $scope.authError = null;
@@ -5090,6 +5458,8 @@ angular.module('app').controller('SigninFormController', ['$scope', '$http', '$s
           };
           $scope.myPromise = userManagement.login(details).success(function (result) {
             console.log(result);
+            $cookies['userId'] = result.user_id;
+            console.log($cookies['userId']);
             $state.go('app.cue');
           }).error(function (err) {
             if(err.type === 400){
@@ -5104,9 +5474,13 @@ angular.module('app').controller('SigninFormController', ['$scope', '$http', '$s
                 console.log("created!", data);
                 if (data.success) {
                   toaster.pop('success', data.message);
+                  $cookies['userId'] = result.user_id;
+                  console.log($cookies['userId'],'cre');
                   $state.go('app.cue');
                 } else {
                   toaster.pop('success', 'Successfully Registered.');
+                  $cookies['userId'] = result.user_id;
+                  console.log($cookies['userId'],'Reg');
                   $state.go('app.cue');
                 }
               }).error(function (err) {
@@ -5139,13 +5513,15 @@ angular.module('app').controller('SigninFormController', ['$scope', '$http', '$s
         userManagement.login(data).success(function(result){
           console.log(result);
           if(result.user_id){
+            $cookies['userId'] = result.user_id;
+            console.log($cookies['userId']);
             $state.go('app.cue');
           }else if(result.error) {
             toaster.pop('error',result.error);
           }
         }).error(function(err){
           console.log(err);
-          //toaster.pop('error',result.error);
+          toaster.pop('error',err.error);
         })
       });
     }
@@ -5173,6 +5549,12 @@ angular.module('app').controller('SigninFormController', ['$scope', '$http', '$s
         //  call usser profile func
         }
       })
+    };
+    $scope.logout = function () {
+      delete $cookies['userId'];
+      Facebook.logout();
+      $state.go('whatsay.login');
+    //  kill access token of fb??.
     };
 }])
 ;
@@ -5231,11 +5613,11 @@ angular.module('app').controller('SignupFormController', ['$scope', '$http', '$s
         accounts.access_token = details.access_token || '';
         data.accounts = [];
         data.accounts.push(accounts);
-        userManagement.signUp(data).success(function (data) {
+        $scope.myPromise = userManagement.signUp(data).success(function (data) {
           console.log("created!", data);
           if (data.success) {
             toaster.pop('success', data.message);
-            $state.go('app.cue');
+            $state.go('whatsay.login');
           } else {
             toaster.pop('error', data.message);
           }

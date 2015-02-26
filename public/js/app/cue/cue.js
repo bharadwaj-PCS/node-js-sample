@@ -16,18 +16,36 @@ angular.module('app')
       $scope.setTest = function () {
         $scope.test = 'my test';
       };
+      var flag = true;
       this.message = 'hello';
       $scope.getCues = function (offset) {
-        $scope.scrollClass = 'infinite-scroll-block';
+        if(flag){
+          $scope.scrollClass = 'infinite-scroll-block';
 
-        $scope.myPromise = cueFactory.getCueList(offset, count).success(function (data) {
-          $scope.cueData = $scope.cueData.concat(data.result);
-          if (!offset) {
-            toaster.pop('success', 'Successfully Loading cues');
-          }
-        }).error(function () {
-          toaster.pop('error', 'Error while loading books.');
+          $scope.myPromise = cueFactory.getCueList(offset, count).success(function (data) {
+            if(!data.length){
+              flag = false;
+            }
+            $scope.cueData = $scope.cueData.concat(data.result);
+            if (!offset) {
+              toaster.pop('success', 'Successfully Loading cues');
+            }
+          }).error(function () {
+            toaster.pop('error', 'Error while loading books.');
+          });
+        }
+
+      };
+
+      $scope.getPollOptions = function (cueData) {
+        console.log(cueData,'getPollOptions');
+        cueFactory.getPollCueOptions(cueData.id).success(function (data) {
+          console.log(data);
+          cueData.options = data.result.options;
+        }).error(function (err) {
+          console.log(err);
         });
+
       };
 
 
@@ -113,19 +131,42 @@ angular.module('app')
 
     }]);
 angular.module('app')
-  .controller('cueCreateController', ['$scope', 'cueFactory', 'toaster',
-    function ($scope, cueFactory, toaster) {
-    console.log("in cueCreatCtrl");
+  .controller('cueCreateController', ['$scope', 'cueFactory', 'toaster', 'assetFactory','appConfig','$q',
+    function ($scope, cueFactory, toaster, assetFactory,appConfig, $q) {
     $scope.cue = {
       text:'',
       bgcolor:'',
       type:'',
       background_url:'',
-      background_url_data:'',
-      background_url_wide:'',
-      background_url_wide_data:''
+      //background_url_data:'',
+      //background_url_wide_data:'',
+      background_url_wide:''
     };
+      var optionFormCollection = {};
+
+      $scope.background_url_data = '';
+      $scope.background_url_wide_data = '';
+      $scope.options = {
+        option1:{
+          text:'',
+          content:''
+        },
+        option2:{
+          text:'',
+          content:''
+        },
+        option3:{
+          text:'',
+          content:''
+        },
+        option4:{
+          text:'',
+          content:''
+        },
+        count:''
+      };
     var originalCue = angular.copy($scope.cue);
+    var originalOptions = angular.copy($scope.options);
       //imageBrowse.onBGSelect();
 
     $scope.onBGSelect = function ($files) {
@@ -141,7 +182,7 @@ angular.module('app')
         reader.onload = (function (theFile) {
           return function (e) {
             $scope.$apply(function () {
-              $scope.cue.background_url_data = e.target.result;
+              $scope.background_url_data = e.target.result;
             });
           };
         })(file);
@@ -171,7 +212,7 @@ angular.module('app')
           return function (e) {
             $scope.$apply(function () {
               //$scope.localWideBackgroundImage = e.target.result;
-              $scope.cue.background_url_wide_data = e.target.result;
+              $scope.background_url_wide_data = e.target.result;
             });
           };
         })(file);
@@ -188,18 +229,105 @@ angular.module('app')
         $('input[name="bgimagewide"]').val("");
       }
     };
-    $scope.addCue = function (cueModel, formData) {
+    $scope.onOptionSelect = function ($files, value) {
+      var file = $files[0];
+      if ((/\.(jpg|jpeg|png)$/i).test(file.name)) {
+        var fd = new FormData();
+        fd.append('content', file);
+        optionFormCollection[value] = fd;
 
-      $scope.myPromise = cueFactory.createCue(cueModel).success(function (result) {
-        console.log(result);
-        toaster.pop('success', 'cues created sucessfuly.');
-        $scope.resetCue();
-      }).error(function () {
-        toaster.pop('error', 'Error while creating cues.');
-      })
+        var reader = new FileReader();
+        reader.onload = (function (theFile) {
+          return function (e) {
+            $scope.$apply(function () {
+              //$scope.localWideBackgroundImage = e.target.result;
+              //optionModel = e.target.result;
+              switch (value){
+                case 1:
+                  $scope.options.option1.content = e.target.result;
+                  break;
+                case 2:
+                  $scope.options.option2.content = e.target.result;
+                  break;
+                case 3:
+                  $scope.options.option3.content = e.target.result;
+                  break;
+                case 4:
+                  $scope.options.option4.content = e.target.result;
+                  break;
+              }
+            });
+          };
+        })(file);
+
+        reader.readAsDataURL(file);
+      } else {
+        toaster.pop('error', "File Extension", "Only JPEG/PNG are allowed.");
+        //$('input[name="bgimagewide"]').val("");
+      }
+    };
+    $scope.addCue = function (cueModel, formData) {
+      console.log(cueModel);
+      if(cueModel.type === 'POLL'){
+        //update image to assert
+        var track = [];
+        var assetsIdCollection = [];
+        for(var keys in optionFormCollection){
+          var fd = optionFormCollection[keys];
+          fd.append('type','IMAGE');
+          fd.append('description',$scope.options["option"+keys].text);
+          fd.append('label','Poll');
+          fd.append('created_at',+(new Date()));
+          track.push(assetFactory.createAsset(fd));
+        }
+
+
+        /*_.each(optionFormCollection, function (col) {
+          track.push(assetFactory.createAsset(col));
+        });*/
+        $scope.myPromise = $q.all(track).then(function (data){
+          //console.log(arguments,'arguments');
+          data.forEach(function(ele,index){
+            //console.log(ele.data.asset_id);
+            assetsIdCollection.push(ele.data.asset_id);
+          });
+          cueModel.polls = assetsIdCollection;
+          console.log(assetsIdCollection,cueModel);
+          $scope.myPromise = cueFactory.createCue(cueModel).success(function (result) {
+            toaster.pop('success','Successfully create a poll cue');
+            $scope.resetCue();
+          }).error(function (err) {
+            console.log(err);
+            toaster.pop('error', 'Error while creating cue.');
+          });
+        },function (err){
+          console.log(err);
+        });
+      }else if(cueModel.type === 'GENERAL'){
+        $scope.myPromise = cueFactory.createCue(cueModel).success(function (result) {
+          console.log(result);
+
+          //$scope.resetCue();
+        }).error(function (err) {
+          console.log(err);
+          toaster.pop('error', 'Error while creating cue.');
+        }).then(function(data){
+          if(data.status === 200){
+            toaster.pop('success', 'cue created sucessfuly.');
+            var result = data.data.result;
+            console.log($scope.options);
+            //console.log(data.data);
+          }
+          console.log('called at then');
+        });
+      }
+
     };
     $scope.resetCue = function () {
       $scope.cue = angular.copy(originalCue);
+      $scope.options = angular.copy(originalOptions);
+      $scope.background_url_data = '';
+      $scope.background_url_wide_data = '';
       $scope.addForm.$setPristine();
     };
 

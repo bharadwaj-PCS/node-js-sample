@@ -7,6 +7,8 @@ angular.module('app').controller('cueEditController',['$scope','$modalInstance',
     //console.log("In CueEdit",cue);
     var originalCue = angular.copy(cue);
     $scope.cue = cue;
+    $scope.background_url_data = '';
+    $scope.background_url_wide_data = '';
   var originalCue = angular.copy(cue);
     $scope.onBGSelect = function($files) {
       var file = $files[0];
@@ -19,7 +21,7 @@ angular.module('app').controller('cueEditController',['$scope','$modalInstance',
           return function(e) {
             $scope.$apply(function() {
               //$scope.localBackgroundImage = e.target.result;
-              $scope.cue.background_url_data = e.target.result;
+              $scope.background_url_data = e.target.result;
             });
           };
         })(file);
@@ -50,7 +52,7 @@ angular.module('app').controller('cueEditController',['$scope','$modalInstance',
           return function(e) {
             $scope.$apply(function() {
               //$scope.localWideBackgroundImage = e.target.result;
-              $scope.cue.background_url_wide_data = e.target.result;
+              $scope.background_url_wide_data = e.target.result;
             });
           };
         })(file);
@@ -70,6 +72,7 @@ angular.module('app').controller('cueEditController',['$scope','$modalInstance',
     $scope.updateCue = function (cueModel,formData) {
       console.log(cueModel,formData);
       cueModel.cue_id = cueModel.id;
+      //cueModel.bgcolor = '#'+cueModel.bgcolor;
       $modalInstance.close(cueModel);
     };
     $scope.resetCue = function (cueModel, formData) {

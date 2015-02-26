@@ -28,13 +28,6 @@ angular.module('app').factory('cueFactory', ['$http', 'appConfig', function ($ht
         'Content-Type':undefined
       }
     });
-    /*return $http({
-      'method':'POST',
-      'url':url,
-      'content-type':'multipart/form-data',
-      'data':data
-      //'J290EeGRFyIYRdXES7outLUbZKr': 'l0FQ5cmpRcADmREyUY4DKwH3CnxejQtpb1cM'
-    })*/
   };
   function updateCue(data){
     var url = appConfig.apiUrl+'/cue/update';
@@ -52,12 +45,20 @@ angular.module('app').factory('cueFactory', ['$http', 'appConfig', function ($ht
       data:data
     });
   };
+  function getPollCueOptions(id){
+    var url = appConfig.apiUrl+'/poll/get/'+id;
+    return $http({
+      method: 'GET',
+      url: url
+    });
+  };
   return {
     getCueList: getCueList,
     createCue:createCue,
     uploadImage:uploadImage,
     updateCue:updateCue,
-    deleteCue:deleteCue
+    deleteCue:deleteCue,
+    getPollCueOptions:getPollCueOptions
   };
 
 }]);

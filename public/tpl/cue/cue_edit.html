@@ -21,16 +21,15 @@
                         <div class="form-group">
                             <label>Type</label>
                             <div class="input-group">
-                                <label class="i-checks checkbox-inline">
+                                <label class="i-checks checkbox-inline" ng-if="cue.type === 'POLL'">
                                     <input type="radio" name="cueType" ng-model="cue.type" value="POLL" required><i></i>Poll
                                 </label>
-                                <label class="i-checks checkbox-inline">
+                                <label class="i-checks checkbox-inline" ng-if="cue.type === 'GENERAL'">
                                     <input type="radio" name="cueType" ng-model="cue.type" value="GENERAL" required><i></i>General
                                 </label>
                                 <div ng-show="cueUpdate.cueType.$dirty" ng-messages="cueUpdate.cueType.$error" ng-messages-include="error_messages.html"></div>
                             </div>
                         </div>
-
 
                     </div>
                     <div class="col-md-6">
@@ -43,8 +42,8 @@
                                     </span>
                                     </span>
                             </div>
-                            <div data-ng-if="(cue.background_url_data || cue.background_url)">
-                                <img ng-src="{{cue.background_url_data || cue.background_url}}" class="img-upload-thimb" />
+                            <div data-ng-if="(background_url_data || cue.background_url)">
+                                <img ng-src="{{background_url_data || cue.background_url}}" class="img-upload-thimb" />
                             </div>
                         </div>
                         <div class="form-group">
@@ -57,8 +56,8 @@
                                     </span>
                             </div>
 
-                            <div data-ng-if="(cue.background_url_wide_data || cue.background_url_wide)">
-                                <img ng-src="{{cue.background_url_wide_data || cue.background_url_wide }}" class="img-upload-thimb" />
+                            <div data-ng-if="(background_url_wide_data || cue.background_url_wide)">
+                                <img ng-src="{{background_url_wide_data || cue.background_url_wide }}" class="img-upload-thimb" />
                             </div>
                         </div>
                     </div>
