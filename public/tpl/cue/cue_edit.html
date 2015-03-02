@@ -2,8 +2,8 @@
     <h4 class="modal-title">Edit Cue</h4>
 </div>
 <div>
-    <div class="modal-body">
-        <div cg-busy="{promise:imagePromise}">
+    <div class="modal-body" cg-busy="{promise:imagePromise}">
+        <div>
             <form role="form" ng-model="cue" name="cueUpdate">
                 <div class="row">
                     <div class="col-md-6">
@@ -72,6 +72,6 @@
                ng-click="updateCue(cue,cueUpdate);" id="btn-update">
         <!--<input type="button" class="btn btn-primary" value="Reset"
                ng-click="resetCue(cue,cueUpdate);" id="btn-reset">-->
-        <button class="btn btn-warning" ng-click="cancel();"><span class="glyphicon glyphicon-remove"></span> Cancel</button>
+        <button class="btn btn-warning" ng-click="cancel();">Cancel</button>
     </div>
 </div>

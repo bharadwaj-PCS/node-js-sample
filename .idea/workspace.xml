@@ -3,10 +3,14 @@
   <component name="ChangeListManager">
     <list default="true" id="a4bf2daa-d649-46fa-b75f-48dad2dc74e1" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/app.min.js" afterPath="$PROJECT_DIR$/public/js/app.min.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/app/cue/cue-edit.js" afterPath="$PROJECT_DIR$/public/js/app/cue/cue-edit.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/app/cue/cue.js" afterPath="$PROJECT_DIR$/public/js/app/cue/cue.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/tpl/cue/cue_create.html" afterPath="$PROJECT_DIR$/public/tpl/cue/cue_create.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/tpl/cue/cue_edit.html" afterPath="$PROJECT_DIR$/public/tpl/cue/cue_edit.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/tpl/cue/cue_view.html" afterPath="$PROJECT_DIR$/public/tpl/cue/cue_view.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/dist_app.js" afterPath="$PROJECT_DIR$/public/js/dist_app.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/dist_lib.js" afterPath="$PROJECT_DIR$/public/js/dist_lib.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/lib.min.js" afterPath="$PROJECT_DIR$/public/js/lib.min.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/tpl/blocks/nav.html" afterPath="$PROJECT_DIR$/public/tpl/blocks/nav.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="node-js-sample.iws" />
@@ -34,7 +38,7 @@
       <file leaf-file-name="login.json" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/public/api/login.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="602">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="604">
               <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
@@ -86,6 +90,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -138,7 +143,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -400,7 +404,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/public/api/login.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="165">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="628">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>

@@ -1,0 +1,74 @@
+<div class="modal-header">
+    <h4 class="modal-title">Edit Category</h4>
+</div>
+<div>
+    <div class="modal-body">
+        <div cg-busy="{promise:imagePromise}">
+            <form role="form" ng-model="category" name="categoryUpdate">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Name {{categoryUpdate.bgimage.$invalid}} </label>
+                            <input type="text" name="categoryName" class="form-control" ng-model="category.name" required>
+                            <div ng-show="categoryUpdate.categoryName.$dirty" ng-messages="categoryUpdate.categoryName.$error" ng-messages-include="error_messages.html"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" rows="6" placeholder="Enter your description" ng-model="category.description"></textarea>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Background Image</label>
+                            <div class="input-group">
+                                    <span class="input-group-btn">
+                                        <span class="btn btn-primary btn-file">
+                                            Browse&hellip; <input type="file" name="bgimage"
+                                                                  ng-file-select="onBGWideSelect($files)" accept="image/*"
+                                                                  required ng-model="bgImageData">
+                                        </span>
+                                    </span>
+                                <div ng-show="(categoryUpdate.bgimage.$error.required  && !category.background_url)" ng-messages="categoryUpdate.bgimage.$error" ng-messages-include="error_messages.html"></div>
+                            </div>
+
+                            <div data-ng-if="(background_url_data || category.background_url)">
+                                <img ng-src="{{background_url_data || category.background_url }}" class="img-upload-thimb" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Icon Image</label>
+                            <div class="input-group">
+                                    <span class="input-group-btn">
+                                    <span class="btn btn-primary btn-file">
+                                    Browse&hellip;
+                                        <input type="file" name="iconimage" ng-file-select
+                                               ng-file-change="onBGSelect($files)"
+                                               ng-model="iconImage" accept="image/*" required="" >
+                                    </span>
+                                    </span>
+                                <div ng-show="(categoryUpdate.iconimage.$error.required && !category.icon_url)" ng-messages="categoryUpdate.iconimage.$error" ng-messages-include="error_messages.html"></div>
+                            </div>
+                            <div data-ng-if="(icon_url_data || category.icon_url)" data-ng-if="">
+                                <img ng-src="{{icon_url_data || category.icon_url }}" class=" img-upload-thimb" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <!--<input type="button" class="btn btn-primary" value="Update" ng-disabled="cueUpdate.$pristine && !cueUpdate.$invalid"-->
+        <input type="button" class="btn btn-primary" value="Update"
+               ng-if="( !category.icon_url || !category.background_url) "
+               ng-disabled="((!categoryUpdate.$valid))"
+               ng-click="updateCategory();" id="btn-update">
+        <input type="button" class="btn btn-primary" value="Update"
+               ng-if="( category.icon_url || category.background_url) "
+               ng-disabled="(categoryUpdate.$pristine && (categoryUpdate.$valid || (category.icon_url && category.background_url)))"
+               ng-click="updateCategory();">
+
+        <button class="btn btn-warning" ng-click="cancel();">Cancel</button>
+    </div>
+</div>

@@ -338,6 +338,40 @@ angular.module('app')
             ]
           }
         })
+        .state('app.category', {
+          url: '/category',
+          template: '<div ui-view class="fade-in-up"></div>'
+        })
+        .state('app.category.view', {
+          url: '/view',
+          views: {
+            '': {
+              templateUrl: 'tpl/category/category_view.html'
+            }
+          },
+          resolve: {
+            deps: ['uiLoad',
+              function (uiLoad) {
+                return uiLoad.load(['js/app/category/category.js']);
+              }
+            ]
+          }
+        })
+        .state('app.category.create', {
+          url: '/create',
+          views: {
+            '': {
+              templateUrl: 'tpl/category/category_create.html'
+            }
+          },
+          resolve: {
+            deps: ['uiLoad',
+              function (uiLoad) {
+                return uiLoad.load(['js/app/category/category.js']);
+              }
+            ]
+          }
+        })
 
         /*.state('book.canvas', {
           url: '/canvas/:BookID',
@@ -2365,6 +2399,358 @@ angular.module('app').controller('pageCtrl', ['$scope', '$stateParams', '$rootSc
   }]);
 
 
+/**
+ * Created by bharadwaj on 26/2/15.
+ */
+angular.module('app')
+  .controller('categoryController', ['$scope', '$modal', 'toaster', 'appConfig', 'categoryFactory','$q',
+    function ($scope, $modal, toaster, appConfig, categoryFactory,$q) {
+      'use strict';
+      $scope.layoutModel = 'thumbnail';
+      var offset = 0, count = 20;
+      $scope.categoriesData = [];
+      var paginationFlag = true;
+      console.log('ion cat ctrl');
+      $scope.getAllCategories = function (offset) {
+        if(paginationFlag){
+          $scope.scrollClass = 'infinite-scroll-block';
+
+          $scope.myPromise = categoryFactory.getCategoriesList(offset, count).success(function (data) {
+            console.log(data);
+            if(!data.length){
+              paginationFlag = false;
+            }
+            $scope.categoriesData = $scope.categoriesData.concat(data.result);
+            if (!offset) {
+              toaster.pop('success', 'Successfully Loading cues');
+            }
+          }).error(function () {
+            toaster.pop('error', 'Error while loading books.');
+          });
+        }
+
+      };
+      $scope.getPagination = function () {
+        $scope.getAllCategories(offset);
+        offset = offset + count;
+      };
+      $scope.editCategory = function (category,index) {
+        var cpyCategory = angular.copy(category);
+        var modelInstance = $modal.open({
+          templateUrl: 'tpl/category/category_edit.html',
+          controller: 'categoryEditController',
+          size: 'lg',
+          backdrop: 'static',
+          resolve: {
+            category: function () {
+              return cpyCategory;
+            }
+          }
+        });
+        modelInstance.result.then(function (updateCategory) {
+          console.log(updateCategory,'in update func');
+          categoryFactory.updateCategory(updateCategory).success(function (result) {
+            $scope.categoriesData[index] = updateCategory;
+            toaster.pop('success', 'Successfully updated the category');
+          }).error(function (err) {
+            console.log(err);
+            toaster.pop('error','Unable to update category');
+          });
+        }, function () {
+          //console.log('Modal dismissed at: ' + new Date());
+        });
+      };
+    }]);
+angular.module('app')
+  .controller('categoryCreateController', ['$scope', 'categoryFactory', 'toaster', 'cueFactory','appConfig','$q',
+    function ($scope, categoryFactory, toaster, cueFactory,appConfig, $q) {
+      var track = [];
+      $scope.category = {
+        name: '',
+        description: '',
+        icon_url: '',
+        background_url:''
+      };
+      $scope.background_url_data = '';
+      $scope.icon_url_data = '';
+      var originalCategory = angular.copy($scope.category);
+      $scope.resetCategory = function () {
+        $scope.category = originalCategory;
+        $scope.addForm.$setPristine();
+        $scope.background_url_data = '';
+        $scope.icon_url_data = '';
+      };
+      /*$scope.openDeleteCategoryModal = function (category, $index) {
+        var modalInstance = $modal.open({
+          templateUrl: 'myDeleteContent.html',
+          backdrop: 'static',
+          size: 'sm',
+          controller: 'categoryDeleteInstanceCtrl',
+          resolve: {
+            category: function () {
+              return category;
+            }
+          }
+        });
+        modalInstance.result.then(function (data) {
+          console.log(data);
+          categoryFactory.deleteCategory(data).success(function (res) {
+            toaster.pop('success', 'Successfully deleted the category');
+            $scope.categoriesData.splice($index, 1);
+
+          }).error(function (err) {
+            toaster.pop('error', 'Error while deleting the cue');
+          });
+        },function () {
+          console.log('Modal dismissed at: ' + new Date());
+        })
+      };*/
+
+      $scope.addCategory = function () {
+        $scope.myPromise = $q.all(track).then(function (result) {
+          result.forEach(function (ele) {
+            var url = ele.data.url;
+            if(url.indexOf('category/icon') != -1){
+              $scope.category.icon_url = url;
+            }else if(url.indexOf('category/bg')){
+              $scope.category.background_url = url;
+            }
+          });
+          console.log($scope.category,'category gng to create');
+          $scope.myPromise = categoryFactory.createCategory($scope.category)
+            .success(function (data) {
+              console.log(data);
+              toaster.pop('success','Category created successfully');
+              $scope.resetCategory();
+            })
+            .error(function (err) {
+                toaster.pop('error','Unable to create category');
+              });
+        });
+      };
+      $scope.onBGSelect = function ($files) {
+        var file = $files[0];
+        if(!file){return;}
+        console.log(file,"file");
+        if ((/\.(jpg|jpeg|png)$/i).test(file.name)) {
+          var fd = new FormData();
+          fd.append('content', file);
+          fd.append('key', 'category/icon/'+file.name);
+
+          var reader = new FileReader();
+          reader.onload = (function (theFile) {
+            return function (e) {
+              $scope.$apply(function () {
+                $scope.icon_url_data = e.target.result;
+              });
+            };
+          })(file);
+
+          reader.readAsDataURL(file);
+          track.push(cueFactory.uploadImage(fd));
+
+        } else {
+          toaster.pop('error', "File Extension", "Only JPEG/PNG are allowed.");
+          $('input[name="bgimage"]').val("");
+        }
+
+      };
+      $scope.onBGWideSelect = function ($files) {
+        var file = $files[0];
+        if ((/\.(jpg|jpeg|png)$/i).test(file.name)) {
+          var fd = new FormData();
+          fd.append('content', file);
+          fd.append('key', 'category/bg/'+file.name);
+
+          var reader = new FileReader();
+          reader.onload = (function (theFile) {
+            return function (e) {
+              $scope.$apply(function () {
+                //$scope.localWideBackgroundImage = e.target.result;
+                $scope.background_url_data = e.target.result;
+              });
+            };
+          })(file);
+
+          reader.readAsDataURL(file);
+          track.push(cueFactory.uploadImage(fd));
+        } else {
+          toaster.pop('error', "File Extension", "Only JPEG/PNG are allowed.");
+          $('input[name="bgimagewide"]').val("");
+        }
+      };
+
+    }]);
+/**
+ * Created by bharadwaj on 26/2/15.
+ */
+'use strict';
+angular.module('app').controller('categoryEditController',['$scope','$modalInstance', 'category','categoryFactory','cueFactory','$q',
+  function ($scope,$modalInstance,category,categoryFactory, cueFactory,$q) {
+    console.log('in category edit ctrl');
+    $scope.category = category;
+    var oriCategory = angular.copy(category);
+    var track = [];
+    $scope.onBGSelect = function ($files) {
+      var file = $files[0];
+      if(!file){return;}
+      console.log(file,"file");
+      if ((/\.(jpg|jpeg|png)$/i).test(file.name)) {
+        var fd = new FormData();
+        fd.append('content', file);
+        fd.append('key', 'category/icon/'+file.name);
+
+        var reader = new FileReader();
+        reader.onload = (function (theFile) {
+          return function (e) {
+            $scope.$apply(function () {
+              $scope.icon_url_data = e.target.result;
+            });
+          };
+        })(file);
+
+        reader.readAsDataURL(file);
+        track.push(cueFactory.uploadImage(fd));
+        /*cueFactory.uploadImage(fd).success(function (result) {
+         console.log(result);
+         $scope.cue.background_url = result.url;
+         }).error(function (err) {
+         console.log(err);
+         });*/
+
+      } else {
+        toaster.pop('error', "File Extension", "Only JPEG/PNG are allowed.");
+        $('input[name="bgimage"]').val("");
+      }
+
+    };
+    $scope.onBGWideSelect = function ($files) {
+      var file = $files[0];
+      if ((/\.(jpg|jpeg|png)$/i).test(file.name)) {
+        var fd = new FormData();
+        fd.append('content', file);
+        fd.append('key', 'category/bg/'+file.name);
+
+        var reader = new FileReader();
+        reader.onload = (function (theFile) {
+          return function (e) {
+            $scope.$apply(function () {
+              //$scope.localWideBackgroundImage = e.target.result;
+              $scope.background_url_data = e.target.result;
+            });
+          };
+        })(file);
+
+        reader.readAsDataURL(file);
+        track.push(cueFactory.uploadImage(fd));
+        /*cueFactory.uploadImage(fd).success(function (result) {
+         $scope.cue.background_url_wide = result.url;
+         }).error(function (err) {
+         console.log(err);
+         });*/
+      } else {
+        toaster.pop('error', "File Extension", "Only JPEG/PNG are allowed.");
+        $('input[name="bgimagewide"]').val("");
+      }
+    };
+    $scope.updateCategory = function () {
+      console.log($scope.category,track);
+      $scope.myPromise = $q.all(track).then(function (result) {
+        result.forEach(function (ele) {
+          var url = ele.data.url;
+          if(url.indexOf('category/icon') != -1){
+            $scope.category.icon_url = url;
+          }else if(url.indexOf('category/bg')){
+            $scope.category.background_url = url;
+          }
+        });
+        console.log($scope.category,'category gng to create');
+        $modalInstance.close($scope.category);
+        /*$scope.myPromise = categoryFactory.updateCategory($scope.category)
+          .success(function (data) {
+            console.log(data);
+            toaster.pop('success','Category updated successfully');
+            $scope.resetCategory();
+          })
+          .error(function (err) {
+            toaster.pop('error','Unable to update category');
+          });*/
+      });
+
+    };
+    $scope.cancel = function(){
+      $scope.category =  angular.copy(oriCategory);
+      $modalInstance.dismiss('cancel');
+    };
+  }]);
+/**
+ * Created by bharadwaj on 26/2/15.
+ */
+angular.module('app').factory('categoryFactory', ['$http', 'appConfig', function ($http, appConfig) {
+  'use strict';
+  function getCategoriesList (offset,count) {
+    var maxValue = (offset+count-1),url = appConfig.apiUrl + '/categories/list/'+offset+'/'+maxValue;
+    console.log(url);
+    return $http({
+      method: 'GET',
+      url: url
+    });
+  };
+  function createCategory(data){
+    var url = appConfig.apiUrl + '/category';
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    });
+  };
+  function updateCategory(data){
+    var url = appConfig.apiUrl+'/category/update';
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    });
+  };
+
+  /*function uploadImage(data,name){
+    var url = appConfig.apiUrl + '/file/upload';
+    return $http.post(url,data,{
+      transformRequest: angular.identity,
+      headers: {
+        'Content-Type':undefined
+      }
+    });
+  };
+   function deleteCategory(data){
+   var url = appConfig.apiUrl+'/cue/delete';
+   return $http({
+   'method':'POST',
+   'url':url,
+   data:data
+   });
+   };
+
+
+  function getPollCueOptions(id){
+    var url = appConfig.apiUrl+'/poll/get/'+id;
+    return $http({
+      method: 'GET',
+      url: url
+    });
+  };*/
+  return {
+    getCategoriesList: getCategoriesList,
+     createCategory:createCategory,
+    updateCategory:updateCategory/*,
+    deleteCategory:deleteCategory,
+    uploadImage:uploadImage,
+    updateCue:updateCue,
+    deleteCue:deleteCue,
+    getPollCueOptions:getPollCueOptions*/
+  };
+
+}]);
 angular.module('app').controller('ContactCtrl', ['$scope', '$http', '$filter', function ($scope, $http, $filter) {
   'use strict';
   $http.get('js/app/contact/contacts.json').then(function (resp) {
@@ -2456,80 +2842,96 @@ angular.module('app').controller('ContactCtrl', ['$scope', '$http', '$filter', f
 }]);
 /**
  * Created by bharadwaj on 29/1/15.
+ * Handles the update functionality of the cue.
+ *
  */
 'use strict';
-angular.module('app').controller('cueEditController',['$scope','$modalInstance', 'cue','cueFactory',
-  function ($scope,$modalInstance,cue,cueFactory) {
+angular.module('app').controller('cueEditController',['$scope','$modalInstance', 'cue','cueFactory','$q',
+  function ($scope,$modalInstance,cue,cueFactory,$q) {
     //console.log("In CueEdit",cue);
     var originalCue = angular.copy(cue);
     $scope.cue = cue;
     $scope.background_url_data = '';
     $scope.background_url_wide_data = '';
-  var originalCue = angular.copy(cue);
+    var originalCue = angular.copy(cue);
+    var fileDataAry = [];
+    /**
+     * This method is called when the background image file button is clicked.
+     * @param $files
+     */
     $scope.onBGSelect = function($files) {
       var file = $files[0];
       if ((/\.(jpg|jpeg|png)$/i).test(file.name)) {
         var fd = new FormData();
         fd.append('content', file);
+        fd.append('key', 'cue/bg/'+file.name);
 
         var reader = new FileReader();
         reader.onload = (function(theFile) {
           return function(e) {
             $scope.$apply(function() {
-              //$scope.localBackgroundImage = e.target.result;
               $scope.background_url_data = e.target.result;
             });
           };
         })(file);
 
         reader.readAsDataURL(file);
-        cueFactory.uploadImage(fd).success(function (result) {
-          console.log(result);
-          $scope.cue.background_url = result.url;
-        }).error(function (err) {
-          console.log(err);
-        });
+        fileDataAry.push(cueFactory.uploadImage(fd));
 
       } else {
-        toaster.pop('error', "File Extension", "Only JPEG/PNG are allowed.");
+        toaster.pop('error', 'File Extension', 'Only JPEG/PNG are allowed.');
         $('input[name="bgimage"]').val("");
       }
 
 
     };
+    /**
+     * This method is called when the wide background button button is clicked and a file is uploaded
+     * @param $files accepts the file that is present in a file button Ref: ng-file upload
+     */
     $scope.onBGWideSelect = function($files) {
       var file = $files[0];
       if ((/\.(jpg|jpeg|png)$/i).test(file.name)) {
         var fd = new FormData();
         fd.append('content', file);
+        fd.append('key', 'cue/bg_wide/'+file.name);
 
         var reader = new FileReader();
         reader.onload = (function(theFile) {
           return function(e) {
             $scope.$apply(function() {
-              //$scope.localWideBackgroundImage = e.target.result;
               $scope.background_url_wide_data = e.target.result;
             });
           };
         })(file);
 
         reader.readAsDataURL(file);
-        cueFactory.uploadImage(fd).success(function (result) {
-          $scope.cue.background_url_wide = result.url;
-        }).error(function (err) {
-          console.log(err);
-        });
+        fileDataAry.push(cueFactory.uploadImage(fd));
 
       } else {
-        toaster.pop('error', "File Extension", "Only JPEG/PNG are allowed.");
+        toaster.pop('error', 'File Extension', 'Only JPEG/PNG are allowed.');
         $('input[name="bgimagewide"]').val("");
       }
     };
-    $scope.updateCue = function (cueModel,formData) {
-      console.log(cueModel,formData);
+    /**
+     * This method is called when update button of cue_view.html is clicked
+     * @param cueModel $scope.cueModel, it has all the data required for cue
+     */
+    $scope.updateCue = function (cueModel) {
       cueModel.cue_id = cueModel.id;
-      //cueModel.bgcolor = '#'+cueModel.bgcolor;
-      $modalInstance.close(cueModel);
+      $scope.imagePromise = $q.all(fileDataAry).then(function (result) {
+        result.forEach(function (ele) {
+          var url = ele.data.url;
+          if(url.indexOf('cue/bg_wide') != -1){
+            cueModel.background_url_wide = url;
+          }else if(url.indexOf('cue/bg')){
+            cueModel.background_url = url;
+          }
+        });
+        $modalInstance.close(cueModel);//mytrack
+
+      });
+
     };
     $scope.resetCue = function (cueModel, formData) {
       $scope.cue =  angular.copy(originalCue);
@@ -2538,7 +2940,6 @@ angular.module('app').controller('cueEditController',['$scope','$modalInstance',
     $scope.cancel = function () {
       $scope.cue =  angular.copy(originalCue);
       $modalInstance.dismiss('cancel');
-      //$scope.$apply();
     };
 
   }]);
@@ -2616,25 +3017,20 @@ angular.module('app').factory('cueFactory', ['$http', 'appConfig', function ($ht
  * This would enable the
  */
 angular.module('app')
-  .controller('cueController', ['$scope', '$modal', 'toaster', 'appConfig', 'cueFactory',
-    function ($scope, $modal, toaster, appConfig, cueFactory) {
+  .controller('cueController', ['$scope', '$modal', 'toaster', 'appConfig', 'cueFactory','$q',
+    function ($scope, $modal, toaster, appConfig, cueFactory,$q) {
       'use strict';
       $scope.layoutModel = 'thumbnail';
       var offset = 0, count = 20;
       $scope.cueData = [];
-      $scope.test = "Helo world";
-      $scope.setTest = function () {
-        $scope.test = 'my test';
-      };
-      var flag = true;
-      this.message = 'hello';
+      var paginationFlag = true;
       $scope.getCues = function (offset) {
-        if(flag){
+        if(paginationFlag){
           $scope.scrollClass = 'infinite-scroll-block';
 
           $scope.myPromise = cueFactory.getCueList(offset, count).success(function (data) {
             if(!data.length){
-              flag = false;
+              paginationFlag = false;
             }
             $scope.cueData = $scope.cueData.concat(data.result);
             if (!offset) {
@@ -2664,6 +3060,7 @@ angular.module('app')
         var modelInstance = $modal.open({
           templateUrl: 'tpl/cue/cue_edit.html',
           controller: 'cueEditController',
+          backdrop: 'static',
           size: 'lg',
           resolve: {
             cue: function () {
@@ -2672,7 +3069,10 @@ angular.module('app')
           }
         });
         modelInstance.result.then(function (updateCue) {
-          //console.log(updateCue);
+          console.log(updateCue);
+          /*$scope.myPromise = $q.all(fileDataAry).then(function (data) {
+            console.log(data);//mydata
+          });*/
           $scope.myPromise = cueFactory.updateCue(updateCue)
             .success(function (result) {
               //console.log(result);
@@ -2719,26 +3119,7 @@ angular.module('app')
       $scope.getPagination = function () {
         $scope.getCues(offset);
         offset = offset + count;
-
       };
-      $scope.log = [];
-      $scope.superheroes = [
-        'Spiderman'
-      ];
-      /*$scope.loadSuperheroes = function(query) {
-       // An arrays of strings here will also be converted into an
-       // array of objects
-
-       return ary;
-       };*/
-      $scope.tagAdded = function (tag) {
-
-      };
-
-      $scope.tagRemoved = function (tag) {
-
-      };
-
     }]);
 angular.module('app')
   .controller('cueCreateController', ['$scope', 'cueFactory', 'toaster', 'assetFactory','appConfig','$q',
@@ -2778,7 +3159,7 @@ angular.module('app')
     var originalCue = angular.copy($scope.cue);
     var originalOptions = angular.copy($scope.options);
       //imageBrowse.onBGSelect();
-
+      //var backgroundImageFi
     $scope.onBGSelect = function ($files) {
       var file = $files[0];
       if(!file){return;}
@@ -2879,9 +3260,11 @@ angular.module('app')
     $scope.addCue = function (cueModel, formData) {
       console.log(cueModel);
       if(validateCueCreation(cueModel)){
+        var track = [];
+        //code to update the background images.
+
         if(cueModel.type === 'POLL'){
           //update image to assert
-          var track = [];
           var assetsIdCollection = [];
           for(var keys in optionFormCollection){
             var fd = optionFormCollection[keys];
@@ -2892,14 +3275,8 @@ angular.module('app')
             track.push(assetFactory.createAsset(fd));
           }
 
-
-          /*_.each(optionFormCollection, function (col) {
-           track.push(assetFactory.createAsset(col));
-           });*/
           $scope.myPromise = $q.all(track).then(function (data){
-            //console.log(arguments,'arguments');
             data.forEach(function(ele,index){
-              //console.log(ele.data.asset_id);
               assetsIdCollection.push(ele.data.asset_id);
             });
             cueModel.polls = assetsIdCollection;

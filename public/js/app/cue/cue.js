@@ -6,25 +6,20 @@
  * This would enable the
  */
 angular.module('app')
-  .controller('cueController', ['$scope', '$modal', 'toaster', 'appConfig', 'cueFactory',
-    function ($scope, $modal, toaster, appConfig, cueFactory) {
+  .controller('cueController', ['$scope', '$modal', 'toaster', 'appConfig', 'cueFactory','$q',
+    function ($scope, $modal, toaster, appConfig, cueFactory,$q) {
       'use strict';
       $scope.layoutModel = 'thumbnail';
       var offset = 0, count = 20;
       $scope.cueData = [];
-      $scope.test = "Helo world";
-      $scope.setTest = function () {
-        $scope.test = 'my test';
-      };
-      var flag = true;
-      this.message = 'hello';
+      var paginationFlag = true;
       $scope.getCues = function (offset) {
-        if(flag){
+        if(paginationFlag){
           $scope.scrollClass = 'infinite-scroll-block';
 
           $scope.myPromise = cueFactory.getCueList(offset, count).success(function (data) {
             if(!data.length){
-              flag = false;
+              paginationFlag = false;
             }
             $scope.cueData = $scope.cueData.concat(data.result);
             if (!offset) {
@@ -54,6 +49,7 @@ angular.module('app')
         var modelInstance = $modal.open({
           templateUrl: 'tpl/cue/cue_edit.html',
           controller: 'cueEditController',
+          backdrop: 'static',
           size: 'lg',
           resolve: {
             cue: function () {
@@ -62,7 +58,10 @@ angular.module('app')
           }
         });
         modelInstance.result.then(function (updateCue) {
-          //console.log(updateCue);
+          console.log(updateCue);
+          /*$scope.myPromise = $q.all(fileDataAry).then(function (data) {
+            console.log(data);//mydata
+          });*/
           $scope.myPromise = cueFactory.updateCue(updateCue)
             .success(function (result) {
               //console.log(result);
@@ -109,26 +108,7 @@ angular.module('app')
       $scope.getPagination = function () {
         $scope.getCues(offset);
         offset = offset + count;
-
       };
-      $scope.log = [];
-      $scope.superheroes = [
-        'Spiderman'
-      ];
-      /*$scope.loadSuperheroes = function(query) {
-       // An arrays of strings here will also be converted into an
-       // array of objects
-
-       return ary;
-       };*/
-      $scope.tagAdded = function (tag) {
-
-      };
-
-      $scope.tagRemoved = function (tag) {
-
-      };
-
     }]);
 angular.module('app')
   .controller('cueCreateController', ['$scope', 'cueFactory', 'toaster', 'assetFactory','appConfig','$q',
@@ -168,7 +148,7 @@ angular.module('app')
     var originalCue = angular.copy($scope.cue);
     var originalOptions = angular.copy($scope.options);
       //imageBrowse.onBGSelect();
-
+      //var backgroundImageFi
     $scope.onBGSelect = function ($files) {
       var file = $files[0];
       if(!file){return;}
@@ -269,9 +249,11 @@ angular.module('app')
     $scope.addCue = function (cueModel, formData) {
       console.log(cueModel);
       if(validateCueCreation(cueModel)){
+        var track = [];
+        //code to update the background images.
+
         if(cueModel.type === 'POLL'){
           //update image to assert
-          var track = [];
           var assetsIdCollection = [];
           for(var keys in optionFormCollection){
             var fd = optionFormCollection[keys];
@@ -282,14 +264,8 @@ angular.module('app')
             track.push(assetFactory.createAsset(fd));
           }
 
-
-          /*_.each(optionFormCollection, function (col) {
-           track.push(assetFactory.createAsset(col));
-           });*/
           $scope.myPromise = $q.all(track).then(function (data){
-            //console.log(arguments,'arguments');
             data.forEach(function(ele,index){
-              //console.log(ele.data.asset_id);
               assetsIdCollection.push(ele.data.asset_id);
             });
             cueModel.polls = assetsIdCollection;
