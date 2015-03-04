@@ -17,40 +17,72 @@
                         <div ng-show="addForm.assetText.$dirty" ng-messages="addForm.assetText.$error" ng-messages-include="error_messages.html"></div>
                     </div>
                     <div class="form-group">
+                        <label>Description</label>
+                        <textarea class="form-control" rows="6" placeholder="Enter your description" ng-model="asset.description"></textarea>
+                    </div>
+                    <div class="form-group">
                         <label>Type </label>
                         <select name="assetType" class="form-control m-b" data-ng-model="asset.type"
-                                data-ng-change="setModel(announcement)"
                                 ng-options="type.value as type.name for type in typesOfAsset">
                         </select>
                         <!--<input type="text" name="assetType" class="form-control" ng-model="asset.type" required>-->
                         <div ng-show="addForm.assetType.$dirty" ng-messages="addForm.assetType.$error" ng-messages-include="error_messages.html"></div>
                     </div>
                     <div class="form-group">
+                        <label>Label </label>
+                        <select name="assetLabel" class="form-control m-b" data-ng-model="asset.label"
+                                ng-options="label.value as label.name for label in labelList">
+                        </select>
+                        <!--<input type="text" name="assetType" class="form-control" ng-model="asset.type" required>-->
+                        <div ng-show="addForm.assetType.$dirty" ng-messages="addForm.assetType.$error" ng-messages-include="error_messages.html"></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
                         <label>Upload Image</label>
                         <div class="input-group">
                                     <span class="input-group-btn">
                                     <span class="btn btn-primary btn-file">
-                                    Browse&hellip; <input type="file" name="bgimage" ng-file-select ng-file-change="onBGSelect($files)" accept="image/*" >
+                                    Browse&hellip;
+                                        <input type="file" name="bgimage" ng-file-select
+                                               ng-model="imageData"
+                                               ng-file-change="onBGSelect($files)" accept="image/*" required="" >
                                     </span>
                                     </span>
                         </div>
-                        <div><img ng-src="{{asset.content}}" class=" img-upload-thimb" />
+
+                        <div ng-show="addForm.bgimage.$error.required" class="text-error">* Required</div>
+                        <div ng-if="asset.content"><img ng-src="{{asset.content}}" class=" img-upload-thimb" />
                         </div>
                     </div>
-                    <!--<div class="form-group">
-                        <label>Content</label>
-
-                        <div text-angular ng-model="asset.content" class="btn-groups" name="assetContent"
-                             ta-toolbar="[['bold','italics','underline'],['html']]"></div>
-                        <div ng-show="flag" ng-messages="addForm.assetContent.$error"
-                             ng-messages-include="error_messages.html"></div>
-                    </div>-->
+                    <div class="form-group">
+                        <label>Select category</label>
+                        <div>
+                            <ui-select multiple ng-model="categoryList.selectedCategories" class="form-control m-b"
+                                       theme="bootstrap"
+                                       reset-search-input="true"
+                                       on-select="filterTagging($item,$model)"
+                                       style="width: 100%;">
+                                <ui-select-match placeholder="Enter category">{{$item.name}}
+                                </ui-select-match>
+                                <ui-select-choices repeat="categoryList in totalCategoryList track by $index"
+                                                   refresh="refreshAddresses($select.search) | filter:$select.search"
+                                                   refresh-delay="10">
+                                    <div ng-bind-html="categoryList.name | highlight: $select.search"></div>
+                                </ui-select-choices>
+                            </ui-select>
+                            <!--<p class="help-block text-danger">
+                                {{categoryList.selectedCategories}}
+                            </p>-->
+                        </div>
+                    </div>
                 </div>
             </div>
             <footer class="panel-footer text-right bg-light lter">
                 <button class="btn m-b-xs btn-sm btn-default btn-addon" ng-click="resetAsset()"><i class="fa fa-circle"></i>Reset
                 </button>
                 <button class="btn m-b-xs btn-sm btn-primary btn-addon"
+                        ng-disabled="addForm.$invalid"
                         ng-click="createAsset(asset,addForm)"><i class="fa fa-plus"></i>Create
                     <!--ng-disabled="addForm.$invalid"-->
                 </button>

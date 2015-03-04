@@ -27,6 +27,14 @@ angular.module('app').factory('categoryFactory', ['$http', 'appConfig', function
       data:data
     });
   };
+  function searchCategory(data){
+    var url = appConfig.apiUrl+'/search/category/namelike';
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    });
+  };
 
   /*function uploadImage(data,name){
     var url = appConfig.apiUrl + '/file/upload';
@@ -57,7 +65,8 @@ angular.module('app').factory('categoryFactory', ['$http', 'appConfig', function
   return {
     getCategoriesList: getCategoriesList,
      createCategory:createCategory,
-    updateCategory:updateCategory/*,
+    updateCategory:updateCategory,
+    searchCategory:searchCategory/*,
     deleteCategory:deleteCategory,
     uploadImage:uploadImage,
     updateCue:updateCue,

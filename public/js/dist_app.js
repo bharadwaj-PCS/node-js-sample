@@ -63,7 +63,27 @@ var app =
     .config(['FacebookProvider',function(FacebookProvider){
       FacebookProvider.init('804274249657423');
     }])
-    .constant('appConfig', {apiUrl: 'https://smacx-node-server-dev.herokuapp.com/api/v1',groupId: '2323435234654356'
+    .constant('appConfig', {apiUrl: 'https://smacx-node-server-dev.herokuapp.com/api/v1',groupId: '2323435234654356',
+      label:[{name:'Poll',
+              value:'POLL'},
+        {name:'Expression',
+          value:'EXPRESSION'},
+        {name:'Emotion',
+          value:'EMOTION'},
+        {name:'Background',
+          value:'BACKGROUND'},
+        {name:'Feedback',
+          value:'FEEDBACK'},
+        {name:'Sticker',
+          value:'STICKER'},
+        {name:'Explore',
+          value:'EXPLORE'},
+        {name:'Theme',
+          value:'THEME'},
+        {name:'Story',
+          value:'STORY'},
+        {name:'Background',
+          value:'BACKGROUND'}]
     });
 // lazyload config
 
@@ -1537,16 +1557,20 @@ angular.module('app').factory('announcementFactory', ['$http', 'appConfig', func
  * Created by bharadwaj on 23/2/15.
  */
 angular.module('app')
-  .controller('assetCreateController', ['$scope', '$modal', 'toaster', 'appConfig', 'assetFactory',
-    function ($scope, $modal, toaster, appConfig, assetFactory) {
+  .controller('assetCreateController', ['$scope', '$modal', 'toaster', 'appConfig', 'assetFactory','categoryFactory',
+    function ($scope, $modal, toaster, appConfig, assetFactory,categoryFactory) {
       //console.log("in asset create controller");
       $scope.typesOfAsset = [
         //{name:'Book', value:'BOOK'},
         {name:'Image', value:'IMAGE'},
         {name:'Text', value:'TEXT'}
       ];
+      $scope.labelList = appConfig.label;
       $scope.asset = {};
       $scope.asset.type = 'IMAGE';
+      $scope.asset.label = 'EXPRESSION';
+      $scope.categoryList = {};
+      var copyAsset = angular.copy($scope.asset);
       var fd;
       $scope.onBGSelect = function ($files) {
         var file = $files[0];
@@ -1575,39 +1599,94 @@ angular.module('app')
         }
 
       };
+
       $scope.createAsset = function(){
-        console.log($scope.asset,fd);
-        for(var keys in $scope.asset){
-          //console.log($scope.asset[keys]);
-          fd.append(keys,$scope.asset[keys]);
+        if(validateCreateAsset()){
+          $scope.asset.categories = [];
+          $scope.categoryList.selectedCategories.forEach(function(ele,index){
+            console.log(ele.name);
+            $scope.asset.categories.push(ele.name);
+          });
+          for(var keys in $scope.asset){
+            //console.log($scope.asset[keys]);
+            fd.append(keys,$scope.asset[keys]);
+          }
+          $scope.myPromise = assetFactory.createAsset(fd).success(function(result){
+            console.log(result);
+            toaster.pop('success','Asset created successfully.');
+            $scope.resetAsset();
+
+          }).error(function(err){
+            console.log(err);
+          });
         }
-        $scope.mypromise = assetFactory.createAsset(fd).success(function(result){
-          console.log(result);
-        }).error(function(err){
-          console.log(err);
-        });
+        console.log($scope.asset,fd);
+        console.log($scope.categoryList.selectedCategories);
+
       };
+      $scope.resetAsset = function () {
+        $scope.asset = copyAsset;
+      };
+      $scope.totalCategoryList = [];
+      $scope.refreshAddresses = function(category) {
+        var data = {
+          sort_param:'name',
+          name_like:category
+        };
+        if(category) {
+          categoryFactory.searchCategory(data).success(function (data) {
+            console.log(data);
+            setCategoryList(data);
+          }).error(function (error) {
+            console.log(error);
+          });
+        }else {
+          $scope.totalCategoryList = $scope.totalCategoryList || [];
+        }
+      };
+      function setCategoryList(result){
+        var temp = $scope.totalCategoryList.concat(result);
+        $scope.totalCategoryList = _.uniq(temp,'id');
+      };
+      function validateCreateAsset(){
+        var flag = true;
+        return flag;
+      }
     }]);
 angular.module('app')
   .controller('assetController',['$scope', '$modal', 'toaster', 'appConfig', 'assetFactory',
     function ($scope, $modal, toaster, appConfig, assetFactory) {
-      console.log('in assetControl');
       var data = {
         coverage:'ALL',
         type:'POLL',
         label:'Expression'
       };
       $scope.layoutModel = 'thumbnail';
-      //$scope.assetData = [];
-      assetFactory.getAsset(data).success(function(result){
-        //console.log(result);
-        $scope.assetData = result.result;
-      }).error(function (error) {
-        console.log(error);
-      });
+      var paginationFlag = true;
+      var offset = 0, count = 20;
+      $scope.assetData = [];
+
+      $scope.getAssets = function (offset) {
+        if(paginationFlag){
+          $scope.scrollClass = 'infinite-scroll-block';
+
+          $scope.myPromise = assetFactory.getAsset(data,offset,count).success(function(result){
+            if(!result.length){
+              paginationFlag = false;
+            }
+            //console.log(result);
+            $scope.assetData = $scope.assetData.concat(result.result);
+            toaster.pop('success', 'Successfully Loading assets');
+          }).error(function (error) {
+            console.log(error);
+            toaster.pop('error', 'Error while loading assets.');
+          });
+        }
+
+      };
+
       $scope.openDeleteAssetModal = function (asset, $index) {
-        //console.log(cue);
-        //$scope.cueData.splice($index,1);
+
         var modalInstance = $modal.open({
           templateUrl: 'myDeleteContent.html',
           backdrop: 'static',
@@ -1658,6 +1737,10 @@ angular.module('app')
           console.log('Modal dismissed at: ' + new Date());
         });
       };
+      $scope.getPagination = function () {
+        $scope.getAssets(data,offset);
+        offset = offset + count;
+      };
 
     }]);
 angular.module('app')
@@ -1691,8 +1774,9 @@ angular.module('app').controller('assetEditController',['$scope','$modalInstance
 'use strict';
 angular.module('app').factory('assetFactory', ['$http', 'appConfig','$cookies', function ($http, appConfig,$cookies) {
    var userId = $cookies['userId'];
- function getAssets(data){
-   var url = appConfig.apiUrl + '/stream';
+ function getAssets(data,offset,count){
+   var maxValue = (offset+count-1);
+   var url = appConfig.apiUrl + '/asset/by/label/Theme/'+offset+'/'+maxValue;
    data.user_id = $cookies['userId'] || '9ff61f0c-961c-4867-9455-d142ff081c90';
    console.log(userId);
    return $http({
@@ -2712,6 +2796,14 @@ angular.module('app').factory('categoryFactory', ['$http', 'appConfig', function
       data:data
     });
   };
+  function searchCategory(data){
+    var url = appConfig.apiUrl+'/search/category/namelike';
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    });
+  };
 
   /*function uploadImage(data,name){
     var url = appConfig.apiUrl + '/file/upload';
@@ -2742,7 +2834,8 @@ angular.module('app').factory('categoryFactory', ['$http', 'appConfig', function
   return {
     getCategoriesList: getCategoriesList,
      createCategory:createCategory,
-    updateCategory:updateCategory/*,
+    updateCategory:updateCategory,
+    searchCategory:searchCategory/*,
     deleteCategory:deleteCategory,
     uploadImage:uploadImage,
     updateCue:updateCue,
@@ -3037,7 +3130,7 @@ angular.module('app')
               toaster.pop('success', 'Successfully Loading cues');
             }
           }).error(function () {
-            toaster.pop('error', 'Error while loading books.');
+            toaster.pop('error', 'Error while loading cues.');
           });
         }
 
@@ -3069,13 +3162,8 @@ angular.module('app')
           }
         });
         modelInstance.result.then(function (updateCue) {
-          console.log(updateCue);
-          /*$scope.myPromise = $q.all(fileDataAry).then(function (data) {
-            console.log(data);//mydata
-          });*/
           $scope.myPromise = cueFactory.updateCue(updateCue)
             .success(function (result) {
-              //console.log(result);
               $scope.cueData[index] = updateCue;
               toaster.pop('success', 'Successfully updated the cue');
             }).error(function (err) {

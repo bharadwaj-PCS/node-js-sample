@@ -4,8 +4,9 @@
 'use strict';
 angular.module('app').factory('assetFactory', ['$http', 'appConfig','$cookies', function ($http, appConfig,$cookies) {
    var userId = $cookies['userId'];
- function getAssets(data){
-   var url = appConfig.apiUrl + '/stream';
+ function getAssets(data,offset,count){
+   var maxValue = (offset+count-1);
+   var url = appConfig.apiUrl + '/asset/by/label/Theme/'+offset+'/'+maxValue;
    data.user_id = $cookies['userId'] || '9ff61f0c-961c-4867-9455-d142ff081c90';
    console.log(userId);
    return $http({

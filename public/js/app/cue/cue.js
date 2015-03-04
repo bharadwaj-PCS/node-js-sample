@@ -26,7 +26,7 @@ angular.module('app')
               toaster.pop('success', 'Successfully Loading cues');
             }
           }).error(function () {
-            toaster.pop('error', 'Error while loading books.');
+            toaster.pop('error', 'Error while loading cues.');
           });
         }
 
@@ -58,13 +58,8 @@ angular.module('app')
           }
         });
         modelInstance.result.then(function (updateCue) {
-          console.log(updateCue);
-          /*$scope.myPromise = $q.all(fileDataAry).then(function (data) {
-            console.log(data);//mydata
-          });*/
           $scope.myPromise = cueFactory.updateCue(updateCue)
             .success(function (result) {
-              //console.log(result);
               $scope.cueData[index] = updateCue;
               toaster.pop('success', 'Successfully updated the cue');
             }).error(function (err) {

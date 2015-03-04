@@ -8,20 +8,27 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>Text </label>
-                            <input type="text" name="announcementText" class="form-control" ng-model="announcement.text" required>
-                            <div ng-show="announcementEdit.announcementText.$dirty" ng-messages="announcementEdit.announcementText.$error"
-                                 ng-messages-include="error_messages.html"></div>
+                            <label>Select category</label>
+                            <div>
+                                <ui-select multiple ng-model="categoryList.selectedCategories" class="form-control"
+                                           theme="bootstrap"
+                                           ng-disabled="disabled"
+                                           reset-search-input="true"
+                                           on-select="filterTagging($item,$model)"
+                                           style="width: 100%;">
+                                    <ui-select-match placeholder="Enter category">{{$item.name}}
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="categoryList in totalCategoryList track by $index"
+                                                       refresh="refreshAddresses($select.search) | filter:$select.search"
+                                                       refresh-delay="0">
+                                        <div ng-bind-html="categoryList.name | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <p class="help-block text-danger">
+                                    {{categoryList.selectedCategories}}
+                                </p>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Content </label>
-                            <div text-angular ng-model="announcement.content" class="btn-groups" name="announcementContent"
-                                 ta-toolbar="[['bold','italics','underline'],['html']]"></div>
-                            <!--<input type="text" name="notificationText" class="form-control" ng-model="notification.text" required>-->
-                            <div ng-show="flag" ng-messages="announcementEdit.announcementText.$dirty"
-                                 ng-messages-include="error_messages.html"></div>
-                        </div>
-
                     </div>
                 </div>
             </form>
