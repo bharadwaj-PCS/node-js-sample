@@ -35,6 +35,30 @@ angular.module('app').factory('categoryFactory', ['$http', 'appConfig', function
       data:data
     });
   };
+  function attachCategoryToAsset(data){
+    var url = appConfig.apiUrl+'/category/asset/attach';
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    });
+  };
+  function detachCategoryToAsset(data){
+    var url = appConfig.apiUrl+'/category/asset/detach';
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    });
+  };
+  function attachCategoryToAsset(data){
+    var url = appConfig.apiUrl+'/category/cue/attach';
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    });
+  };
 
   /*function uploadImage(data,name){
     var url = appConfig.apiUrl + '/file/upload';
@@ -63,10 +87,12 @@ angular.module('app').factory('categoryFactory', ['$http', 'appConfig', function
     });
   };*/
   return {
-    getCategoriesList: getCategoriesList,
+    getCategoriesList:getCategoriesList,
      createCategory:createCategory,
     updateCategory:updateCategory,
-    searchCategory:searchCategory/*,
+    searchCategory:searchCategory,
+    attachCategoryToAsset:attachCategoryToAsset,
+    detachCategoryToAsset:detachCategoryToAsset/*,
     deleteCategory:deleteCategory,
     uploadImage:uploadImage,
     updateCue:updateCue,

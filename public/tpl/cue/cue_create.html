@@ -23,6 +23,27 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Select category</label>
+                    <div>
+                        <ui-select multiple ng-model="categoryList.selectedCategories" class="form-control m-b"
+                                   theme="bootstrap"
+                                   reset-search-input="true"
+                                   on-select="filterTagging($item,$model)"
+                                   style="width: 100%;">
+                            <ui-select-match placeholder="Enter category">{{$item.name}}
+                            </ui-select-match>
+                            <ui-select-choices repeat="categoryList in totalCategoryList track by $index"
+                                               refresh="refreshAddresses($select.search) | filter:$select.search"
+                                               refresh-delay="10">
+                                <div ng-bind-html="categoryList.name | highlight: $select.search"></div>
+                            </ui-select-choices>
+                        </ui-select>
+                        <!--<p class="help-block text-danger">
+                            {{categoryList.selectedCategories}}
+                        </p>-->
+                    </div>
+                </div>
+                <div class="form-group">
                     <label>Type</label>
                     <div class="input-group">
                     <label class="i-checks checkbox-inline">

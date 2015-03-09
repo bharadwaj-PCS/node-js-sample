@@ -106,6 +106,7 @@ angular.module('app')
       };*/
 
       $scope.addCategory = function () {
+        console.log(track);
         $scope.myPromise = $q.all(track).then(function (result) {
           result.forEach(function (ele) {
             var url = ele.data.url;

@@ -106,8 +106,8 @@ angular.module('app')
       };
     }]);
 angular.module('app')
-  .controller('cueCreateController', ['$scope', 'cueFactory', 'toaster', 'assetFactory','appConfig','$q',
-    function ($scope, cueFactory, toaster, assetFactory,appConfig, $q) {
+  .controller('cueCreateController', ['$scope', 'cueFactory', 'toaster', 'assetFactory','appConfig','$q','categoryFactory',
+    function ($scope, cueFactory, toaster, assetFactory,appConfig, $q, categoryFactory) {
     $scope.cue = {
       text:'',
       bgcolor:'',
@@ -118,7 +118,28 @@ angular.module('app')
       background_url_wide:''
     };
       var optionFormCollection = {};
-
+      $scope.categoryList = {};
+      $scope.totalCategoryList = [];
+      $scope.refreshAddresses = function(category) {
+        var data = {
+          sort_param:'name',
+          name_like:category
+        };
+        if(category) {
+          categoryFactory.searchCategory(data).success(function (data) {
+            console.log(data);
+            setCategoryList(data);
+          }).error(function (error) {
+            console.log(error);
+          });
+        }else {
+          $scope.totalCategoryList = $scope.totalCategoryList || [];
+        }
+      };
+      function setCategoryList(result){
+        var temp = $scope.totalCategoryList.concat(result);
+        $scope.totalCategoryList = _.uniq(temp,'id');
+      };
       $scope.background_url_data = '';
       $scope.background_url_wide_data = '';
       $scope.options = {
@@ -245,6 +266,12 @@ angular.module('app')
       console.log(cueModel);
       if(validateCueCreation(cueModel)){
         var track = [];
+        var categoryAry = [];
+        $scope.categoryList.selectedCategories.forEach(function(ele){
+          console.log(ele.name);
+          categoryAry.push(ele.name);
+        });
+        cueModel.categories = categoryAry;
         //code to update the background images.
 
         if(cueModel.type === 'POLL'){
@@ -267,7 +294,8 @@ angular.module('app')
             console.log(assetsIdCollection,cueModel);
             $scope.myPromise = cueFactory.createCue(cueModel).success(function (result) {
               toaster.pop('success','Successfully create a poll cue');
-              $scope.resetCue();
+              console.log($scope.categoryList);
+              $scope.resetCue(result);
             }).error(function (err) {
               console.log(err);
               toaster.pop('error', 'Error while creating cue.');
@@ -283,10 +311,10 @@ angular.module('app')
             toaster.pop('error', 'Error while creating cue.');
           }).then(function(data){
             if(data.status === 200){
-              toaster.pop('success', 'cue created sucessfuly.');
+              toaster.pop('success', 'cue created successfully.');
               var result = data.data.result;
               console.log($scope.options);
-              $scope.resetCue();
+              $scope.resetCue(data);
             }
             console.log('called at then');
           });
@@ -295,24 +323,27 @@ angular.module('app')
 
 
     };
-    $scope.resetCue = function () {
+    $scope.resetCue = function (status) {
+
       $scope.cue = angular.copy(originalCue);
       $scope.options = angular.copy(originalOptions);
       $scope.background_url_data = '';
       $scope.background_url_wide_data = '';
+      $scope.categoryList.categories = [];
+
       $scope.addForm.$setPristine();
     };
     function validateCueCreation(cueModel){
       var flag = true;
       console.log(cueModel);
-      for(var keys in cueModel){
+      /*for(var keys in cueModel){
         if(!cueModel[keys]){
           console.log(keys);
           flag = false;
           toaster.pop('warning','Please fill all the values to create a cue.');
           break;
         }
-      }
+      }*/
       if(!flag){
         return flag;
       }
@@ -334,7 +365,8 @@ angular.module('app')
         flag = false;
         toaster.pop('warning','Please select options for poll cue');
       }
-      return flag;
+      //return flag;
+      return true;
     };
 
   }]);

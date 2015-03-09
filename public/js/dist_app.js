@@ -83,7 +83,8 @@ var app =
         {name:'Story',
           value:'STORY'},
         {name:'Background',
-          value:'BACKGROUND'}]
+          value:'BACKGROUND'}],
+      userId:'9ff61f0c-961c-4867-9455-d142ff081c90'
     });
 // lazyload config
 
@@ -1620,8 +1621,6 @@ angular.module('app')
             console.log(err);
           });
         }
-        console.log($scope.asset,fd);
-        console.log($scope.categoryList.selectedCategories);
 
       };
       $scope.resetAsset = function () {
@@ -1654,29 +1653,33 @@ angular.module('app')
       }
     }]);
 angular.module('app')
-  .controller('assetController',['$scope', '$modal', 'toaster', 'appConfig', 'assetFactory',
-    function ($scope, $modal, toaster, appConfig, assetFactory) {
-      var data = {
-        coverage:'ALL',
-        type:'POLL',
-        label:'Expression'
+  .controller('assetController',['$scope', '$modal', 'toaster', 'appConfig', 'assetFactory','categoryFactory','$q',
+    function ($scope, $modal, toaster, appConfig, assetFactory, categoryFactory,$q) {
+
+      $scope.labelList = appConfig.label;
+      $scope.assetTitle = {
+        label:$scope.labelList[0].value
       };
+
       $scope.layoutModel = 'thumbnail';
       var paginationFlag = true;
-      var offset = 0, count = 20;
+      var offset = 0, count = 10;
+      var countCpy = count;
       $scope.assetData = [];
 
-      $scope.getAssets = function (offset) {
+      $scope.getAssets = function (offset,label) {
         if(paginationFlag){
           $scope.scrollClass = 'infinite-scroll-block';
 
-          $scope.myPromise = assetFactory.getAsset(data,offset,count).success(function(result){
-            if(!result.length){
+          $scope.myPromise = assetFactory.getAsset(offset,count,label).success(function(result){
+            if(!result.result.length){
               paginationFlag = false;
             }
-            //console.log(result);
+            console.log(result.result);
             $scope.assetData = $scope.assetData.concat(result.result);
-            toaster.pop('success', 'Successfully Loading assets');
+            if(!offset){
+              toaster.pop('success', 'Successfully Loaded assets');
+            }
           }).error(function (error) {
             console.log(error);
             toaster.pop('error', 'Error while loading assets.');
@@ -1685,7 +1688,7 @@ angular.module('app')
 
       };
 
-      $scope.openDeleteAssetModal = function (asset, $index) {
+      $scope.openDeleteAssetModal = function (asset, index) {
 
         var modalInstance = $modal.open({
           templateUrl: 'myDeleteContent.html',
@@ -1723,24 +1726,63 @@ angular.module('app')
             }
           }
         });
-        modelInstance.result.then(function (updateAsset) {
-          //console.log(updateCue);
-          $scope.myPromise = cueFactory.updateAsset(updateAsset)
-            .success(function (result) {
-              //console.log(result);
-              $scope.assetData[index] = updateAsset;
-              toaster.pop('success', 'Successfully updated the cue');
-            }).error(function (err) {
-              console.log(err);
-            })
+        modelInstance.result.then(function (categoriesList) {
+          //var categoryAry = categoriesList;
+          var originalAssetAry = $scope.assetData[index].categories;
+          //detach category
+
+          var oriCategory = {};
+          var track = [];
+          var assetId = $scope.assetData[index].id;
+          originalAssetAry.forEach(function(ele){
+            //oriCategory[''+ele.id] = true;
+            var data = {
+              asset_id:assetId,
+              name:ele.name
+            };
+            track.push(categoryFactory.detachCategoryToAsset(data));
+          });
+          categoriesList.forEach(function (ele) {
+              var data = {
+                asset_id:assetId,
+                name:ele.name
+              };
+              track.push(categoryFactory.attachCategoryToAsset(data))
+          });
+          //console.log(track);
+          if(track.length){
+            $scope.myPromise = $q.all(track).then(function (result) {
+              if(result[0].statusText === 'OK'){
+                $scope.assetData[index].categories = categoriesList;
+                toaster.pop('success','Updated the asset successfully');
+              }
+
+            });
+          }
         }, function () {
           console.log('Modal dismissed at: ' + new Date());
         });
       };
       $scope.getPagination = function () {
-        $scope.getAssets(data,offset);
+        var label = setLabel();
+        $scope.getAssets(offset,label);
         offset = offset + count;
       };
+      function setLabel(){
+        var labelAry = $scope.assetTitle.label.toLowerCase().split('');
+        labelAry[0] =  labelAry[0].toUpperCase();
+        var label = labelAry.join('');
+        return label;
+      }
+      $scope.loadLabeledAssets = function (e,s) {
+        var label = setLabel();
+        offset = 0, count = countCpy;
+        paginationFlag = true;
+        console.log(label,offset,count);
+        $scope.assetData = [];
+        $scope.getPagination();
+
+      }
 
     }]);
 angular.module('app')
@@ -1762,10 +1804,38 @@ angular.module('app')
  * Created by bharadwaj on 23/2/15.
  */
 'use strict';
-angular.module('app').controller('assetEditController',['$scope','$modalInstance', 'asset','assetFactory',
-  function ($scope,$modalInstance,asset,assetFactory) {
-    //console.log("In CueEdit",cue);
+angular.module('app').controller('assetEditController',['$scope','$modalInstance', 'asset','assetFactory','categoryFactory',
+  function ($scope,$modalInstance,asset,assetFactory,categoryFactory) {
+    console.log("In assetEdit",asset);
+    $scope.asset = asset;
+    $scope.multipleDemo = {};
+    $scope.multipleDemo.categories = asset.categories;
 
+
+    $scope.getCategories = function(category) {
+      var data = {
+        sort_param:'name',
+        name_like:category
+      };
+      if(category) {
+        categoryFactory.searchCategory(data).success(function (data) {
+          console.log(data);
+          setCategoryList(data);
+        }).error(function (error) {
+          console.log(error);
+        });
+      }else {
+        asset.categories = asset.categories;
+      }
+    };
+    function setCategoryList(result){
+      var temp = asset.categories.concat(result);
+      asset.categories = _.uniq(temp,'id');
+    };
+    $scope.editAsset = function () {
+
+    $modalInstance.close($scope.multipleDemo.categories);
+    };
   }]);
 
 /**
@@ -1774,22 +1844,21 @@ angular.module('app').controller('assetEditController',['$scope','$modalInstance
 'use strict';
 angular.module('app').factory('assetFactory', ['$http', 'appConfig','$cookies', function ($http, appConfig,$cookies) {
    var userId = $cookies['userId'];
- function getAssets(data,offset,count){
+ function getAssets(offset,count,label){
    var maxValue = (offset+count-1);
-   var url = appConfig.apiUrl + '/asset/by/label/Theme/'+offset+'/'+maxValue;
-   data.user_id = $cookies['userId'] || '9ff61f0c-961c-4867-9455-d142ff081c90';
-   console.log(userId);
+   var url = appConfig.apiUrl + '/asset/by/label/'+label+'/'+offset+'/'+maxValue;
+   //data.user_id = $cookies['userId'] || '9ff61f0c-961c-4867-9455-d142ff081c90';
+   console.log(url);
    return $http({
-     method:'POST',
-     url:url,
-     data:data
+     method:'GET',
+     url:url
    });
  };
   function createAsset(file){
     var url = appConfig.apiUrl+'/asset/put';
 
     //var url = 'http://localhost:5000/api/v1/asset/put';
-    file.append('user_id',$cookies['userId'] || '9ff61f0c-961c-4867-9455-d142ff081c90');
+    file.append('user_id',$cookies['userId'] || appConfig.userId);
 
     return $http({
       method:'POST',
@@ -1804,7 +1873,7 @@ angular.module('app').factory('assetFactory', ['$http', 'appConfig','$cookies', 
   };
   function deleteAsset(data){
     var url = appConfig.apiUrl + '/asset/delete';
-    data.user_id = $cookies['userId'] || '9ff61f0c-961c-4867-9455-d142ff081c90';
+    data.user_id = $cookies['userId'] || appConfig.userId;
     return $http({
       method:'POST',
       url:url,
@@ -2591,6 +2660,7 @@ angular.module('app')
       };*/
 
       $scope.addCategory = function () {
+        console.log(track);
         $scope.myPromise = $q.all(track).then(function (result) {
           result.forEach(function (ele) {
             var url = ele.data.url;
@@ -2804,6 +2874,30 @@ angular.module('app').factory('categoryFactory', ['$http', 'appConfig', function
       data:data
     });
   };
+  function attachCategoryToAsset(data){
+    var url = appConfig.apiUrl+'/category/asset/attach';
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    });
+  };
+  function detachCategoryToAsset(data){
+    var url = appConfig.apiUrl+'/category/asset/detach';
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    });
+  };
+  function attachCategoryToAsset(data){
+    var url = appConfig.apiUrl+'/category/cue/attach';
+    return $http({
+      method:'POST',
+      url:url,
+      data:data
+    });
+  };
 
   /*function uploadImage(data,name){
     var url = appConfig.apiUrl + '/file/upload';
@@ -2832,10 +2926,12 @@ angular.module('app').factory('categoryFactory', ['$http', 'appConfig', function
     });
   };*/
   return {
-    getCategoriesList: getCategoriesList,
+    getCategoriesList:getCategoriesList,
      createCategory:createCategory,
     updateCategory:updateCategory,
-    searchCategory:searchCategory/*,
+    searchCategory:searchCategory,
+    attachCategoryToAsset:attachCategoryToAsset,
+    detachCategoryToAsset:detachCategoryToAsset/*,
     deleteCategory:deleteCategory,
     uploadImage:uploadImage,
     updateCue:updateCue,
@@ -3210,8 +3306,8 @@ angular.module('app')
       };
     }]);
 angular.module('app')
-  .controller('cueCreateController', ['$scope', 'cueFactory', 'toaster', 'assetFactory','appConfig','$q',
-    function ($scope, cueFactory, toaster, assetFactory,appConfig, $q) {
+  .controller('cueCreateController', ['$scope', 'cueFactory', 'toaster', 'assetFactory','appConfig','$q','categoryFactory',
+    function ($scope, cueFactory, toaster, assetFactory,appConfig, $q, categoryFactory) {
     $scope.cue = {
       text:'',
       bgcolor:'',
@@ -3222,7 +3318,28 @@ angular.module('app')
       background_url_wide:''
     };
       var optionFormCollection = {};
-
+      $scope.categoryList = {};
+      $scope.totalCategoryList = [];
+      $scope.refreshAddresses = function(category) {
+        var data = {
+          sort_param:'name',
+          name_like:category
+        };
+        if(category) {
+          categoryFactory.searchCategory(data).success(function (data) {
+            console.log(data);
+            setCategoryList(data);
+          }).error(function (error) {
+            console.log(error);
+          });
+        }else {
+          $scope.totalCategoryList = $scope.totalCategoryList || [];
+        }
+      };
+      function setCategoryList(result){
+        var temp = $scope.totalCategoryList.concat(result);
+        $scope.totalCategoryList = _.uniq(temp,'id');
+      };
       $scope.background_url_data = '';
       $scope.background_url_wide_data = '';
       $scope.options = {
@@ -3349,6 +3466,12 @@ angular.module('app')
       console.log(cueModel);
       if(validateCueCreation(cueModel)){
         var track = [];
+        var categoryAry = [];
+        $scope.categoryList.selectedCategories.forEach(function(ele){
+          console.log(ele.name);
+          categoryAry.push(ele.name);
+        });
+        cueModel.categories = categoryAry;
         //code to update the background images.
 
         if(cueModel.type === 'POLL'){
@@ -3371,7 +3494,8 @@ angular.module('app')
             console.log(assetsIdCollection,cueModel);
             $scope.myPromise = cueFactory.createCue(cueModel).success(function (result) {
               toaster.pop('success','Successfully create a poll cue');
-              $scope.resetCue();
+              console.log($scope.categoryList);
+              $scope.resetCue(result);
             }).error(function (err) {
               console.log(err);
               toaster.pop('error', 'Error while creating cue.');
@@ -3387,10 +3511,10 @@ angular.module('app')
             toaster.pop('error', 'Error while creating cue.');
           }).then(function(data){
             if(data.status === 200){
-              toaster.pop('success', 'cue created sucessfuly.');
+              toaster.pop('success', 'cue created successfully.');
               var result = data.data.result;
               console.log($scope.options);
-              $scope.resetCue();
+              $scope.resetCue(data);
             }
             console.log('called at then');
           });
@@ -3399,24 +3523,27 @@ angular.module('app')
 
 
     };
-    $scope.resetCue = function () {
+    $scope.resetCue = function (status) {
+
       $scope.cue = angular.copy(originalCue);
       $scope.options = angular.copy(originalOptions);
       $scope.background_url_data = '';
       $scope.background_url_wide_data = '';
+      $scope.categoryList.categories = [];
+
       $scope.addForm.$setPristine();
     };
     function validateCueCreation(cueModel){
       var flag = true;
       console.log(cueModel);
-      for(var keys in cueModel){
+      /*for(var keys in cueModel){
         if(!cueModel[keys]){
           console.log(keys);
           flag = false;
           toaster.pop('warning','Please fill all the values to create a cue.');
           break;
         }
-      }
+      }*/
       if(!flag){
         return flag;
       }
@@ -3438,7 +3565,8 @@ angular.module('app')
         flag = false;
         toaster.pop('warning','Please select options for poll cue');
       }
-      return flag;
+      //return flag;
+      return true;
     };
 
   }]);

@@ -65,8 +65,6 @@ angular.module('app')
             console.log(err);
           });
         }
-        console.log($scope.asset,fd);
-        console.log($scope.categoryList.selectedCategories);
 
       };
       $scope.resetAsset = function () {
@@ -99,29 +97,33 @@ angular.module('app')
       }
     }]);
 angular.module('app')
-  .controller('assetController',['$scope', '$modal', 'toaster', 'appConfig', 'assetFactory',
-    function ($scope, $modal, toaster, appConfig, assetFactory) {
-      var data = {
-        coverage:'ALL',
-        type:'POLL',
-        label:'Expression'
+  .controller('assetController',['$scope', '$modal', 'toaster', 'appConfig', 'assetFactory','categoryFactory','$q',
+    function ($scope, $modal, toaster, appConfig, assetFactory, categoryFactory,$q) {
+
+      $scope.labelList = appConfig.label;
+      $scope.assetTitle = {
+        label:$scope.labelList[0].value
       };
+
       $scope.layoutModel = 'thumbnail';
       var paginationFlag = true;
-      var offset = 0, count = 20;
+      var offset = 0, count = 10;
+      var countCpy = count;
       $scope.assetData = [];
 
-      $scope.getAssets = function (offset) {
+      $scope.getAssets = function (offset,label) {
         if(paginationFlag){
           $scope.scrollClass = 'infinite-scroll-block';
 
-          $scope.myPromise = assetFactory.getAsset(data,offset,count).success(function(result){
-            if(!result.length){
+          $scope.myPromise = assetFactory.getAsset(offset,count,label).success(function(result){
+            if(!result.result.length){
               paginationFlag = false;
             }
-            //console.log(result);
+            console.log(result.result);
             $scope.assetData = $scope.assetData.concat(result.result);
-            toaster.pop('success', 'Successfully Loading assets');
+            if(!offset){
+              toaster.pop('success', 'Successfully Loaded assets');
+            }
           }).error(function (error) {
             console.log(error);
             toaster.pop('error', 'Error while loading assets.');
@@ -130,7 +132,7 @@ angular.module('app')
 
       };
 
-      $scope.openDeleteAssetModal = function (asset, $index) {
+      $scope.openDeleteAssetModal = function (asset, index) {
 
         var modalInstance = $modal.open({
           templateUrl: 'myDeleteContent.html',
@@ -168,24 +170,63 @@ angular.module('app')
             }
           }
         });
-        modelInstance.result.then(function (updateAsset) {
-          //console.log(updateCue);
-          $scope.myPromise = cueFactory.updateAsset(updateAsset)
-            .success(function (result) {
-              //console.log(result);
-              $scope.assetData[index] = updateAsset;
-              toaster.pop('success', 'Successfully updated the cue');
-            }).error(function (err) {
-              console.log(err);
-            })
+        modelInstance.result.then(function (categoriesList) {
+          //var categoryAry = categoriesList;
+          var originalAssetAry = $scope.assetData[index].categories;
+          //detach category
+
+          var oriCategory = {};
+          var track = [];
+          var assetId = $scope.assetData[index].id;
+          originalAssetAry.forEach(function(ele){
+            //oriCategory[''+ele.id] = true;
+            var data = {
+              asset_id:assetId,
+              name:ele.name
+            };
+            track.push(categoryFactory.detachCategoryToAsset(data));
+          });
+          categoriesList.forEach(function (ele) {
+              var data = {
+                asset_id:assetId,
+                name:ele.name
+              };
+              track.push(categoryFactory.attachCategoryToAsset(data))
+          });
+          //console.log(track);
+          if(track.length){
+            $scope.myPromise = $q.all(track).then(function (result) {
+              if(result[0].statusText === 'OK'){
+                $scope.assetData[index].categories = categoriesList;
+                toaster.pop('success','Updated the asset successfully');
+              }
+
+            });
+          }
         }, function () {
           console.log('Modal dismissed at: ' + new Date());
         });
       };
       $scope.getPagination = function () {
-        $scope.getAssets(data,offset);
+        var label = setLabel();
+        $scope.getAssets(offset,label);
         offset = offset + count;
       };
+      function setLabel(){
+        var labelAry = $scope.assetTitle.label.toLowerCase().split('');
+        labelAry[0] =  labelAry[0].toUpperCase();
+        var label = labelAry.join('');
+        return label;
+      }
+      $scope.loadLabeledAssets = function (e,s) {
+        var label = setLabel();
+        offset = 0, count = countCpy;
+        paginationFlag = true;
+        console.log(label,offset,count);
+        $scope.assetData = [];
+        $scope.getPagination();
+
+      }
 
     }]);
 angular.module('app')
